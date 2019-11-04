@@ -1,0 +1,46 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: veilarbfiltrering
+  namespace: {{namespace}}
+  cluster: dev-fss
+  labels:
+    branch: dev
+    team: pto
+spec:
+  image: docker.pkg.github.com/navikt/veilarbfiltrering/veilarbfiltrering:{{version}}
+  replicas:
+    min: 2
+    max: 4
+    cpuThresholdPercentage: 50
+  port: 8080
+  ingresses:
+    - https://veilarbfiltrering-{{namespace}}.nais.preprod.local
+    - https://app-{{namespace}}.adeo.no/veilarbfiltrering
+  webproxy: true
+  vault:
+    enabled: true
+  healthcheck:
+    liveness:
+      path: veilarbfiltrering/internal/isAlive
+      initialDelay: 60
+      timeout: 10
+    readiness:
+      path: veilarbfiltrering/internal/isReady
+      initialDelay: 60
+      timeout: 10
+  prometheus:
+    enabled: true
+    path: veilarbfiltrering/internal/metrics
+  resources:
+    limits:
+      cpu: "6"
+      memory: 3Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+  env:
+    - name: ISSO_JWKS_URL
+      value: https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri
+    - name: ISSO_ISSUER
+      value: https://isso-q.adeo.no:443/isso/oauth2
