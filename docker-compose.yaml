@@ -12,7 +12,6 @@ services:
       POSTGRES_USER: "user"
       POSTGRES_PASSWORD: "password"
       POSTGRES_DB: "veilarbfiltering"
-    mem_limit: "8g"
 
 volumes:
   veilarbfiltering-data:

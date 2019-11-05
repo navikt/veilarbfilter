@@ -1,15 +1,16 @@
 package no.nav.pto.veilarbfiltrering.service
 
+import no.nav.pto.veilarbfiltrering.config.dbQuery;
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
-import no.nav.pto.veilarbfiltrering.config.Database.dbQuery
 import no.nav.pto.veilarbfiltrering.model.EnhetFilter
 import no.nav.pto.veilarbfiltrering.model.EnhetFilterModel
 import no.nav.pto.veilarbfiltrering.model.FilterModel
 import no.nav.pto.veilarbfiltrering.model.NyttFilterModel
 
 class EnhetFilterServiceImpl (): EnhetFilterService {
+
     override suspend fun hentFilter(filterId: Int): EnhetFilterModel? = dbQuery {
         EnhetFilter.select { (EnhetFilter.filterId eq filterId) }
             .mapNotNull { tilEnhetFilterModel(it) }

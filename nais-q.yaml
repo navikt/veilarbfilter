@@ -44,3 +44,7 @@ spec:
       value: https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri
     - name: ISSO_ISSUER
       value: https://isso-q.adeo.no:443/isso/oauth2
+    - name: VEILARBFILTRERING_DB_URL
+      value: jdbc:postgresql://b27dbvl008.preprod.local:5432/postgres
+    - name: VAULT_MOUNT_PATH
+      value: postgresql/preprod-fss

@@ -7,43 +7,47 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.flywaydb.core.Flyway
-import io.ktor.config.HoconApplicationConfig
-import com.typesafe.config.ConfigFactory
-import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
+import no.nav.pto.veilarbfiltrering.config.Configuration
 
-object Database {
+class Database (private val configuration: Configuration) {
 
-    private val appConfig = HoconApplicationConfig(ConfigFactory.load())
-    private val dbUrl = appConfig.property("db.jdbcUrl").getString()
-    private val dbUser = appConfig.property("db.dbUser").getString()
-    private val dbPassword = appConfig.property("db.dbPassword").getString()
+    private val dbUrl = configuration.database.url
+    private val dbUser = configuration.database.username
+    private val dbPassword = configuration.database.password;
 
-    fun init() {
-        Database.connect(hikari())
-        val flyway = Flyway.configure().dataSource(dbUrl, dbUser, dbPassword).initSql(String.format("SET ROLE \"%s\"", dbRole("admin"))).load()
-        flyway.migrate()
-    }
-
-    private fun hikari(user: String): HikariDataSource {
+    fun initLocal() {
         val config = HikariConfig()
         config.driverClassName = "org.postgresql.Driver"
         config.jdbcUrl = dbUrl
-        config.minimumIdle = 1
+        config.username = dbUser
+        config.password = dbPassword
         config.maximumPoolSize = 3
-        val mountPath = if (getEnvironmentClass() === P) "postgresql/prod-fss" else "postgresql/preprod-fss"
-        return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user))
+        config.isAutoCommit = false
+        config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+        config.validate()
+        Database.connect(HikariDataSource(config))
+        val flyway = Flyway.configure().dataSource(dbUrl, dbUser, dbPassword).load()
+        flyway.migrate()
     }
 
-    private fun dbRole(role: String): String {
-        return if (getEnvironmentClass() === P)
-            arrayOf(APPLICATION_NAME, role).joinToString("-")
-        else
-            arrayOf(APPLICATION_NAME, requireEnvironmentName(), role).joinToString("-")
+    fun initRemote() {
+        val config = HikariConfig()
+        config.driverClassName = "org.postgresql.Driver"
+        config.jdbcUrl = dbUrl
+        config.username = dbUser
+        config.password = dbPassword
+        config.maximumPoolSize = 3
+        config.isAutoCommit = false
+        config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+        config.validate()
+        Database.connect(HikariDataSource(config))
+        val flyway = Flyway.configure().dataSource(dbUrl, dbUser, dbPassword).load()
+        flyway.migrate()
     }
 
-
-    suspend fun <T> dbQuery(block: () -> T): T =
-        withContext(Dispatchers.IO) {
-            transaction { block() }
-        }
 }
+
+suspend fun <T> dbQuery(block: () -> T): T =
+    withContext(Dispatchers.IO) {
+        transaction { block() }
+    }

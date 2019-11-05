@@ -23,6 +23,8 @@
         <hikari.version>3.3.1</hikari.version>
         <postgresql.version>42.2.2</postgresql.version>
         <vaultjdbc.version>1.2.1</vaultjdbc.version>
+        <konfig.version>1.6.10.0</konfig.version>
+        <prometheus.version>0.4.0</prometheus.version>
 
 
         <main.class>io.ktor.server.netty.EngineMain</main.class>
@@ -58,6 +60,11 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.natpryce</groupId>
+            <artifactId>konfig</artifactId>
+            <version>${konfig.version}</version>
         </dependency>
 
         <!-- ktor -->
@@ -114,6 +121,24 @@
             <artifactId>vault-jdbc</artifactId>
             <version>${vaultjdbc.version}</version>
         </dependency>
+
+        <!-- Prometheus -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_hotspot</artifactId>
+            <version>${prometheus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_common</artifactId>
+            <version>${prometheus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_dropwizard</artifactId>
+            <version>${prometheus.version}</version>
+        </dependency>
+
 
         <!-- test -->
         <dependency>
