@@ -7,13 +7,23 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.flywaydb.core.Flyway
-import no.nav.pto.veilarbfiltrering.config.Configuration
+import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
 
-class Database (private val configuration: Configuration) {
+class Database (configuration: Configuration) {
+    private val APPLICATION_NAME = "veilarbfiltrering"
 
     private val dbUrl = configuration.database.url
     private val dbUser = configuration.database.username
-    private val dbPassword = configuration.database.password;
+    private val dbPassword = configuration.database.password
+    private val mountPath = configuration.database.vaultMountPath
+    private val clusterName = configuration.clusterName;
+
+    init {
+        when (clusterName) {
+            "" -> initLocal()
+            else -> initRemote()
+        }
+    }
 
     fun initLocal() {
         val config = HikariConfig()
@@ -30,19 +40,33 @@ class Database (private val configuration: Configuration) {
         flyway.migrate()
     }
 
-    fun initRemote() {
+    fun initRemote () {
+        val adminDataSource = dataSource("admin")
+        migrateDatabase(adminDataSource);
+        Database.connect(dataSource("user"))
+    }
+
+    fun migrateDatabase(dataSource: HikariDataSource) {
+        Flyway.configure()
+            .dataSource(dataSource)
+            .initSql(String.format("SET ROLE \"%s\"", dbRole("admin")))
+            .load()
+            .migrate()
+    }
+
+    private fun dataSource(user: String): HikariDataSource {
         val config = HikariConfig()
-        config.driverClassName = "org.postgresql.Driver"
         config.jdbcUrl = dbUrl
-        config.username = dbUser
-        config.password = dbPassword
         config.maximumPoolSize = 3
-        config.isAutoCommit = false
-        config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-        config.validate()
-        Database.connect(HikariDataSource(config))
-        val flyway = Flyway.configure().dataSource(dbUrl, dbUser, dbPassword).load()
-        flyway.migrate()
+        config.minimumIdle = 1
+        return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user))
+    }
+
+    private fun dbRole(role: String): String {
+        return if (clusterName == "q0")
+            arrayOf(APPLICATION_NAME, "q0", role).joinToString("-")
+        else
+            arrayOf(APPLICATION_NAME, role).joinToString("-")
     }
 
 }
