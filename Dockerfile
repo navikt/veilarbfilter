@@ -1,5 +1,3 @@
-FROM navikt/java:8-appdynamics
+FROM navikt/java:8
 
-ADD /target/*.jar ./
-
-ENV APPD_ENABLED=true
+ADD /target/app-jar-with-dependencies.jar ./app.jar

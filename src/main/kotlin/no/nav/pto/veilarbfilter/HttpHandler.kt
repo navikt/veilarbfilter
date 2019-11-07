@@ -22,7 +22,7 @@ import no.nav.pto.veilarbfilter.routes.naisRoutes
 import no.nav.pto.veilarbfilter.routes.veilarbfilterRoutes
 
 fun createHttpServer(applicationState: ApplicationState,
-                     port: Int = 8080,
+                     port: Int = 7070,
                      configuration: Configuration,
                      useAuthentication: Boolean = true): ApplicationEngine = embeddedServer(Netty, port) {
     install(StatusPages) {

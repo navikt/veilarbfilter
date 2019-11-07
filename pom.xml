@@ -25,6 +25,7 @@
         <vaultjdbc.version>1.2.1</vaultjdbc.version>
         <konfig.version>1.6.10.0</konfig.version>
         <prometheus.version>0.4.0</prometheus.version>
+        <logstash.version>5.1</logstash.version>
 
 
         <main.class>io.ktor.server.netty.EngineMain</main.class>
@@ -61,6 +62,12 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.natpryce</groupId>
             <artifactId>konfig</artifactId>
@@ -213,12 +220,29 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <finalName>app</finalName>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>no.nav.pto.veilarbfilter.ApplicationKt</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <finalName>app</finalName>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
