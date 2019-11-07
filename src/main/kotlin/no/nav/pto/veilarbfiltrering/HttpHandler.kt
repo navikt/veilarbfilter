@@ -5,6 +5,7 @@ import io.ktor.auth.Authentication
 import io.ktor.features.*
 import io.ktor.http.ContentType
 import io.ktor.jackson.JacksonConverter
+import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
@@ -41,11 +42,13 @@ fun createHttpServer(applicationState: ApplicationState,
         register(ContentType.Application.Json, JacksonConverter(ObjectMapperProvider.objectMapper))
     }
 
-    Database(configuration).initLocal();
+    val database = Database(configuration);
 
     routing {
-        naisRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
-        veilarbfiltreringRoutes(EnhetFilterServiceImpl(), false)
+        route("/veilarbfiltrering") {
+            naisRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
+            veilarbfiltreringRoutes(EnhetFilterServiceImpl(), false)
+        }
     }
 
     applicationState.initialized = true

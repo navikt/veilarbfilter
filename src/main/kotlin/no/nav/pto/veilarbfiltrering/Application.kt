@@ -3,7 +3,6 @@ package no.nav.pto.veilarbfiltrering
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import no.nav.pto.veilarbfiltrering.config.Configuration
-import no.nav.pto.veilarbfiltrering.createHttpServer
 
 private val logger = LoggerFactory.getLogger("veilarbfiltrering.Application")
 data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
