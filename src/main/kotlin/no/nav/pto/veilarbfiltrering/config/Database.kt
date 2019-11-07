@@ -16,10 +16,10 @@ class Database (configuration: Configuration) {
     private val dbUser = configuration.database.username
     private val dbPassword = configuration.database.password
     private val mountPath = configuration.database.vaultMountPath
-    private val clusterName = configuration.clusterName;
+    private val naisNamespace = configuration.namespace;
 
     init {
-        when (clusterName) {
+        when (naisNamespace) {
             "" -> initLocal()
             else -> initRemote()
         }
@@ -63,8 +63,8 @@ class Database (configuration: Configuration) {
     }
 
     private fun dbRole(role: String): String {
-        return if (clusterName == "q0")
-            arrayOf(APPLICATION_NAME, "q0", role).joinToString("-")
+        return if (naisNamespace == "q0")
+            arrayOf(APPLICATION_NAME, naisNamespace, role).joinToString("-")
         else
             arrayOf(APPLICATION_NAME, role).joinToString("-")
     }
