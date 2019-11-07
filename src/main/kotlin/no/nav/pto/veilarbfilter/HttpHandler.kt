@@ -45,7 +45,7 @@ fun createHttpServer(applicationState: ApplicationState,
     //val database = Database(configuration);
 
     routing {
-        route("/veilarbfilter") {
+        route("veilarbfilter") {
             naisRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
             veilarbfilterRoutes(EnhetFilterServiceImpl(), false)
         }
