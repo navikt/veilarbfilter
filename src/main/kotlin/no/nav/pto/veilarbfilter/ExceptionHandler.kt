@@ -1,4 +1,4 @@
-package no.nav.pto.veilarbfiltrering
+package no.nav.pto.veilarbfilter
 
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call

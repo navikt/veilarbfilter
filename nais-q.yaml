@@ -1,37 +1,37 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: veilarbfiltrering
+  name: veilarbfilter
   namespace: {{namespace}}
   cluster: dev-fss
   labels:
     branch: dev
     team: pto
 spec:
-  image: docker.pkg.github.com/navikt/veilarbfiltrering/veilarbfiltrering:{{version}}
+  image: docker.pkg.github.com/navikt/veilarbfilter/veilarbfilter:{{version}}
   replicas:
     min: 2
     max: 4
     cpuThresholdPercentage: 50
   port: 8080
   ingresses:
-    - https://veilarbfiltrering-{{namespace}}.nais.preprod.local
-    - https://app-{{namespace}}.adeo.no/veilarbfiltrering
+    - https://veilarbfilter-{{namespace}}.nais.preprod.local
+    - https://app-{{namespace}}.adeo.no/veilarbfilter
   webproxy: true
   vault:
     enabled: true
   healthcheck:
     liveness:
-      path: veilarbfiltrering/internal/isAlive
+      path: veilarbfilter/internal/isAlive
       initialDelay: 60
       timeout: 10
     readiness:
-      path: veilarbfiltrering/internal/isReady
+      path: veilarbfilter/internal/isReady
       initialDelay: 60
       timeout: 10
   prometheus:
     enabled: true
-    path: veilarbfiltrering/internal/metrics
+    path: veilarbfilter/internal/metrics
   resources:
     limits:
       cpu: "6"
@@ -44,7 +44,7 @@ spec:
       value: https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri
     - name: ISSO_ISSUER
       value: https://isso-q.adeo.no:443/isso/oauth2
-    - name: VEILARBFILTRERING_DB_URL
+    - name: VEILARBFILTER_DB_URL
       value: jdbc:postgresql://b27dbvl008.preprod.local:5432/postgres
     - name: VAULT_MOUNT_PATH
       value: postgresql/preprod-fss

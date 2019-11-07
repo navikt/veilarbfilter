@@ -1,4 +1,4 @@
-package no.nav.pto.veilarbfiltrering.config
+package no.nav.pto.veilarbfilter.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -10,7 +10,7 @@ import org.flywaydb.core.Flyway
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
 
 class Database (configuration: Configuration) {
-    private val APPLICATION_NAME = "veilarbfiltrering"
+    private val APPLICATION_NAME = "veilarbfilter"
     private val TEST_MILJO = "dev-fss"
 
     private val dbUrl = configuration.database.url

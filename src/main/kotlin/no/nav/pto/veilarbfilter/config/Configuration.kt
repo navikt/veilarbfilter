@@ -1,8 +1,8 @@
-package no.nav.pto.veilarbfiltrering.config
+package no.nav.pto.veilarbfilter.config
 
 import com.auth0.jwk.JwkProvider
 import com.natpryce.konfig.*
-import no.nav.pto.veilarbfiltrering.JwtUtil
+import no.nav.pto.veilarbfilter.JwtUtil
 
 private const val secret = ""
 private const val notUsedLocally = ""
@@ -12,10 +12,10 @@ private val defaultProperties = ConfigurationMap(
                 "NAIS_CLUSTER_NAME" to notUsedLocally,
                 "ISSO_JWKS_URL" to "https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri",
                 "ISSO_ISSUER" to "https://isso-q.adeo.no:443/isso/oauth2",
-                "VEILARBFILTRERING_DB_URL" to "jdbc:postgresql://localhost:54321/veilarbfiltering",
-                "VEILARBFILTRERING_DB_NAME" to "veilarbfiltering",
-                "VEILARBFILTRERING_DB_USERNAME" to "user",
-                "VEILARBFILTRERING_DB_PASSWORD" to "password",
+                "veilarbfilter_DB_URL" to "jdbc:postgresql://localhost:54321/veilarbfiltering",
+                "veilarbfilter_DB_NAME" to "veilarbfiltering",
+                "veilarbfilter_DB_USERNAME" to "user",
+                "veilarbfilter_DB_PASSWORD" to "password",
                 "VAULT_MOUNT_PATH" to notUsedLocally
         )
 )
@@ -33,10 +33,10 @@ data class Configuration (
         )
 
         data class DB (
-                val url: String = config()[Key("VEILARBFILTRERING_DB_URL", stringType)],
-                val name: String = config()[Key("VEILARBFILTRERING_DB_NAME", stringType)],
-                val username: String = config()[Key("VEILARBFILTRERING_DB_USERNAME", stringType)],
-                val password: String = config()[Key("VEILARBFILTRERING_DB_PASSWORD", stringType)],
+                val url: String = config()[Key("veilarbfilter_DB_URL", stringType)],
+                val name: String = config()[Key("veilarbfilter_DB_NAME", stringType)],
+                val username: String = config()[Key("veilarbfilter_DB_USERNAME", stringType)],
+                val password: String = config()[Key("veilarbfilter_DB_PASSWORD", stringType)],
                 val vaultMountPath: String = config()[Key("VAULT_MOUNT_PATH", stringType)]
         )
 

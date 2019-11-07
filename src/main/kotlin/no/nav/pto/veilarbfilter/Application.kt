@@ -1,10 +1,10 @@
-package no.nav.pto.veilarbfiltrering
+package no.nav.pto.veilarbfilter
 
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
-import no.nav.pto.veilarbfiltrering.config.Configuration
+import no.nav.pto.veilarbfilter.config.Configuration
 
-private val logger = LoggerFactory.getLogger("veilarbfiltrering.Application")
+private val logger = LoggerFactory.getLogger("veilarbfilter.Application")
 data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
 
 fun main() {

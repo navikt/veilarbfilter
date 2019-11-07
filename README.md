@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/navikt/veilarbfiltrering.svg?style=svg)](https://circleci.com/gh/navikt/veilarbfiltrering)
+[![CircleCI](https://circleci.com/gh/navikt/veilarbfilter.svg?style=svg)](https://circleci.com/gh/navikt/veilarbfilter)
 
 Mikrotjeneste som lagrer filtervalg fra veilarbportefoljeflatefs
 

@@ -1,9 +1,9 @@
-package no.nav.pto.veilarbfiltrering.routes
+package no.nav.pto.veilarbfilter.routes
 
 import io.ktor.http.ContentType
 import io.ktor.response.respondText
-import no.nav.pto.veilarbfiltrering.model.NyttFilterModel
-import no.nav.pto.veilarbfiltrering.service.EnhetFilterService
+import no.nav.pto.veilarbfilter.model.NyttFilterModel
+import no.nav.pto.veilarbfilter.service.EnhetFilterService
 import io.ktor.application.call
 import io.ktor.auth.AuthenticationRouteSelector
 import io.ktor.auth.authenticate
@@ -22,7 +22,7 @@ fun Route.conditionalAuthenticate(useAuthentication: Boolean, build: Route.() ->
 }
 
 
-fun Route.veilarbfiltreringRoutes(enhetFilterService: EnhetFilterService, useAuthentication: Boolean) {
+fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, useAuthentication: Boolean) {
     route("/api/enhet") {
         post("/{enhetId}") {
             val request = call.receive<NyttFilterModel>();

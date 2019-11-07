@@ -1,4 +1,4 @@
-package no.nav.pto.veilarbfiltrering.model
+package no.nav.pto.veilarbfilter.model
 
 import org.jetbrains.exposed.sql.Table
 

@@ -1,8 +1,8 @@
-package no.nav.pto.veilarbfiltrering.service
+package no.nav.pto.veilarbfilter.service
 
-import no.nav.pto.veilarbfiltrering.model.EnhetFilterModel
-import no.nav.pto.veilarbfiltrering.model.FilterModel
-import no.nav.pto.veilarbfiltrering.model.NyttFilterModel
+import no.nav.pto.veilarbfilter.model.EnhetFilterModel
+import no.nav.pto.veilarbfilter.model.FilterModel
+import no.nav.pto.veilarbfilter.model.NyttFilterModel
 
 interface EnhetFilterService {
     suspend fun lagreEnhetFilter (enhetId: String, nyttFilter: NyttFilterModel) : EnhetFilterModel;

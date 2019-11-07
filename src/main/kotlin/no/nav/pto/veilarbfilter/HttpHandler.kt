@@ -1,4 +1,4 @@
-package no.nav.pto.veilarbfiltrering
+package no.nav.pto.veilarbfilter
 
 import io.ktor.application.install
 import io.ktor.auth.Authentication
@@ -10,16 +10,16 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import no.nav.pto.veilarbfiltrering.ApplicationState
-import no.nav.pto.veilarbfiltrering.ObjectMapperProvider
-import no.nav.pto.veilarbfiltrering.config.Database
-import no.nav.pto.veilarbfiltrering.exceptionHandler
-import no.nav.pto.veilarbfiltrering.notFoundHandler
-import no.nav.pto.veilarbfiltrering.service.EnhetFilterServiceImpl
+import no.nav.pto.veilarbfilter.ApplicationState
+import no.nav.pto.veilarbfilter.ObjectMapperProvider
+import no.nav.pto.veilarbfilter.config.Database
+import no.nav.pto.veilarbfilter.exceptionHandler
+import no.nav.pto.veilarbfilter.notFoundHandler
+import no.nav.pto.veilarbfilter.service.EnhetFilterServiceImpl
 import org.slf4j.event.Level
-import no.nav.pto.veilarbfiltrering.config.Configuration
-import no.nav.pto.veilarbfiltrering.routes.naisRoutes
-import no.nav.pto.veilarbfiltrering.routes.veilarbfiltreringRoutes
+import no.nav.pto.veilarbfilter.config.Configuration
+import no.nav.pto.veilarbfilter.routes.naisRoutes
+import no.nav.pto.veilarbfilter.routes.veilarbfilterRoutes
 
 fun createHttpServer(applicationState: ApplicationState,
                      port: Int = 8080,
@@ -45,9 +45,9 @@ fun createHttpServer(applicationState: ApplicationState,
     val database = Database(configuration);
 
     routing {
-        route("/veilarbfiltrering") {
+        route("/veilarbfilter") {
             naisRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
-            veilarbfiltreringRoutes(EnhetFilterServiceImpl(), false)
+            veilarbfilterRoutes(EnhetFilterServiceImpl(), false)
         }
     }
 

@@ -1,13 +1,13 @@
-package no.nav.pto.veilarbfiltrering.service
+package no.nav.pto.veilarbfilter.service
 
-import no.nav.pto.veilarbfiltrering.config.dbQuery;
+import no.nav.pto.veilarbfilter.config.dbQuery;
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
-import no.nav.pto.veilarbfiltrering.model.EnhetFilter
-import no.nav.pto.veilarbfiltrering.model.EnhetFilterModel
-import no.nav.pto.veilarbfiltrering.model.FilterModel
-import no.nav.pto.veilarbfiltrering.model.NyttFilterModel
+import no.nav.pto.veilarbfilter.model.EnhetFilter
+import no.nav.pto.veilarbfilter.model.EnhetFilterModel
+import no.nav.pto.veilarbfilter.model.FilterModel
+import no.nav.pto.veilarbfilter.model.NyttFilterModel
 
 class EnhetFilterServiceImpl (): EnhetFilterService {
 

@@ -1,4 +1,4 @@
-package no.nav.pto.veilarbfiltrering.routes
+package no.nav.pto.veilarbfilter.routes
 
 import io.ktor.application.call
 import io.ktor.http.ContentType

@@ -1,4 +1,4 @@
-package no.nav.pto.veilarbfiltrering
+package no.nav.pto.veilarbfilter
 
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter

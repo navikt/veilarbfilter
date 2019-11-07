@@ -1,4 +1,4 @@
-package no.nav.pto.veilarbfiltrering
+package no.nav.pto.veilarbfilter
 
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
@@ -16,7 +16,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import org.slf4j.LoggerFactory
 
-private val log = LoggerFactory.getLogger("veilarbfiltrering.JwtConfig")
+private val log = LoggerFactory.getLogger("veilarbfilter.JwtConfig")
 class JwtUtil {
     companion object {
         fun useJwtFromCookie(call: ApplicationCall): HttpAuthHeader? {
