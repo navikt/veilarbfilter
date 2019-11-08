@@ -43,7 +43,7 @@ class Database (configuration: Configuration) {
     fun initRemote () {
         val adminDataSource = dataSource("admin")
         migrateDatabase(adminDataSource);
-        Database.connect(dataSource("user"))
+        Database.connect(adminDataSource)
     }
 
     fun migrateDatabase(dataSource: HikariDataSource) {
