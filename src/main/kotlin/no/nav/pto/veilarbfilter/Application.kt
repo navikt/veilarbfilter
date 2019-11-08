@@ -1,8 +1,7 @@
 package no.nav.pto.veilarbfilter
 
-import org.slf4j.LoggerFactory
-import java.util.concurrent.TimeUnit
 import no.nav.pto.veilarbfilter.config.Configuration
+import java.util.concurrent.TimeUnit
 
 data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
 
