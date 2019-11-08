@@ -242,11 +242,10 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>app</finalName>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>io.ktor.server.netty.DevelopmentEngine</mainClass>
+                            <mainClass> no.nav.pto.veilarbfilter.ApplicationKt</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

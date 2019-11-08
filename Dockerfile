@@ -1,3 +1,3 @@
 FROM navikt/java:8
 
-ADD /target/app-jar-with-dependencies.jar ./app.jar
+ADD /target/veilarbfilter-1-jar-with-dependencies.jar app.jar
