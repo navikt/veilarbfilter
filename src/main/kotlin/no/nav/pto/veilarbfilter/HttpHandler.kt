@@ -14,6 +14,7 @@ import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import no.nav.pto.veilarbfilter.config.Configuration
+import no.nav.pto.veilarbfilter.config.Database
 import no.nav.pto.veilarbfilter.routes.naisRoutes
 import no.nav.pto.veilarbfilter.routes.veilarbfilterRoutes
 import no.nav.pto.veilarbfilter.service.EnhetFilterServiceImpl
@@ -40,7 +41,7 @@ fun createHttpServer(applicationState: ApplicationState,
         register(ContentType.Application.Json, JacksonConverter(ObjectMapperProvider.objectMapper))
     }
 
-    //val database = Database(configuration);
+    val database = Database(configuration);
 
     routing {
         route("veilarbfilter") {
