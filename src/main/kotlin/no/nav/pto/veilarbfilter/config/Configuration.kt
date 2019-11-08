@@ -8,7 +8,6 @@ private const val secret = ""
 private const val notUsedLocally = ""
 private val defaultProperties = ConfigurationMap(
         mapOf(
-                "NAIS_NAMESPACE" to notUsedLocally,
                 "NAIS_CLUSTER_NAME" to notUsedLocally,
                 "ISSO_JWKS_URL" to "https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri",
                 "ISSO_ISSUER" to "https://isso-q.adeo.no:443/isso/oauth2",
@@ -21,7 +20,6 @@ private val defaultProperties = ConfigurationMap(
 )
 
 data class Configuration (
-        val namespace: String = config()[Key("NAIS_NAMESPACE", stringType)],
         val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
         val database: DB = DB(),
         val jwt: Jwt = Jwt()
