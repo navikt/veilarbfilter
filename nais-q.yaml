@@ -18,8 +18,6 @@ spec:
     - https://veilarbfiltrering-{{namespace}}.nais.preprod.local
     - https://app-{{namespace}}.adeo.no/veilarbfiltrering
   webproxy: true
-  vault:
-    enabled: true
   healthcheck:
     liveness:
       path: veilarbfiltrering/internal/isAlive
