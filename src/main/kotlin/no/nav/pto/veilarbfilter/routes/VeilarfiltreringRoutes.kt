@@ -1,46 +1,42 @@
 package no.nav.pto.veilarbfilter.routes
 
-import io.ktor.http.ContentType
-import io.ktor.response.respondText
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import no.nav.pto.veilarbfilter.service.EnhetFilterService
 import io.ktor.application.call
-import io.ktor.auth.AuthenticationRouteSelector
-import io.ktor.auth.authenticate
 import io.ktor.http.HttpStatusCode
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
-
-fun Route.conditionalAuthenticate(useAuthentication: Boolean, build: Route.() -> Unit): Route {
-    if (useAuthentication) {
-        return authenticate(build = build)
-    }
-    val route = createChild(AuthenticationRouteSelector(listOf<String?>(null)))
-    route.build()
-    return route
-}
+import no.nav.pto.veilarbfilter.abac.PepClient
 
 
-fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, useAuthentication: Boolean) {
+fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient: PepClient) {
     route("/api/enhet") {
-        post("/{enhetId}") {
+        post("/") {
             val request = call.receive<NyttFilterModel>();
-            call.parameters["enhetId"]?.let {
+            call.request.queryParameters["enhetId"]?.let {
+                if(!it.matches("\\d{4}$".toRegex())) {
+                    call.respond(HttpStatusCode.BadRequest)
+                }
+                if(!pepClient.harTilgangTilEnhet(call.request.header("Authorization"),it)) {
+                        call.respond(HttpStatusCode.Forbidden)
+                    }
                 val nyttfilter = enhetFilterService.lagreEnhetFilter(it, request)
                 call.respond(nyttfilter);
             }
         }
-        get("/{enhetId}") {
-            call.parameters["enhetId"]?.let {
+        get("/") {
+            call.request.queryParameters["enhetId"]?.let {
+                if(!it.matches("\\d{4}$".toRegex())) {
+                    call.respond(HttpStatusCode.BadRequest)
+                }
+                if(!pepClient.harTilgangTilEnhet(call.request.header("Authorization"),it)) {
+                    call.respond(HttpStatusCode.Forbidden)
+                }
                 val filterListe = enhetFilterService.finnFilterForEnhet(it)
                 call.respond(filterListe);
             }
-        }
-    }
-    route("/api/veileder") {
-        get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
         }
     }
 }
