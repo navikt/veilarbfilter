@@ -28,6 +28,12 @@ fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient:
         }
         get("/") {
             call.request.queryParameters["enhetId"]?.let {
+                if(!it.matches("\\d{4}$".toRegex())) {
+                    call.respond(HttpStatusCode.BadRequest)
+                }
+                if(!pepClient.harTilgangTilEnhet(call.request.header("Authorization"),it)) {
+                    call.respond(HttpStatusCode.Forbidden)
+                }
                 val filterListe = enhetFilterService.finnFilterForEnhet(it)
                 call.respond(filterListe);
             }

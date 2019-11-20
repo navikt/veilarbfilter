@@ -1,6 +1,5 @@
 package no.nav.pto.veilarbfilter.abac
 
-import com.sun.tools.doclets.standard.Standard
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import kotlinx.coroutines.runBlocking
@@ -26,8 +25,8 @@ class PepClient (config: Configuration) {
         HttpClient(Apache) {
             install(Auth) {
                 basic {
-                    username = config.abac.username
-                    password = config.abac.password
+                    username = config.serviceUser.username
+                    password = config.serviceUser.password
                 }
             }
         }
