@@ -20,33 +20,25 @@ private const val MEDIA_TYPE = "application/xacml+json"
 class PepClient (config: Configuration) {
 
     private val abacUrl = config.abac.url
-
-    private val abacClient by lazy {
-        HttpClient(Apache) {
-            install(Auth) {
-                basic {
-                    username = config.serviceUser.username
-                    password = config.serviceUser.password
-                }
-            }
-        }
-    }
+    private val username = config.serviceUser.username
+    private val password = config.serviceUser.password
 
     fun harTilgangTilEnhet (bearerToken: String?, enhetId: String): Boolean {
         requireNotNull(bearerToken) { "Authorization token not set" }
-        val subject = extractTokenBody(bearerToken);
+        val subject = extractTokenBody(bearerToken)
         val xacmlRequest = createXacmlRequest(subject, enhetId)
         val xacmlResponse = askForPermission(xacmlRequest)
         return harTilgang(xacmlResponse.response?.decision)
     }
 
     private fun harTilgang (decision: Decision?): Boolean {
-        return decision == Decision.Permit;
+        return decision == Decision.Permit
     }
 
     private fun askForPermission(xacmlRequest: XacmlRequest): XacmlResponse {
-        val xacml = xacmlRequest.build();
-        val xacmlJson = ObjectMapperProvider.objectMapper.writeValueAsString(xacml);
+        val xacml = xacmlRequest.build()
+        val xacmlJson = ObjectMapperProvider.objectMapper.writeValueAsString(xacml)
+        val abacClient = createAbacHttpClient(username, password)
         return runBlocking {
             abacClient.use { httpClient ->
                 val result = httpClient.post<HttpResponse>(abacUrl) {
@@ -75,3 +67,13 @@ class PepClient (config: Configuration) {
         return bearerToken.substringAfter(" ")
     }
 }
+
+private fun createAbacHttpClient(serviceUsername: String, servicePassword: String): HttpClient =
+    HttpClient(Apache) {
+        install(Auth) {
+            basic {
+                username = serviceUsername
+                password = servicePassword
+            }
+        }
+    }
