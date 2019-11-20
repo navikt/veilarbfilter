@@ -2,6 +2,8 @@ package no.nav.pto.veilarbfilter.config
 
 import com.auth0.jwk.JwkProvider
 import com.natpryce.konfig.*
+import no.nav.common.utils.NaisUtils
+import no.nav.common.utils.NaisUtils.getCredentials
 import no.nav.pto.veilarbfilter.JwtUtil
 
 private const val secret = ""
@@ -18,12 +20,12 @@ private val defaultProperties = ConfigurationMap(
                 "VAULT_MOUNT_PATH" to notUsedLocally
         )
 )
-
 data class Configuration (
         val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
         val database: DB = DB(),
         val jwt: Jwt = Jwt(),
-        val abac: Abac = Abac()
+        val abac: Abac = Abac(),
+        val serviceUser: NaisUtils.Credentials = getCredentials("service_user")
 ) {
 
         data class Jwt (
@@ -40,13 +42,8 @@ data class Configuration (
         )
 
         data class Abac (
-                val url: String = config()[Key("ABAC_PDP_ENDPOINT_URL", stringType)],
-                val name: String = config()[Key("veilarbfilter_DB_NAME", stringType)],
-                val username: String = config()[Key("veilarbfilter_DB_USERNAME", stringType)],
-                val password: String = config()[Key("veilarbfilter_DB_PASSWORD", stringType)],
-                val vaultMountPath: String = config()[Key("VAULT_MOUNT_PATH", stringType)]
+                val url: String = config()[Key("ABAC_PDP_ENDPOINT_URL", stringType)]
         )
-
 }
 
 private fun config() = ConfigurationProperties.systemProperties() overriding

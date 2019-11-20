@@ -27,6 +27,8 @@
         <prometheus.version>0.4.0</prometheus.version>
         <logstash.version>5.1</logstash.version>
         <jacksonkotlin.version>2.9.7</jacksonkotlin.version>
+        <commonutils.version>1.2019.11.15-14.33-055ca1d05826</commonutils.version>
+        <abacattribute.version>3.3.13</abacattribute.version>
 
 
         <main.class>io.ktor.server.netty.EngineMain</main.class>
@@ -67,12 +69,6 @@
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>${logstash.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.nav.abac.policies</groupId>
-            <artifactId>abac-attribute-constants</artifactId>
-            <version>3.3.13</version>
         </dependency>
 
         <dependency>
@@ -123,11 +119,6 @@
         <dependency>
             <groupId>io.ktor</groupId>
             <artifactId>ktor-jackson</artifactId>
-            <version>${ktor.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-client-jackson</artifactId>
             <version>${ktor.version}</version>
         </dependency>
         <dependency>
@@ -187,6 +178,19 @@
             <version>${prometheus.version}</version>
         </dependency>
 
+
+        <!-- Annet -->
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>util</artifactId>
+            <version>${commonutils.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.nav.abac.policies</groupId>
+            <artifactId>abac-attribute-constants</artifactId>
+            <version>${abacattribute.version}</version>
+        </dependency>
 
         <!-- test -->
         <dependency>

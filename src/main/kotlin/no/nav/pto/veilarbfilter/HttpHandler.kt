@@ -33,7 +33,7 @@ fun createHttpServer(applicationState: ApplicationState,
     install(Authentication) {
         jwt {
             authHeader(JwtUtil.Companion::useJwtFromCookie)
-            realm = "veilarbremotestore"
+            realm = "veilarbfilter"
             verifier(configuration.jwt.jwksUrl, configuration.jwt.jwtIssuer)
             validate { JwtUtil.validateJWT(it) }
         }
