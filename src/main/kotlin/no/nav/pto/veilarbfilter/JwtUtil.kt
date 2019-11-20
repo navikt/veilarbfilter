@@ -56,7 +56,7 @@ class JwtUtil {
             }
         }
 
-        private fun HttpAuthHeader.getBlob() = when {
+        fun HttpAuthHeader.getBlob() = when {
             this is HttpAuthHeader.Single -> blob
             else -> null
         }
