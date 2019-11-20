@@ -70,6 +70,12 @@
         </dependency>
 
         <dependency>
+            <groupId>no.nav.abac.policies</groupId>
+            <artifactId>abac-attribute-constants</artifactId>
+            <version>3.3.13</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.natpryce</groupId>
             <artifactId>konfig</artifactId>
             <version>${konfig.version}</version>
@@ -98,7 +104,30 @@
         </dependency>
         <dependency>
             <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-apache</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-auth</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-auth-jvm</artifactId>
+            <version>${ktor.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Jackson -->
+        <dependency>
+            <groupId>io.ktor</groupId>
             <artifactId>ktor-jackson</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-jackson</artifactId>
             <version>${ktor.version}</version>
         </dependency>
         <dependency>

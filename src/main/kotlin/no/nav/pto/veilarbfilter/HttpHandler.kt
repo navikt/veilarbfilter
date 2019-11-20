@@ -2,17 +2,17 @@ package no.nav.pto.veilarbfilter
 
 import io.ktor.application.install
 import io.ktor.auth.Authentication
-import io.ktor.features.CallLogging
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.StatusPages
-import io.ktor.features.callIdMdc
+import io.ktor.auth.jwt.jwt
+import io.ktor.features.*
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.jackson.JacksonConverter
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import no.nav.pto.veilarbfilter.abac.PepClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
 import no.nav.pto.veilarbfilter.routes.naisRoutes
@@ -29,12 +29,29 @@ fun createHttpServer(applicationState: ApplicationState,
         notFoundHandler();
     }
 
+
+    install(Authentication) {
+        jwt {
+            authHeader(JwtUtil.Companion::useJwtFromCookie)
+            realm = "veilarbremotestore"
+            verifier(configuration.jwt.jwksUrl, configuration.jwt.jwtIssuer)
+            validate { JwtUtil.validateJWT(it) }
+        }
+    }
+
+
+    install(CORS) {
+        anyHost()
+        method(HttpMethod.Put)
+        method(HttpMethod.Post)
+        method(HttpMethod.Delete)
+
+        allowCredentials = true
+    }
+
     install(CallLogging) {
         level = Level.TRACE
         callIdMdc("X-Request-ID")
-    }
-
-    install(Authentication) {
     }
 
     install(ContentNegotiation) {
@@ -46,7 +63,7 @@ fun createHttpServer(applicationState: ApplicationState,
     routing {
         route("veilarbfilter") {
             naisRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
-            veilarbfilterRoutes(EnhetFilterServiceImpl(), false)
+            veilarbfilterRoutes(EnhetFilterServiceImpl(), PepClient(config = configuration))
         }
     }
 

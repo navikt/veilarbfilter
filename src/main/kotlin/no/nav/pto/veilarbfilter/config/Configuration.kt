@@ -22,7 +22,8 @@ private val defaultProperties = ConfigurationMap(
 data class Configuration (
         val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
         val database: DB = DB(),
-        val jwt: Jwt = Jwt()
+        val jwt: Jwt = Jwt(),
+        val abac: Abac = Abac()
 ) {
 
         data class Jwt (
@@ -32,6 +33,14 @@ data class Configuration (
 
         data class DB (
                 val url: String = config()[Key("veilarbfilter_DB_URL", stringType)],
+                val name: String = config()[Key("veilarbfilter_DB_NAME", stringType)],
+                val username: String = config()[Key("veilarbfilter_DB_USERNAME", stringType)],
+                val password: String = config()[Key("veilarbfilter_DB_PASSWORD", stringType)],
+                val vaultMountPath: String = config()[Key("VAULT_MOUNT_PATH", stringType)]
+        )
+
+        data class Abac (
+                val url: String = config()[Key("ABAC_PDP_ENDPOINT_URL", stringType)],
                 val name: String = config()[Key("veilarbfilter_DB_NAME", stringType)],
                 val username: String = config()[Key("veilarbfilter_DB_USERNAME", stringType)],
                 val password: String = config()[Key("veilarbfilter_DB_PASSWORD", stringType)],
