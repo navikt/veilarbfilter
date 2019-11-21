@@ -16,17 +16,17 @@ data class XacmlResponse (
 data class Response (
     @JsonProperty("Decision") val decision: Decision?,
     @JsonProperty("AssociatedAdvice") val associatedAdvice: Advice?,
-    @JsonProperty("Status") val status: Status?
+    @JsonProperty("Status") val status: List<Status>?
 )
 
 data class Advice (
-    @JsonProperty("Id") val id: String? = null,
-    @JsonProperty("AttributeAssignment") val attributeAssignment: List<AttributeAssignment>? = null
+    @JsonProperty("Id") val id: String?,
+    @JsonProperty("AttributeAssignment") val attributeAssignment: List<AttributeAssignment>?
 )
 
 data class Status (
-    @JsonProperty("StatusCode") val statusCode: String? = null,
-    @JsonProperty("Value") val value: Any? = null
+    @JsonProperty("StatusCode") val statusCode: String?,
+    @JsonProperty("Value") val value: Any?
 )
 
 data class AttributeAssignment (
