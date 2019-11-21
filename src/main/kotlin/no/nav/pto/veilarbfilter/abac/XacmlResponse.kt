@@ -2,6 +2,13 @@ package no.nav.pto.veilarbfilter.abac
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
+enum class Decision {
+    Permit,
+    Deny,
+    NotApplicable,
+    Indeterminate
+}
+
 data class XacmlResponse (
     @JsonProperty("Response") val response: Response? = null
 )

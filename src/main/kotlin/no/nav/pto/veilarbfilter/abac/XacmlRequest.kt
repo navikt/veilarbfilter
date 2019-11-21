@@ -10,7 +10,7 @@ class XacmlRequest {
         return mapOf("Request" to xacmlAttributes)
     }
 
-    fun addAttribute(category: String, id: String, value: Any): XacmlRequest {
+    fun addAttribute(category: String, id: String?, value: Any?): XacmlRequest {
         xacmlAttributes.getOrPut(category) { Attributes() }.attributes += Attribute(id, value)
         return this
     }
@@ -21,13 +21,6 @@ data class Attributes (
 )
 
 data class Attribute (
-    @JsonProperty("AttributeId") val attributeId: String,
-    @JsonProperty("Value") val value: Any
+    @JsonProperty("AttributeId") val attributeId: String?,
+    @JsonProperty("Value") val value: Any?
 )
-
-enum class Decision {
-    Permit,
-    Deny,
-    NotApplicable,
-    Indeterminate
-}

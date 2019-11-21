@@ -18,7 +18,6 @@ fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient:
         authenticate {
             post {
                 val cookie = JwtUtil.useJwtFromCookie(call)?.getBlob()
-                val request = call.receive<NyttFilterModel>()
                 call.request.queryParameters["enhetId"]?.let {
                     if (!it.matches("\\d{4}$".toRegex())) {
                         call.respond(HttpStatusCode.BadRequest)
@@ -26,6 +25,7 @@ fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient:
                     if (!pepClient.harTilgangTilEnhet(cookie, it)) {
                         call.respond(HttpStatusCode.Forbidden)
                     }
+                    val request = call.receive<NyttFilterModel>()
                     val nyttfilter = enhetFilterService.lagreEnhetFilter(it, request)
                     call.respond(nyttfilter)
                 }

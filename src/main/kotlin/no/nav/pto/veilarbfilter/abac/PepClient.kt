@@ -61,6 +61,7 @@ class PepClient (config: Configuration) {
             .addAttribute("Resource", NavAttributter.RESOURCE_FELLES_DOMENE, "veilarb")
             .addAttribute("Resource", NavAttributter.RESOURCE_FELLES_RESOURCE_TYPE, NavAttributter.RESOURCE_FELLES_ENHET)
             .addAttribute("Resource", NavAttributter.RESOURCE_FELLES_ENHET, enhetId)
+            .addAttribute("AccessSubject", null, null)
     }
 
     private fun extractTokenBody(bearerToken: String): String {
