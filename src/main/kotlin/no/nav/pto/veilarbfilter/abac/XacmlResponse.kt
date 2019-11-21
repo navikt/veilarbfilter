@@ -15,8 +15,8 @@ data class XacmlResponse (
 
 data class Response (
     @JsonProperty("Decision") val decision: Decision?,
-    @JsonProperty("AssociatedAdvice") val associatedAdvice: Advice?,
-    @JsonProperty("Status") val status: Status?
+    @JsonProperty("Status") val status: Status?,
+    @JsonProperty("AssociatedAdvice") val associatedAdvice: Advice?
 )
 
 data class Advice (
@@ -29,7 +29,7 @@ data class Status (
 )
 
 data class StatusCode (
-    @JsonProperty("Value") val value: Any?
+    @JsonProperty("Value") val value: String
 )
 
 data class AttributeAssignment (
