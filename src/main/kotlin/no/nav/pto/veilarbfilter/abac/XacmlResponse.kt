@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.abac
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
 enum class Decision {
@@ -13,9 +14,9 @@ data class XacmlResponse (
     @JsonProperty("Response") val response: Response? = null
 )
 
+@JsonIgnoreProperties("Status")
 data class Response (
     @JsonProperty("Decision") val decision: Decision?,
-    @JsonProperty("Status") val status: Status?,
     @JsonProperty("AssociatedAdvice") val associatedAdvice: Advice?
 )
 
@@ -24,13 +25,6 @@ data class Advice (
     @JsonProperty("AttributeAssignment") val attributeAssignment: List<AttributeAssignment>?
 )
 
-data class Status (
-    @JsonProperty("StatusCode") val statusCode: StatusCode?
-)
-
-data class StatusCode (
-    @JsonProperty("Value") val value: String
-)
 
 data class AttributeAssignment (
     @JsonProperty("AttributeId") val attributeId: String?,
