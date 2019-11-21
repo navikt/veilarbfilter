@@ -23,10 +23,9 @@ class PepClient (config: Configuration) {
     private val username = config.serviceUser.username
     private val password = config.serviceUser.password
 
-    fun harTilgangTilEnhet (bearerToken: String?, enhetId: String): Boolean {
-        requireNotNull(bearerToken) { "Authorization token not set" }
-        val subject = extractTokenBody(bearerToken)
-        val xacmlRequest = createXacmlRequest(subject, enhetId)
+    fun harTilgangTilEnhet (ident: String?, enhetId: String): Boolean {
+        requireNotNull(ident) { "Ident is not set" }
+        val xacmlRequest = createXacmlRequest(ident, enhetId)
         val xacmlResponse = askForPermission(xacmlRequest)
         return harTilgang(xacmlResponse.response?.decision)
     }
@@ -56,16 +55,12 @@ class PepClient (config: Configuration) {
     private fun createXacmlRequest(subject: String, enhetId: String) : XacmlRequest {
         return XacmlRequest()
             .addAttribute("Environment", NavAttributter.ENVIRONMENT_FELLES_PEP_ID, "veilarbfilter")
-            .addAttribute("Environment", NavAttributter.ENVIRONMENT_FELLES_CONSUMER_OIDC_TOKEN_BODY, subject)
             .addAttribute("Action", StandardAttributter.ACTION_ID, "read")
             .addAttribute("Resource", NavAttributter.RESOURCE_FELLES_DOMENE, "veilarb")
             .addAttribute("Resource", NavAttributter.RESOURCE_FELLES_RESOURCE_TYPE, NavAttributter.RESOURCE_FELLES_ENHET)
             .addAttribute("Resource", NavAttributter.RESOURCE_FELLES_ENHET, enhetId)
-            .addAttribute("AccessSubject", null, null)
-    }
-
-    private fun extractTokenBody(bearerToken: String): String {
-        return bearerToken.substringAfter(" ")
+            .addAttribute("AccessSubject", StandardAttributter.SUBJECT_ID, subject)
+            .addAttribute("AccessSubject", NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, "InternBruker")
     }
 }
 

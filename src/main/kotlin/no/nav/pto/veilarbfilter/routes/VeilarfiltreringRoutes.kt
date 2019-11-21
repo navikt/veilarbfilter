@@ -8,8 +8,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
-import no.nav.pto.veilarbfilter.JwtUtil
-import no.nav.pto.veilarbfilter.JwtUtil.Companion.getBlob
+import no.nav.pto.veilarbfilter.JwtUtil.Companion.getSubject
 import no.nav.pto.veilarbfilter.abac.PepClient
 
 
@@ -17,12 +16,12 @@ fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient:
     route("/api/enhet") {
         authenticate {
             post {
-                val cookie = JwtUtil.useJwtFromCookie(call)?.getBlob()
+                val ident = getSubject(call)
                 call.request.queryParameters["enhetId"]?.let {
                     if (!it.matches("\\d{4}$".toRegex())) {
                         call.respond(HttpStatusCode.BadRequest)
                     }
-                    if (!pepClient.harTilgangTilEnhet(cookie, it)) {
+                    if (!pepClient.harTilgangTilEnhet(ident, it)) {
                         call.respond(HttpStatusCode.Forbidden)
                     }
                     val request = call.receive<NyttFilterModel>()
@@ -31,12 +30,12 @@ fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient:
                 }
             }
             get {
-                val cookie = JwtUtil.useJwtFromCookie(call)?.getBlob()
+                val ident = getSubject(call)
                 call.request.queryParameters["enhetId"]?.let {
                     if (!it.matches("\\d{4}$".toRegex())) {
                         call.respond(HttpStatusCode.BadRequest)
                     }
-                    if (!pepClient.harTilgangTilEnhet(cookie, it)) {
+                    if (!pepClient.harTilgangTilEnhet(ident, it)) {
                         call.respond(HttpStatusCode.Forbidden)
                     }
                     val filterListe = enhetFilterService.finnFilterForEnhet(it)
