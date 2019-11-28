@@ -15,7 +15,6 @@
         <kotlin.version>1.3.50</kotlin.version>
         <coroutines.version>1.3.2</coroutines.version>
         <kotlin.code.style>official</kotlin.code.style>
-        <junit.version>4.12</junit.version>
         <ktor.version>1.2.5</ktor.version>
         <logback.version>1.2.1</logback.version>
         <flyway.version>5.2.4</flyway.version>
@@ -29,6 +28,8 @@
         <jacksonkotlin.version>2.9.7</jacksonkotlin.version>
         <commonutils.version>1.2019.11.15-14.33-055ca1d05826</commonutils.version>
         <abacattribute.version>3.3.13</abacattribute.version>
+        <spek.version>1.1.5</spek.version>
+        <kluent.version>1.34</kluent.version>
 
 
         <main.class>io.ktor.server.netty.EngineMain</main.class>
@@ -194,15 +195,21 @@
 
         <!-- test -->
         <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
-            <version>${kotlin.version}</version>
+            <groupId>org.jetbrains.spek</groupId>
+            <artifactId>spek-api</artifactId>
+            <version>${spek.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <groupId>org.jetbrains.spek</groupId>
+            <artifactId>spek-junit-platform-engine</artifactId>
+            <version>${spek.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.amshove.kluent</groupId>
+            <artifactId>kluent</artifactId>
+            <version>${kluent.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

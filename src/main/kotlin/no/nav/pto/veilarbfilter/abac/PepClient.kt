@@ -16,6 +16,7 @@ import no.nav.pto.veilarbfilter.ObjectMapperProvider
 import no.nav.pto.veilarbfilter.config.Configuration
 
 private const val MEDIA_TYPE = "application/xacml+json"
+private val abacCache = AbacCache()
 
 class PepClient (config: Configuration) {
 
@@ -25,9 +26,16 @@ class PepClient (config: Configuration) {
 
     fun harTilgangTilEnhet (ident: String?, enhetId: String): Boolean {
         requireNotNull(ident) { "Ident is not set" }
+        val finnesICache = abacCache.harTilgangTilEnheten(ident, enhetId)
+        if(finnesICache != null) {
+            return finnesICache
+        }
         val xacmlRequest = createXacmlRequest(ident, enhetId)
         val xacmlResponse = askForPermission(xacmlRequest)
-        return harTilgang(xacmlResponse.response?.decision)
+        val harTilgangFraAabac = harTilgang(xacmlResponse.response?.decision)
+        abacCache.leggTilEnhetICachen(ident, enhetId, harTilgangFraAabac)
+
+        return harTilgangFraAabac
     }
 
     private fun harTilgang (decision: Decision?): Boolean {
