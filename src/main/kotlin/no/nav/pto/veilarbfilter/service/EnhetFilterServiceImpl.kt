@@ -1,13 +1,11 @@
 package no.nav.pto.veilarbfilter.service
 
-import no.nav.pto.veilarbfilter.config.dbQuery;
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.model.EnhetFilter
 import no.nav.pto.veilarbfilter.model.EnhetFilterModel
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
+import org.jetbrains.exposed.sql.*
 
 class EnhetFilterServiceImpl (): EnhetFilterService {
 
@@ -17,17 +15,28 @@ class EnhetFilterServiceImpl (): EnhetFilterService {
             .singleOrNull()
     }
 
+    override suspend fun slettFilter(enhetId: String, filterId: String): Int  = dbQuery {
+        EnhetFilter.deleteWhere {(EnhetFilter.enhet eq enhetId) and (EnhetFilter.filterId eq filterId.toInt()) }
+    }
+
     override suspend fun finnFilterForEnhet(enhetId: String): List<EnhetFilterModel> = dbQuery {
         EnhetFilter.select { (EnhetFilter.enhet eq enhetId) }
             .mapNotNull { tilEnhetFilterModel(it) }
     }
 
     override suspend fun oppdaterEnhetFilter(enhetId: String, filterValg: FilterModel): EnhetFilterModel {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        dbQuery {
+            EnhetFilter.update({ (EnhetFilter.enhet eq enhetId) and (EnhetFilter.filterId eq filterValg.filterId) }) {
+                it[filterNavn] = filterValg.filterNavn
+                it[valgteFilter] = filterValg.filterValg
+                it[enhet] = enhetId
+            }
+        }
+        return hentFilter(filterValg.filterId)!!
     }
 
     override suspend fun lagreEnhetFilter(enhetId: String, nyttFilter: NyttFilterModel): EnhetFilterModel {
-       var key = 0;
+        var key = 0
         dbQuery {
             key = (EnhetFilter.insert {
                 it[filterNavn] = nyttFilter.filterNavn
