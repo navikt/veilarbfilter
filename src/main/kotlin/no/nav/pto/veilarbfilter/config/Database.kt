@@ -16,7 +16,7 @@ class Database (configuration: Configuration) {
     private val dbUser = configuration.database.username
     private val dbPassword = configuration.database.password
     private val mountPath = configuration.database.vaultMountPath
-    private val naisClustername = configuration.clustername;
+    private val naisClustername = configuration.clustername
 
     init {
         when (naisClustername) {
@@ -42,8 +42,9 @@ class Database (configuration: Configuration) {
 
     fun initRemote () {
         val adminDataSource = dataSource("admin")
-        migrateDatabase(adminDataSource);
-        Database.connect(adminDataSource)
+        migrateDatabase(adminDataSource)
+        adminDataSource.close()
+        Database.connect(dataSource("user"))
     }
 
     fun migrateDatabase(dataSource: HikariDataSource) {
