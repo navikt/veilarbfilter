@@ -48,7 +48,7 @@ spec:
     - name: ISSO_ISSUER
       value: https://isso-q.adeo.no:443/isso/oauth2
     - name: VEILARBFILTER_DB_URL
-      value: jdbc:postgresql://b27dbvl008.preprod.local:5432/postgres
+      value: jdbc:postgresql://b27dbvl008.preprod.local:5432/veilarbfilter
     - name: VAULT_MOUNT_PATH
       value: postgresql/preprod-fss
     - name: ABAC_PDP_ENDPOINT_URL
