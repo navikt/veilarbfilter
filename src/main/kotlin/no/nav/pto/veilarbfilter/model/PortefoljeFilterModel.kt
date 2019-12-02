@@ -23,11 +23,11 @@ data class EnhetPortefoljeFilter (
 
 
 data class Aktiviteter (
-    @get:JsonProperty("BEHANDLING") val BEHANDLING: String,
-    @get:JsonProperty("EGEN") val EGEN: String,
-    @get:JsonProperty("GRUPPEAKTIVITET") val GRUPPEAKTIVITET: String,
-    @get:JsonProperty("IJOBB") val IJOBB: String,
-    @get:JsonProperty("MOTE") val MOTE: String,
-    @get:JsonProperty("STILLING") val STILLING: String,
-    @get:JsonProperty("UTDANNINGAKTIVITET") val UTDANNINGAKTIVITET: String
+    @get:JsonProperty("BEHANDLING") val BEHANDLING: String?,
+    @get:JsonProperty("EGEN") val EGEN: String?,
+    @get:JsonProperty("GRUPPEAKTIVITET") val GRUPPEAKTIVITET: String?,
+    @get:JsonProperty("IJOBB") val IJOBB: String?,
+    @get:JsonProperty("MOTE") val MOTE: String?,
+    @get:JsonProperty("STILLING") val STILLING: String?,
+    @get:JsonProperty("UTDANNINGAKTIVITET") val UTDANNINGAKTIVITET: String?
 )
