@@ -25,6 +25,7 @@ data class Configuration (
         val database: DB = DB(),
         val jwt: Jwt = Jwt(),
         val abac: Abac = Abac(),
+        val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
         val serviceUser: NaisUtils.Credentials = getCredentials("service_user")
 ) {
 
@@ -43,6 +44,10 @@ data class Configuration (
 
         data class Abac (
                 val url: String = config()[Key("ABAC_PDP_ENDPOINT_URL", stringType)]
+        )
+
+        data class VeilarbveilederConfig (
+                val url: String = config()[Key("VEILARBVEILEDERAPI_URL", stringType)]
         )
 }
 
