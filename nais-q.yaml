@@ -53,3 +53,5 @@ spec:
       value: postgresql/preprod-fss
     - name: VEILARBVEILEDERAPI_URL
       value: https://veilarbveileder-q0.nais.preprod.local/veilarbveileder/api
+    - name: ABAC_PDP_ENDPOINT_URL
+        value: https://wasapp-q0.adeo.no/asm-pdp/authorize
