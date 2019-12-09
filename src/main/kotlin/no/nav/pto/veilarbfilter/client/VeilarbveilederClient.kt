@@ -13,7 +13,7 @@ import no.nav.pto.veilarbfilter.config.Configuration
 
 
 data class Enhet (val enhetId: String, val navn: String)
-data class Veileder(val etternavn: String, val fornavn: String, val ident: String, val navn: String)
+data class Veileder(val etternavn: String?, val fornavn: String?, val ident: String, val navn: String?)
 
 data class VeiledereResponse (val enhet: Enhet, val veilederListe: List<Veileder>)
 
