@@ -13,6 +13,7 @@ import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import no.nav.pto.veilarbfilter.abac.PepClient
+import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
 import no.nav.pto.veilarbfilter.routes.naisRoutes
@@ -26,7 +27,7 @@ fun createHttpServer(applicationState: ApplicationState,
                      useAuthentication: Boolean = true): ApplicationEngine = embeddedServer(Netty, port) {
     install(StatusPages) {
         exceptionHandler()
-        notFoundHandler();
+        notFoundHandler()
     }
 
 
@@ -58,12 +59,12 @@ fun createHttpServer(applicationState: ApplicationState,
         register(ContentType.Application.Json, JacksonConverter(ObjectMapperProvider.objectMapper))
     }
 
-    val database = Database(configuration);
+    val database = Database(configuration)
 
     routing {
         route("veilarbfilter") {
             naisRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
-            veilarbfilterRoutes(EnhetFilterServiceImpl(), PepClient(config = configuration))
+            veilarbfilterRoutes(EnhetFilterServiceImpl(), PepClient(config = configuration), VeilarbveilederClient())
         }
     }
 
