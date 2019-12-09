@@ -35,7 +35,7 @@ class VeilarbveilederClient () {
     }
 
     companion object {
-        private const val veilarbVeilederBaseUrl = "/veilarbveileder/api"
+        private const val veilarbVeilederBaseUrl = "https://veilarbveileder.nais.preprod.local/veilarbveileder/api"
     }
 
 }
