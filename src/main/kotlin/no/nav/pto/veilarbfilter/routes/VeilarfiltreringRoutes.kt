@@ -12,6 +12,7 @@ import io.ktor.routing.*
 import io.ktor.util.pipeline.PipelineContext
 import no.nav.pto.veilarbfilter.JwtUtil.Companion.getSubject
 import no.nav.pto.veilarbfilter.abac.PepClient
+import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.model.FilterModel
 
 suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(pepClient: PepClient, build: suspend PipelineContext<Unit, ApplicationCall>.(id: String) -> Unit) {
@@ -29,7 +30,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(pepClient: PepClient,
     }
 }
 
-fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient: PepClient) {
+fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient: PepClient, veilarbveilederClient: VeilarbveilederClient) {
     authenticate {
         route("/api/enhet") {
             post("/{enhetId}") {
@@ -48,7 +49,8 @@ fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient:
             }
             get("/{enhetId}") {
                 pepAuth(pepClient) {
-                    val filterListe = enhetFilterService.finnFilterForEnhet(it)
+                    val veilederePaEnheten = veilarbveilederClient.hentVeilederePaEnheten(it, call.request.cookies["ID_token"])
+                    val filterListe = enhetFilterService.finnFilterForEnhet(it, veilederePaEnheten)
                     call.respond(filterListe)
                 }
             }

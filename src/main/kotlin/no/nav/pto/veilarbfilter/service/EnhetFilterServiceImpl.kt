@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.service
 
+import no.nav.pto.veilarbfilter.client.VeiledereResponse
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.model.EnhetFilter
 import no.nav.pto.veilarbfilter.model.EnhetFilterModel
@@ -19,9 +20,14 @@ class EnhetFilterServiceImpl (): EnhetFilterService {
         EnhetFilter.deleteWhere {(EnhetFilter.enhet eq enhetId) and (EnhetFilter.filterId eq filterId.toInt()) }
     }
 
-    override suspend fun finnFilterForEnhet(enhetId: String): List<EnhetFilterModel> = dbQuery {
-        EnhetFilter.select { (EnhetFilter.enhet eq enhetId) }
-            .mapNotNull { tilEnhetFilterModel(it) }
+    override suspend fun finnFilterForEnhet(enhetId: String, veilederePaEnheten: VeiledereResponse): List<EnhetFilterModel> {
+        val listeMedFilter = hentFilter(enhetId)
+
+        return listeMedFilter.map {
+            val filtrerVeileder = filtrerVeilederSomErIkkePaEnheten(it, veilederePaEnheten)
+            val nyttFilter  = it.filterValg.copy(veiledere = filtrerVeileder)
+            oppdaterEnhetFilter(it.enhetId , FilterModel(it.filterId, it.filterNavn, nyttFilter))
+        }
     }
 
     override suspend fun oppdaterEnhetFilter(enhetId: String, filterValg: FilterModel): EnhetFilterModel {
@@ -54,4 +60,15 @@ class EnhetFilterServiceImpl (): EnhetFilterService {
             filterValg = row[EnhetFilter.valgteFilter],
             enhetId = row[EnhetFilter.enhet]
         )
+
+    private fun filtrerVeilederSomErIkkePaEnheten (lagretFilter: EnhetFilterModel, veilederePaEnheten: VeiledereResponse): List<String>  =
+        lagretFilter.filterValg.veiledere.filter { veilederIdent ->
+            veilederePaEnheten.veilederListe.map { it.ident }.contains(veilederIdent)
+        }
+
+    private suspend fun hentFilter (enhetId: String) = dbQuery {
+        EnhetFilter.select { (EnhetFilter.enhet eq enhetId) }
+            .mapNotNull { tilEnhetFilterModel(it) }
+    }
+
 }
