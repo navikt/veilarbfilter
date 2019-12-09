@@ -64,7 +64,7 @@ fun createHttpServer(applicationState: ApplicationState,
     routing {
         route("veilarbfilter") {
             naisRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
-            veilarbfilterRoutes(EnhetFilterServiceImpl(), PepClient(config = configuration), VeilarbveilederClient())
+            veilarbfilterRoutes(EnhetFilterServiceImpl(), PepClient(config = configuration), VeilarbveilederClient(configuration))
         }
     }
 
