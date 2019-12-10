@@ -37,14 +37,14 @@ fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient:
                 pepAuth(pepClient) {
                     val request = call.receive<NyttFilterModel>()
                     val nyttfilter = enhetFilterService.lagreEnhetFilter(it, request)
-                    call.respond(nyttfilter)
+                    call.respond(HttpStatusCode.NotFound)
                 }
             }
             put("/{enhetId}") {
                 pepAuth(pepClient) {
                     val request = call.receive<FilterModel>()
                     val nyttfilter = enhetFilterService.oppdaterEnhetFilter(it, request)
-                    call.respond(nyttfilter)
+                    call.respond(HttpStatusCode.NotFound)
                 }
             }
             get("/{enhetId}") {
@@ -61,7 +61,7 @@ fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient:
                         if(slettetFilterId == 0 ) {
                             call.respond(HttpStatusCode.NotFound)
                         }
-                        call.respond(HttpStatusCode.NoContent)
+                        call.respond(HttpStatusCode.NotFound)
                     }
                 }
             }
