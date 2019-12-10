@@ -17,11 +17,20 @@ data class Veileder(val etternavn: String?, val fornavn: String?, val ident: Str
 
 data class VeiledereResponse (val enhet: Enhet, val veilederListe: List<Veileder>)
 
+
+private val veilederPaEnhetenCache = VeilederCache()
+
 class VeilarbveilederClient (config: Configuration) {
     private val veilarbveilederClientUrl = config.veilarbveilederConfig.url
 
     fun hentVeilederePaEnheten(enhetId: String, requestToken: String?): VeiledereResponse {
         requireNotNull(requestToken) { "RequestToken is not set" }
+        val veilederCacheValue = veilederPaEnhetenCache.veilederePaEnheten(enhetId)
+
+        if(veilederCacheValue !== null) {
+            return veilederCacheValue
+        }
+
         return runBlocking {
             HttpClient(Apache).use { httpClient ->
                 val result = httpClient.get<HttpResponse>("$veilarbveilederClientUrl/enhet/$enhetId/veiledere") {
@@ -31,7 +40,9 @@ class VeilarbveilederClient (config: Configuration) {
                     throw RuntimeException("Veilarbveileder kallet feilet ${result.status.description}")
                 }
                 val res = result.readText()
-                ObjectMapperProvider.objectMapper.readValue(res, VeiledereResponse::class.java)
+                val veiledereResponse = ObjectMapperProvider.objectMapper.readValue(res, VeiledereResponse::class.java)
+                veilederPaEnhetenCache.leggTilEnhetICachen(enhetId, veiledereResponse)
+                veiledereResponse
             }
         }
     }
