@@ -1,4 +1,4 @@
-package no.nav.pto.veilarbfiltrering.config
+package no.nav.pto.veilarbfilter.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -10,18 +10,16 @@ import org.flywaydb.core.Flyway
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
 
 class Database (configuration: Configuration) {
-    private val APPLICATION_NAME = "veilarbfiltrering"
-    private val TEST_MILJO = "dev-fss"
+    private val APPLICATION_NAME = "veilarbfilter"
 
     private val dbUrl = configuration.database.url
     private val dbUser = configuration.database.username
     private val dbPassword = configuration.database.password
     private val mountPath = configuration.database.vaultMountPath
-    private val naisNamespace = configuration.namespace;
-    private val naisClustername = configuration.clustername;
+    private val naisClustername = configuration.clustername
 
     init {
-        when (naisNamespace) {
+        when (naisClustername) {
             "" -> initLocal()
             else -> initRemote()
         }
@@ -44,7 +42,8 @@ class Database (configuration: Configuration) {
 
     fun initRemote () {
         val adminDataSource = dataSource("admin")
-        migrateDatabase(adminDataSource);
+        migrateDatabase(adminDataSource)
+        adminDataSource.close()
         Database.connect(dataSource("user"))
     }
 
@@ -65,10 +64,7 @@ class Database (configuration: Configuration) {
     }
 
     private fun dbRole(role: String): String {
-        return if (naisClustername == TEST_MILJO)
-            arrayOf(APPLICATION_NAME, naisNamespace, role).joinToString("-")
-        else
-            arrayOf(APPLICATION_NAME, role).joinToString("-")
+        return arrayOf(APPLICATION_NAME, role).joinToString("-")
     }
 
 }
