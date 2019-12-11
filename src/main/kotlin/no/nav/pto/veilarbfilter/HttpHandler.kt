@@ -59,12 +59,12 @@ fun createHttpServer(applicationState: ApplicationState,
         register(ContentType.Application.Json, JacksonConverter(ObjectMapperProvider.objectMapper))
     }
 
-    val database = Database(configuration)
+    //val database = Database(configuration)
 
     routing {
         route("veilarbfilter") {
             naisRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
-            veilarbfilterRoutes(EnhetFilterServiceImpl(), PepClient(config = configuration), VeilarbveilederClient(configuration))
+            //veilarbfilterRoutes(EnhetFilterServiceImpl(), PepClient(config = configuration), VeilarbveilederClient(configuration))
         }
     }
 
