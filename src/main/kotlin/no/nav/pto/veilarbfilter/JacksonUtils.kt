@@ -21,6 +21,7 @@ class ObjectMapperProvider {
                 disableDefaultTyping()
                 enable(SerializationFeature.INDENT_OUTPUT)
                 enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+                disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             }
     }
 }
