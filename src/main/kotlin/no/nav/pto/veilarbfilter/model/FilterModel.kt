@@ -2,6 +2,7 @@ package no.nav.pto.veilarbfilter.model
 
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.datetime
+import java.sql.Timestamp
 import java.time.LocalDateTime
 
 
