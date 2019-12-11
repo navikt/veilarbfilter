@@ -20,9 +20,9 @@ private val abacCache = AbacCache()
 
 class PepClient (config: Configuration) {
 
-    private val abacUrl = config.abac.url
-    private val username = config.serviceUser.username
-    private val password = config.serviceUser.password
+    private val abacUrl = ""
+    private val username =""
+    private val password = ""
 
     fun harTilgangTilEnhet (ident: String?, enhetId: String): Boolean {
         requireNotNull(ident) { "Ident is not set" }
