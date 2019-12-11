@@ -17,7 +17,6 @@ import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.routes.naisRoutes
 import no.nav.pto.veilarbfilter.routes.veilarbfilterRoutes
-import no.nav.pto.veilarbfilter.service.EnhetFilterServiceImpl
 import org.slf4j.event.Level
 
 fun createHttpServer(applicationState: ApplicationState,
