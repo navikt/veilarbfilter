@@ -15,8 +15,8 @@ spec:
     cpuThresholdPercentage: 50
   port: 8080
   ingresses:
-    - https://veilarbfilter.nais.adeo
-    - https://app.adeo.no/veilarbfilter
+      - https://veilarbfilter.nais.adeo.no
+      - https://app.adeo.no/veilarbfilter
   webproxy: true
   vault:
     enabled: true
