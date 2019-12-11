@@ -20,6 +20,8 @@ private val defaultProperties = ConfigurationMap(
                 "VAULT_MOUNT_PATH" to notUsedLocally
         )
 )
+
+/*
 data class Configuration (
         val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
         val database: DB = DB(),
@@ -49,6 +51,20 @@ data class Configuration (
         data class VeilarbveilederConfig (
                 val url: String = config()[Key("VEILARBVEILEDERAPI_URL", stringType)]
         )
+}
+
+*/
+
+data class Configuration (
+        val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
+        val jwt: Jwt = Jwt()
+) {
+
+        data class Jwt (
+                val jwksUrl: JwkProvider = JwtUtil.makeJwkProvider(config()[Key("ISSO_JWKS_URL", stringType)]),
+                val jwtIssuer: String = config()[Key("ISSO_ISSUER", stringType)]
+        )
+
 }
 
 private fun config() = ConfigurationProperties.systemProperties() overriding

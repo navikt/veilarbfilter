@@ -15,7 +15,6 @@ import io.ktor.server.netty.Netty
 import no.nav.pto.veilarbfilter.abac.PepClient
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
-import no.nav.pto.veilarbfilter.config.Database
 import no.nav.pto.veilarbfilter.routes.naisRoutes
 import no.nav.pto.veilarbfilter.routes.veilarbfilterRoutes
 import no.nav.pto.veilarbfilter.service.EnhetFilterServiceImpl
