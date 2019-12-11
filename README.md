@@ -10,6 +10,19 @@ For lokal kjøring :
 `docker-compose up`
 `docker-compose down -V`
 
+## Tilgang
+Last ned VAULT CLI og kjør føljande kommandosar
+
+`export VAULT_ADDR=https://vault.adeo.no USER=NAV_IDENT
+vault login -method=oidc`
+
+Preprod credentials:
+
+`vault read postgresql/preprod-fss/creds/veilarbfilter-admin`
+
+Prod credentials:
+
+`vault read postgresql/prod-fss/creds/veilarbfilter-admin`
 
 ## Kontakt og spørsmål
 Opprett en issue i GitHub for eventuelle spørsmål.s
