@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.flywaydb.core.Flyway
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
-/*
+
 class Database (configuration: Configuration) {
     private val APPLICATION_NAME = "veilarbfilter"
 
@@ -73,5 +73,3 @@ suspend fun <T> dbQuery(block: () -> T): T =
     withContext(Dispatchers.IO) {
         transaction { block() }
     }
-
- */

@@ -21,7 +21,7 @@ data class VeiledereResponse (val enhet: Enhet, val veilederListe: List<Veileder
 private val veilederPaEnhetenCache = VeilederCache()
 
 class VeilarbveilederClient (config: Configuration) {
-    private val veilarbveilederClientUrl = ""
+    private val veilarbveilederClientUrl = config.veilarbveilederConfig.url
 
     fun hentVeilederePaEnheten(enhetId: String, requestToken: String?): VeiledereResponse {
         requireNotNull(requestToken) { "RequestToken is not set" }

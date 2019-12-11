@@ -1,5 +1,5 @@
 package no.nav.pto.veilarbfilter.service
-/*
+
 import no.nav.pto.veilarbfilter.client.VeiledereResponse
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.model.EnhetFilter
@@ -75,4 +75,3 @@ class EnhetFilterServiceImpl (): EnhetFilterService {
     }
 
 }
-*/

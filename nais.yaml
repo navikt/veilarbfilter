@@ -41,7 +41,7 @@ spec:
     cpuThresholdPercentage: 50
   prometheus:
     enabled: true
-    path: /veilarbfilter/metrics
+    path: /veilarbfilter/internal/metrics
   env:
     - name: ISSO_JWKS_URL
       value: https://isso.adeo.no/isso/oauth2/connect/jwk_uri
