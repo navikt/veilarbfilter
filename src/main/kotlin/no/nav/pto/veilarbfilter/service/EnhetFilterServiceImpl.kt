@@ -7,6 +7,7 @@ import no.nav.pto.veilarbfilter.model.EnhetFilterModel
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import org.jetbrains.exposed.sql.*
+import java.time.LocalDateTime
 
 class EnhetFilterServiceImpl (): EnhetFilterService {
 
@@ -48,6 +49,7 @@ class EnhetFilterServiceImpl (): EnhetFilterService {
                 it[filterNavn] = nyttFilter.filterNavn
                 it[valgteFilter] = nyttFilter.filterValg
                 it[enhet] = enhetId
+                it[opprettetDato] = LocalDateTime.now()
             } get EnhetFilter.filterId)
         }
         return hentFilter(key)!!
@@ -58,7 +60,8 @@ class EnhetFilterServiceImpl (): EnhetFilterService {
             filterId = row[EnhetFilter.filterId],
             filterNavn = row[EnhetFilter.filterNavn],
             filterValg = row[EnhetFilter.valgteFilter],
-            enhetId = row[EnhetFilter.enhet]
+            enhetId = row[EnhetFilter.enhet],
+            opprettetDato = row[EnhetFilter.opprettetDato]
         )
 
     private fun filtrerVeilederSomErIkkePaEnheten (lagretFilter: EnhetFilterModel, veilederePaEnheten: VeiledereResponse): List<String>  =
