@@ -5,11 +5,10 @@ package no.nav.pto.veilarbfilter.abac
 private const val TEN_MIN_CACHE_EXPIRATION_TIME = 1000 * 60 * 10
 
 data class AbacValue (val enhetId: String, val timestamp: Long, val harTilgang: Boolean)
-typealias VeilederIdent = String;
+typealias VeilederIdent = String
 
-class AbacCache(cacheExpiration: Int = TEN_MIN_CACHE_EXPIRATION_TIME) {
+class AbacCache(private val cacheExpiration: Int = TEN_MIN_CACHE_EXPIRATION_TIME) {
     private val cache = HashMap<VeilederIdent, MutableList<AbacValue>>()
-    private val cacheExpiration = cacheExpiration;
 
     fun harTilgangTilEnheten(ident: String, enhetId: String): Boolean? =
         cache[ident]
