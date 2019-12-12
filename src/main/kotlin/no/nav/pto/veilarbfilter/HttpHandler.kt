@@ -12,6 +12,7 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import no.nav.log.LogFilter
 import no.nav.pto.veilarbfilter.abac.PepClient
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
@@ -51,8 +52,7 @@ fun createHttpServer(applicationState: ApplicationState,
     }
 
     install(CallLogging) {
-        level = Level.TRACE
-        callIdMdc("X-Request-ID")
+        LogFilter()
     }
 
     install(ContentNegotiation) {
