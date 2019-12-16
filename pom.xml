@@ -203,6 +203,12 @@
         </dependency>
 
         <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>log</artifactId>
+            <version>${commonutils.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>no.nav.abac.policies</groupId>
             <artifactId>abac-attribute-constants</artifactId>
             <version>${abacattribute.version}</version>
