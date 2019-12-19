@@ -49,6 +49,7 @@ fun Route.internalRoutes(
             val loggerAndLevel = loggers
                 .filter { logger -> !logger.effectiveLevel.equals(LogUtils.getRootLevel()) }
                 .map { logger -> "<div> ${logger.name} - ${logger.effectiveLevel} </div>" }
+                .joinToString { " " }
 
             call.respondText {
                 """
@@ -58,7 +59,7 @@ fun Route.internalRoutes(
                         <body>
                             <h1>ROOT log level: $rootLevel </h1>
                             <h1>Loggere med annen log level enn root</h1>
-                            ${loggerAndLevel}
+                            $loggerAndLevel
                         </body>
                     </html>
                 """.trimIndent()
