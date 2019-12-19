@@ -3,7 +3,10 @@ package no.nav.pto.veilarbfilter
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.jwt.jwt
-import io.ktor.features.*
+import io.ktor.features.CORS
+import io.ktor.features.CallLogging
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.StatusPages
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.jackson.JacksonConverter
@@ -17,10 +20,9 @@ import no.nav.pto.veilarbfilter.abac.PepClient
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
-import no.nav.pto.veilarbfilter.routes.naisRoutes
-import no.nav.pto.veilarbfilter.routes.veilarbfilterRoutes
+import no.nav.pto.veilarbfilter.routes.internalRoutes
+import no.nav.pto.veilarbfilter.routes.apiRoutes
 import no.nav.pto.veilarbfilter.service.EnhetFilterServiceImpl
-import org.slf4j.event.Level
 
 fun createHttpServer(applicationState: ApplicationState,
                      port: Int = 8080,
@@ -63,8 +65,8 @@ fun createHttpServer(applicationState: ApplicationState,
 
     routing {
         route("veilarbfilter") {
-            naisRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
-            veilarbfilterRoutes(EnhetFilterServiceImpl(), PepClient(config = configuration), VeilarbveilederClient(configuration))
+            internalRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
+            apiRoutes(EnhetFilterServiceImpl(), PepClient(config = configuration), VeilarbveilederClient(configuration))
         }
     }
 

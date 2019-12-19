@@ -30,7 +30,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(pepClient: PepClient,
     }
 }
 
-fun Route.veilarbfilterRoutes(enhetFilterService: EnhetFilterService, pepClient: PepClient, veilarbveilederClient: VeilarbveilederClient) {
+fun Route.apiRoutes(enhetFilterService: EnhetFilterService, pepClient: PepClient, veilarbveilederClient: VeilarbveilederClient) {
     authenticate {
         route("/api/enhet") {
             post("/{enhetId}") {
