@@ -61,7 +61,7 @@ fun createHttpServer(applicationState: ApplicationState,
         register(ContentType.Application.Json, JacksonConverter(ObjectMapperProvider.objectMapper))
     }
 
-    val database = Database(configuration)
+    Database(configuration)
 
     routing {
         route("veilarbfilter") {

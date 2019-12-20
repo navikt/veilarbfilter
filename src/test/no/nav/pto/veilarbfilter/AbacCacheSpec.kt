@@ -18,7 +18,6 @@ object AbacCacheSpec: Spek({
                 val ident = "Z007";
                 val enhetId = "NAV 001"
                 val harTilgang = false
-                abacCache.leggTilEnhetICachen(ident, enhetId, harTilgang)
                 it("should return the result of adding the first number to the second number") {
                     assertEquals(false, abacCache.harTilgangTilEnheten(ident, enhetId))
                 }

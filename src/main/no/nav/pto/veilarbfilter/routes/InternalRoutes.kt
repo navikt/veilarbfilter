@@ -2,6 +2,7 @@ package no.nav.pto.veilarbfilter.routes
 
 import io.ktor.application.call
 import io.ktor.http.ContentType
+import io.ktor.http.ContentType.Text.Html
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respondText
 import io.ktor.response.respondTextWriter
@@ -47,11 +48,11 @@ fun Route.internalRoutes(
             val rootLevel = loggers.get(0).level
 
             val loggerAndLevel = loggers
-                .filter { logger -> !logger.effectiveLevel.equals(LogUtils.getRootLevel()) }
+                .filter { logger -> logger.effectiveLevel != LogUtils.getRootLevel() }
                 .map { logger -> "<div> ${logger.name} - ${logger.effectiveLevel} </div>" }
                 .joinToString { " " }
 
-            call.respondText {
+            call.respondText(contentType = Html) {
                 """
                     <html>
                         <head>
