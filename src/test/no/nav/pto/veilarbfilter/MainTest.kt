@@ -1,14 +1,19 @@
 package no.nav.pto.veilarbfilter
 
+import no.nav.common.utils.NaisUtils
 import no.nav.pto.veilarbfilter.config.Configuration
 import java.util.concurrent.TimeUnit
 
-data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
-
 fun main() {
-    val configuration = Configuration()
-    val applicationState = ApplicationState()
 
+    val configuration = Configuration(
+        clustername = "",
+        serviceUser = NaisUtils.Credentials("foo", "bar"),
+        abac = Configuration.Abac(""),
+        veilarbveilederConfig = Configuration.VeilarbveilederConfig("")
+    )
+
+    val applicationState = ApplicationState()
     val applicationServer = createHttpServer(applicationState = applicationState, configuration = configuration);
 
     Runtime.getRuntime().addShutdownHook(Thread {

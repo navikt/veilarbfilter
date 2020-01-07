@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.config
 
+import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
@@ -13,8 +14,6 @@ class Database (configuration: Configuration) {
     private val APPLICATION_NAME = "veilarbfilter"
 
     private val dbUrl = configuration.database.url
-    private val dbUser = configuration.database.username
-    private val dbPassword = configuration.database.password
     private val mountPath = configuration.database.vaultMountPath
     private val naisClustername = configuration.clustername
 
@@ -26,17 +25,23 @@ class Database (configuration: Configuration) {
     }
 
     fun initLocal() {
+
+        val embeddedPostgres = EmbeddedPostgres.builder().start()
+        val pg = "postgres"
+        val jdbcUrl = embeddedPostgres.getJdbcUrl(pg, pg)
+
         val config = HikariConfig()
         config.driverClassName = "org.postgresql.Driver"
-        config.jdbcUrl = dbUrl
-        config.username = dbUser
-        config.password = dbPassword
+        config.jdbcUrl = jdbcUrl
+        config.username = pg
+        config.password = pg
         config.maximumPoolSize = 3
         config.isAutoCommit = false
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         config.validate()
         Database.connect(HikariDataSource(config))
-        val flyway = Flyway.configure().dataSource(dbUrl, dbUser, dbPassword).load()
+
+        val flyway = Flyway.configure().dataSource(jdbcUrl, pg, pg).load()
         flyway.migrate()
     }
 
