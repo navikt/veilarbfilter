@@ -5,8 +5,9 @@ import java.util.concurrent.TimeUnit
 
 data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
 
-fun main(configuration: Configuration = Configuration()) {
+fun main() {
 
+    val configuration = Configuration()
     val applicationState = ApplicationState()
     val applicationServer = createHttpServer(applicationState = applicationState, configuration = configuration);
 
