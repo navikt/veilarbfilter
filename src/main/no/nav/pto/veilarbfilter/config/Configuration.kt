@@ -20,6 +20,8 @@ private val defaultProperties = ConfigurationMap(
                 "VAULT_MOUNT_PATH" to notUsedLocally
         )
 )
+
+
 data class Configuration (
         val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
         val database: DB = DB(),

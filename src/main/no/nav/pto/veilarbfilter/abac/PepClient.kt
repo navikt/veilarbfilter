@@ -19,7 +19,6 @@ private const val MEDIA_TYPE = "application/xacml+json"
 private val abacCache = AbacCache()
 
 class PepClient (config: Configuration) {
-
     private val abacUrl = config.abac.url
     private val username = config.serviceUser.username
     private val password = config.serviceUser.password
