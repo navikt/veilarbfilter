@@ -1,7 +1,9 @@
 package no.nav.pto.veilarbfilter.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class EnhetPortefoljeFilter (
     val aktiviteter: Aktiviteter,
     val alder: List<String>,
@@ -18,8 +20,7 @@ data class EnhetPortefoljeFilter (
     val tiltakstyper: List<String>,
     val veilederNavnQuery: String,
     val veiledere: List<String>,
-    val ytelse: String?,
-    val registreringstype: List<String>
+    val ytelse: String?
 )
 
 
