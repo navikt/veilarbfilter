@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class EnhetPortefoljeFilter (
