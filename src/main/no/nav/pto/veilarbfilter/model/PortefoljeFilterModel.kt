@@ -21,7 +21,7 @@ data class EnhetPortefoljeFilter (
     val veilederNavnQuery: String,
     val veiledere: List<String>,
     val ytelse: String?,
-    val registreringstype: List<String>
+    val registreringstype?: List<String>
 )
 
 
