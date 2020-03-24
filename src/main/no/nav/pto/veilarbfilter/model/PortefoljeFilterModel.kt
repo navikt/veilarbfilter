@@ -18,7 +18,8 @@ data class EnhetPortefoljeFilter (
     val tiltakstyper: List<String>,
     val veilederNavnQuery: String,
     val veiledere: List<String>,
-    val ytelse: String?
+    val ytelse: String?,
+    val registreringstype: List<String>
 )
 
 
