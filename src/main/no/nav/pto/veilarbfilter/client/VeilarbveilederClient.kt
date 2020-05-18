@@ -7,7 +7,9 @@ import io.ktor.client.request.header
 import io.ktor.client.response.HttpResponse
 import io.ktor.client.response.readText
 import io.ktor.http.HttpHeaders
+import io.ktor.http.cookies
 import kotlinx.coroutines.runBlocking
+import no.nav.common.utils.IdUtils
 import no.nav.pto.veilarbfilter.ObjectMapperProvider
 import no.nav.pto.veilarbfilter.config.Configuration
 import org.slf4j.LoggerFactory
@@ -39,6 +41,8 @@ class VeilarbveilederClient (config: Configuration) {
             HttpClient(Apache).use { httpClient ->
                 val result = httpClient.get<HttpResponse>("$veilarbveilederClientUrl/api/enhet/$enhetId/veiledere") {
                     header(HttpHeaders.Authorization, "Bearer $requestToken")
+                    header("Nav-Call-Id", IdUtils.generateId())
+                    header("Nav-Consumer-Id", "veilarbfilter")
                 }
                 if (result.status.value != 200) {
                     log.error("Veilarbveileder kallet feilet ${result.status.description}")
