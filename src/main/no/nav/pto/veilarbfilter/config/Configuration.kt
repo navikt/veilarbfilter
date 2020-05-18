@@ -5,6 +5,7 @@ import com.natpryce.konfig.*
 import no.nav.common.utils.NaisUtils
 import no.nav.common.utils.NaisUtils.getCredentials
 import no.nav.pto.veilarbfilter.JwtUtil
+import no.nav.sbl.util.EnvironmentUtils
 
 private const val secret = ""
 private const val notUsedLocally = ""
@@ -49,7 +50,7 @@ data class Configuration (
         )
 
         data class VeilarbveilederConfig (
-                val url: String = config()[Key("VEILARBVEILEDERAPI_URL", stringType)]
+                val url: String = "http://veilarbveileder.${EnvironmentUtils.requireNamespace()}.svc.nais.local/veilarbveileder"
         )
 }
 

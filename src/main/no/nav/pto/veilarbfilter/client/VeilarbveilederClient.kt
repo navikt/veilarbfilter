@@ -10,6 +10,7 @@ import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.runBlocking
 import no.nav.pto.veilarbfilter.ObjectMapperProvider
 import no.nav.pto.veilarbfilter.config.Configuration
+import org.slf4j.LoggerFactory
 
 
 data class Enhet (val enhetId: String, val navn: String)
@@ -20,7 +21,10 @@ data class VeiledereResponse (val enhet: Enhet, val veilederListe: List<Veileder
 
 private val veilederPaEnhetenCache = VeilederCache()
 
+
 class VeilarbveilederClient (config: Configuration) {
+    private val log = LoggerFactory.getLogger(this.javaClass.simpleName)
+
     private val veilarbveilederClientUrl = config.veilarbveilederConfig.url
 
     fun hentVeilederePaEnheten(enhetId: String, requestToken: String?): VeiledereResponse {
@@ -33,11 +37,11 @@ class VeilarbveilederClient (config: Configuration) {
 
         return runBlocking {
             HttpClient(Apache).use { httpClient ->
-                val result = httpClient.get<HttpResponse>("$veilarbveilederClientUrl/enhet/$enhetId/veiledere") {
+                val result = httpClient.get<HttpResponse>("$veilarbveilederClientUrl/api/enhet/$enhetId/veiledere") {
                     header(HttpHeaders.Authorization, "Bearer $requestToken")
                 }
                 if (result.status.value != 200) {
-                    throw RuntimeException("Veilarbveileder kallet feilet ${result.status.description}")
+                    log.error("Veilarbveileder kallet feilet ${result.status.description}")
                 }
                 val res = result.readText()
                 val veiledereResponse = ObjectMapperProvider.objectMapper.readValue(res, VeiledereResponse::class.java)
