@@ -15,6 +15,7 @@ import java.net.URL
 import java.util.*
 import java.util.concurrent.TimeUnit
 import org.slf4j.LoggerFactory
+import java.lang.IllegalStateException
 
 private val log = LoggerFactory.getLogger("veilarbfilter.JwtConfig")
 class JwtUtil {
@@ -29,14 +30,15 @@ class JwtUtil {
             }
         }
 
-        fun getSubject(call: ApplicationCall): String {
+        fun getSubject(call: ApplicationCall): String? {
             return try {
                 useJwtFromCookie(call)
                     ?.getBlob()
                     ?.let { blob -> JWT.decode(blob).parsePayload().subject }
-                    ?: "Unauthenticated"
+                    ?: throw IllegalStateException()
             } catch (e: Throwable) {
-                "JWT not found"
+                log.error("JWT not found", e)
+                null
             }
         }
 
