@@ -7,6 +7,13 @@ import io.ktor.features.origin
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.ApplicationRequest
 import io.ktor.response.respond
+import org.slf4j.LoggerFactory
+import org.springframework.web.client.HttpServerErrorException
+import java.lang.RuntimeException
+
+private val log = LoggerFactory.getLogger("Exceptionhandler")
+
+class BadGatewayException(message:String): Exception(message)
 
 fun StatusPages.Configuration.exceptionHandler() {
     exception<Throwable> { cause ->
@@ -19,6 +26,11 @@ fun StatusPages.Configuration.exceptionHandler() {
         }
     }
 
+    exception<BadGatewayException> { cause ->
+        call.logErrorAndRespond(cause, HttpStatusCode.BadGateway) {
+            "The request failed against backend service or db"
+        }
+    }
 }
 
 fun StatusPages.Configuration.notFoundHandler() {
@@ -39,6 +51,8 @@ private suspend inline fun ApplicationCall.logErrorAndRespond(
     lazyMessage: () -> String
 ) {
     val message = lazyMessage()
+    log.error(message, cause)
+
     val response = HttpErrorResponse(
         url = this.request.url(),
         cause = cause.toString(),

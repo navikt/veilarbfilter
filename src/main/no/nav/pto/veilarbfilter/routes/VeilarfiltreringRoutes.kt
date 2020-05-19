@@ -6,14 +6,17 @@ import no.nav.pto.veilarbfilter.service.EnhetFilterService
 import io.ktor.application.call
 import io.ktor.auth.authenticate
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.HttpStatusCode.Companion.BadGateway
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
 import io.ktor.util.pipeline.PipelineContext
+import no.nav.pto.veilarbfilter.BadGatewayException
 import no.nav.pto.veilarbfilter.JwtUtil.Companion.getSubject
 import no.nav.pto.veilarbfilter.abac.PepClient
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.model.FilterModel
+import java.lang.IllegalStateException
 
 suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(pepClient: PepClient, build: suspend PipelineContext<Unit, ApplicationCall>.(id: String) -> Unit) {
     val ident = getSubject(call)
@@ -49,7 +52,10 @@ fun Route.apiRoutes(enhetFilterService: EnhetFilterService, pepClient: PepClient
             }
             get("/{enhetId}") {
                 pepAuth(pepClient) {
-                    val veilederePaEnheten = veilarbveilederClient.hentVeilederePaEnheten(it, call.request.cookies["ID_token"])
+                    val veilederePaEnheten = veilarbveilederClient
+                        .hentVeilederePaEnheten(it, call.request.cookies["ID_token"])
+                        ?: throw IllegalStateException()
+
                     val filterListe = enhetFilterService.finnFilterForEnhet(it, veilederePaEnheten)
                     call.respond(filterListe)
                 }
