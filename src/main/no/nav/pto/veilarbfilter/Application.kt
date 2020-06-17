@@ -4,7 +4,7 @@ import no.nav.pto.veilarbfilter.config.Configuration
 import java.util.concurrent.TimeUnit
 
 data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
-
+//TODO LAG ETT JOBB SOM OPPDATERER DATABASEN
 fun main() {
 
     val configuration = Configuration()
