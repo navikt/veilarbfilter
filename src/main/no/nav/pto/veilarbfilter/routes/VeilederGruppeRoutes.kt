@@ -33,7 +33,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(pepClient: PepClient,
     }
 }
 
-fun Route.apiRoutes(enhetFilterService: EnhetFilterService, pepClient: PepClient, veilarbveilederClient: VeilarbveilederClient) {
+fun Route.apiRoutes(enhetFilterService: EnhetFilterService, pepClient: PepClient) {
     authenticate {
         route("/api/enhet") {
             post("/{enhetId}") {
@@ -52,11 +52,7 @@ fun Route.apiRoutes(enhetFilterService: EnhetFilterService, pepClient: PepClient
             }
             get("/{enhetId}") {
                 pepAuth(pepClient) {
-                    val veilederePaEnheten = veilarbveilederClient
-                        .hentVeilederePaEnheten(it, call.request.cookies["ID_token"])
-                        ?: throw IllegalStateException()
-
-                    val filterListe = enhetFilterService.finnFilterForEnhet(it, veilederePaEnheten)
+                    val filterListe = enhetFilterService.finnFilterForEnhet(it)
                     call.respond(filterListe)
                 }
             }

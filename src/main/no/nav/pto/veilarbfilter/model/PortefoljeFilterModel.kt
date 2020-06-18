@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class EnhetPortefoljeFilter (
+data class PortefoljeFilter (
     val aktiviteter: Aktiviteter,
     val alder: List<String>,
     val ferdigfilterListe: List<String>,

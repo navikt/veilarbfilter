@@ -1,4 +1,4 @@
-package no.nav.pto.veilarbfilter.model
+package no.nav.pto.veilarbfilter.db
 
 import no.nav.pto.veilarbfilter.ObjectMapperProvider.Companion.objectMapper
 import org.jetbrains.exposed.sql.Column

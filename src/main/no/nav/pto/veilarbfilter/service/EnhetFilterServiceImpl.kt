@@ -2,14 +2,14 @@ package no.nav.pto.veilarbfilter.service
 
 import no.nav.pto.veilarbfilter.client.VeiledereResponse
 import no.nav.pto.veilarbfilter.config.dbQuery
-import no.nav.pto.veilarbfilter.model.EnhetFilter
+import no.nav.pto.veilarbfilter.db.EnhetFilter
 import no.nav.pto.veilarbfilter.model.EnhetFilterModel
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
 
-class EnhetFilterServiceImpl (): EnhetFilterService {
+class EnhetFilterServiceImpl (): FilterService {
 
     override suspend fun hentFilter(filterId: Int): EnhetFilterModel? = dbQuery {
         EnhetFilter.select { (EnhetFilter.filterId eq filterId) }
@@ -21,17 +21,11 @@ class EnhetFilterServiceImpl (): EnhetFilterService {
         EnhetFilter.deleteWhere {(EnhetFilter.enhet eq enhetId) and (EnhetFilter.filterId eq filterId.toInt()) }
     }
 
-    override suspend fun finnFilterForEnhet(enhetId: String, veilederePaEnheten: VeiledereResponse): List<EnhetFilterModel> {
-        val listeMedFilter = hentFilter(enhetId)
-
-        return listeMedFilter.map {
-            val filtrerVeileder = filtrerVeilederSomErIkkePaEnheten(it, veilederePaEnheten)
-            val nyttFilter  = it.filterValg.copy(veiledere = filtrerVeileder)
-            oppdaterEnhetFilter(it.enhetId , FilterModel(it.filterId, it.filterNavn, nyttFilter))
-        }
+    override suspend fun finnFilterForFilterBruker(enhetId: String): List<EnhetFilterModel> {
+        return hentFilter(enhetId)
     }
 
-    override suspend fun oppdaterEnhetFilter(enhetId: String, filterValg: FilterModel): EnhetFilterModel {
+    override suspend fun oppdaterFilter(enhetId: String, filterValg: FilterModel): EnhetFilterModel {
         dbQuery {
             EnhetFilter.update({ (EnhetFilter.enhet eq enhetId) and (EnhetFilter.filterId eq filterValg.filterId) }) {
                 it[filterNavn] = filterValg.filterNavn
@@ -42,7 +36,7 @@ class EnhetFilterServiceImpl (): EnhetFilterService {
         return hentFilter(filterValg.filterId)!!
     }
 
-    override suspend fun lagreEnhetFilter(enhetId: String, nyttFilter: NyttFilterModel): EnhetFilterModel {
+    override suspend fun lagreFilter(enhetId: String, nyttFilter: NyttFilterModel): EnhetFilterModel {
         var key = 0
         dbQuery {
             key = (EnhetFilter.insert {

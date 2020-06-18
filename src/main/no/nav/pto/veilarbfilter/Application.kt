@@ -1,5 +1,8 @@
 package no.nav.pto.veilarbfilter
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import no.nav.pto.veilarbfilter.config.Configuration
 import java.util.concurrent.TimeUnit
 
