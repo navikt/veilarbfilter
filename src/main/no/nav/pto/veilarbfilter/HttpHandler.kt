@@ -17,6 +17,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import no.nav.log.LogFilter
 import no.nav.pto.veilarbfilter.abac.PepClient
+import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
 import no.nav.pto.veilarbfilter.routes.internalRoutes
@@ -67,7 +68,7 @@ fun createHttpServer(applicationState: ApplicationState,
     routing {
         route("veilarbfilter") {
             internalRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
-            veilederGruppeRoutes(VeilederGrupperServiceImpl(), PepClient(config = configuration))
+            veilederGruppeRoutes(VeilederGrupperServiceImpl(VeilarbveilederClient(config= configuration)), PepClient(config = configuration))
             mineFilterRoutes(MineFilterServiceImpl(), PepClient(config = configuration))
         }
     }
