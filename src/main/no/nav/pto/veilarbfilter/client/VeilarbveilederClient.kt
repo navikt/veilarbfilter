@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.client
 
+import com.fasterxml.jackson.core.type.TypeReference
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.request.get
@@ -27,8 +28,7 @@ private val veilederPaEnhetenCache = VeilederCache()
 class VeilarbveilederClient(config: Configuration) {
     private val veilarbveilederClientUrl = config.veilarbveilederConfig.url
 
-    fun hentVeilederePaEnheten(enhetId: String, requestToken: String?): VeiledereResponse? {
-        requireNotNull(requestToken) { "RequestToken is not set" }
+    fun hentVeilederePaEnheten(enhetId: String): List<String>? {
         val veilederCacheValue = veilederPaEnhetenCache.veilederePaEnheten(enhetId)
 
         if (veilederCacheValue !== null) {
@@ -37,7 +37,7 @@ class VeilarbveilederClient(config: Configuration) {
 
         return runBlocking {
             HttpClient(Apache).use { httpClient ->
-                val response = get(httpClient, enhetId, requestToken)
+                val response = get(httpClient, enhetId)
                 when (response.status.value) {
                     200 -> readResponse(response, enhetId)
                     else -> throw IllegalStateException("Feilet mot veilarbveileder")
@@ -49,21 +49,19 @@ class VeilarbveilederClient(config: Configuration) {
     private suspend fun readResponse(
         response: HttpResponse,
         enhetId: String
-    ): VeiledereResponse? {
+    ): List<String>? {
         val res = response.readText()
-        val veiledereResponse =
-            ObjectMapperProvider.objectMapper.readValue(res, VeiledereResponse::class.java)
+        val veiledereResponse: List<String> =
+            ObjectMapperProvider.objectMapper.readValue(res, object : TypeReference<List<String>>() {});
         veilederPaEnhetenCache.leggTilEnhetICachen(enhetId, veiledereResponse)
         return veiledereResponse
     }
 
     private suspend fun get(
         httpClient: HttpClient,
-        enhetId: String,
-        requestToken: String?
+        enhetId: String
     ): HttpResponse {
-        val result = httpClient.get<HttpResponse>("$veilarbveilederClientUrl/api/enhet/$enhetId/veiledere") {
-            header(HttpHeaders.Authorization, "Bearer $requestToken")
+        val result = httpClient.get<HttpResponse>("$veilarbveilederClientUrl/api/enhet/$enhetId/identer") {
             header("Nav-Call-Id", IdUtils.generateId())
             header("Nav-Consumer-Id", "veilarbfilter")
         }

@@ -12,7 +12,7 @@ data class PortefoljeFilter (
     val formidlingsgruppe: List<String>,
     val hovedmal: List<String>,
     val innsatsgruppe: List<String>,
-    val kjonn: KjonnFilter,
+    val kjonn: String?,
     val manuellBrukerStatus: List<String>,
     val navnEllerFnrQuery: String,
     val rettighetsgruppe: List<String>,
@@ -23,12 +23,6 @@ data class PortefoljeFilter (
     val ytelse: String?,
     val registreringstype: List<String>?
     )
-
-
-sealed class KjonnFilter {
-    class List<String>(val data: List<String>) : KjonnFilter()
-    class String(val data: String?) : KjonnFilter()
-}
 
 data class Aktiviteter (
     @get:JsonProperty("BEHANDLING") val BEHANDLING: String?,

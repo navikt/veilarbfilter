@@ -1,15 +1,19 @@
 package no.nav.pto.veilarbfilter.service
 
+import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
+import no.nav.pto.veilarbfilter.client.VeiledereResponse
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.db.VeilederGrupperFilter
+import no.nav.pto.veilarbfilter.model.EnhetFilterModel
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import no.nav.pto.veilarbfilter.model.VeilederGruppeFilterModel
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
 
-class VeilederGrupperService() : FilterService {
+class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) : FilterService {
+    private val veilarbveilederClient: VeilarbveilederClient = veilarbveilederClient;
 
     override suspend fun lagreFilter(enhetId: String, nyttFilter: NyttFilterModel): FilterModel? {
         var key = 0;
@@ -81,37 +85,50 @@ class VeilederGrupperService() : FilterService {
         }
     }
 
-}
-        /*
-            fetch all rows from table: veiledergrupper
-            for each row
-                - make api request to fetch all veilederer for that enhet
-                - filter all veileder that are not longer active and update db
-                - ask Lars: if groups is empty after cleanup we can remove group as well
-         */
+     suspend fun slettVeiledereSomIkkeErAktivePaEnheten(enhetId: String) {
+         val veilederePaEnheten = veilarbveilederClient
+             .hentVeilederePaEnheten(enhetId)
+             ?: throw IllegalStateException();
 
-        /*
-        val veilederePaEnheten = veilarbveilederClient
-                        .hentVeilederePaEnheten(it, call.request.cookies["ID_token"])
-                        ?: throw IllegalStateException()
-         */
+        val filterForBruker = finnFilterForFilterBruker(enhetId);
 
-        /*
-    private fun cleanupVeilederGrupper(enhetId: String) {
-        return listeMedFilter.map {
-            val filtrerVeileder = filtrerVeilederSomErIkkePaEnheten(it, veilederePaEnheten)
-            val nyttFilter  = it.filterValg.copy(veiledere = filtrerVeileder)
-            oppdaterFilter(it.enhetId , FilterModel(it.filterId, it.filterNavn, nyttFilter, null))
-        }
-         */
+         filterForBruker.forEach {
+             val filtrerVeileder = filtrerVeilederSomErIkkePaEnheten(it, veilederePaEnheten)
+             val nyttFilter  = it.filterValg.copy(veiledere = filtrerVeileder)
+             oppdaterFilter(enhetId , FilterModel(it.filterId, it.filterNavn, nyttFilter, null))
+         }
 
+     }
 
-    /*
-    private fun filtrerVeilederSomErIkkePaEnheten(
-        lagretFilter: EnhetFilterModel,
-        veilederePaEnheten: VeiledereResponse
-    ): List<String> =
+    private fun filtrerVeilederSomErIkkePaEnheten(lagretFilter: FilterModel, veilederePaEnheten: VeiledereResponse): List<String> =
         lagretFilter.filterValg.veiledere.filter { veilederIdent ->
             veilederePaEnheten.veilederListe.map { it.ident }.contains(veilederIdent)
         }
-     */
+
+
+}
+/*
+    fetch all rows from table: veiledergrupper
+    for each row
+        - make api request to fetch all veilederer for that enhet
+        - filter all veileder that are not longer active and update db
+        - ask Lars: if groups is empty after cleanup we can remove group as well
+ */
+
+/*
+val veilederePaEnheten = veilarbveilederClient
+                .hentVeilederePaEnheten(it, call.request.cookies["ID_token"])
+                ?: throw IllegalStateException()
+ */
+
+/*
+private fun cleanupVeilederGrupper(enhetId: String) {
+return listeMedFilter.map {
+    val filtrerVeileder = filtrerVeilederSomErIkkePaEnheten(it, veilederePaEnheten)
+    val nyttFilter  = it.filterValg.copy(veiledere = filtrerVeileder)
+    oppdaterFilter(it.enhetId , FilterModel(it.filterId, it.filterNavn, nyttFilter, null))
+}
+ */
+
+
+

@@ -8,7 +8,6 @@ import io.ktor.response.respond
 import io.ktor.routing.*
 import no.nav.pto.veilarbfilter.JwtUtil
 import no.nav.pto.veilarbfilter.abac.PepClient
-import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import no.nav.pto.veilarbfilter.service.FilterService
 
