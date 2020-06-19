@@ -13,13 +13,13 @@ class MineFilterServiceImpl() : FilterService {
 
     override suspend fun hentFilter(filterId: Int): FilterModel? = dbQuery {
         (Filter innerJoin MineFilter).slice(
-                Filter.filterId,
-                Filter.filterNavn,
-                Filter.valgteFilter,
-                MineFilter.veilederId
+            Filter.filterId,
+            Filter.filterNavn,
+            Filter.valgteFilter,
+            MineFilter.veilederId
         ).select { (Filter.filterId.eq(filterId)) }
-                .mapNotNull { tilMineFilterModel(it) }
-                .singleOrNull()
+            .mapNotNull { tilMineFilterModel(it) }
+            .singleOrNull()
     }
 
     override suspend fun slettFilter(filterId: Int, veilederId: String): Int = dbQuery {
@@ -29,16 +29,6 @@ class MineFilterServiceImpl() : FilterService {
         } else {
             0
         }
-    }
-
-    override suspend fun oppdaterFilter(filterId: Int, filterValg: FilterModel): FilterModel {
-        dbQuery {
-            Filter.update({ (Filter.filterId eq filterId) }) {
-                it[filterNavn] = filterValg.filterNavn
-                it[valgteFilter] = filterValg.filterValg
-            }
-        }
-        return hentFilter(filterValg.filterId)!!
     }
 
     override suspend fun lagreFilter(veilederId: String, nyttFilter: NyttFilterModel): FilterModel? {
@@ -58,23 +48,34 @@ class MineFilterServiceImpl() : FilterService {
         return hentFilter(key)
     }
 
+    override suspend fun oppdaterFilter(filterBrukerId: String, filterValg: FilterModel): FilterModel {
+        dbQuery {
+            (Filter innerJoin MineFilter)
+                .update({ (Filter.filterId eq filterValg.filterId) and (MineFilter.veilederId eq filterBrukerId)}) {
+                    it[Filter.filterNavn] = filterValg.filterNavn
+                    it[Filter.valgteFilter] = filterValg.filterValg
+                }
+        }
+        return hentFilter(filterValg.filterId)!!
+    }
+
     private fun tilMineFilterModel(row: ResultRow): FilterModel =
-            MineFilterModel(
-                    filterId = row[Filter.filterId],
-                    filterNavn = row[Filter.filterNavn],
-                    filterValg = row[Filter.valgteFilter],
-                    veilederId = row[MineFilter.veilederId],
-                    opprettetDato = row[Filter.opprettetDato]
-            )
+        MineFilterModel(
+            filterId = row[Filter.filterId],
+            filterNavn = row[Filter.filterNavn],
+            filterValg = row[Filter.valgteFilter],
+            veilederId = row[MineFilter.veilederId],
+            opprettetDato = row[Filter.opprettetDato]
+        )
 
     override suspend fun finnFilterForFilterBruker(veilederId: String) = dbQuery {
         (Filter innerJoin MineFilter).slice(
-                Filter.filterId,
-                Filter.filterNavn,
-                Filter.valgteFilter,
-                MineFilter.veilederId
+            Filter.filterId,
+            Filter.filterNavn,
+            Filter.valgteFilter,
+            MineFilter.veilederId
         ).select { (MineFilter.veilederId.eq(veilederId)) }
-                .map { tilMineFilterModel(it) }
+            .mapNotNull { tilMineFilterModel(it) }
     }
 
 }

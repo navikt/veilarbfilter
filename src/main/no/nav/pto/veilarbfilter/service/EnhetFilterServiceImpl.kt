@@ -1,8 +1,8 @@
 package no.nav.pto.veilarbfilter.service
 
-import no.nav.pto.veilarbfilter.client.VeiledereResponse
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.EnhetFilter
+import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.model.EnhetFilterModel
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
@@ -11,61 +11,71 @@ import java.time.LocalDateTime
 
 class EnhetFilterServiceImpl (): FilterService {
 
-    override suspend fun hentFilter(filterId: Int): EnhetFilterModel? = dbQuery {
-        EnhetFilter.select { (EnhetFilter.filterId eq filterId) }
+    override suspend fun hentFilter(filterId: Int): EnhetFilterModel?  = dbQuery {
+        (Filter innerJoin EnhetFilter).slice(
+            Filter.filterId,
+            Filter.filterNavn,
+            Filter.valgteFilter,
+            EnhetFilter.enhetId
+        ).select { (Filter.filterId.eq(filterId)) }
             .mapNotNull { tilEnhetFilterModel(it) }
             .singleOrNull()
     }
 
-    override suspend fun slettFilter(enhetId: String, filterId: String): Int  = dbQuery {
-        EnhetFilter.deleteWhere {(EnhetFilter.enhet eq enhetId) and (EnhetFilter.filterId eq filterId.toInt()) }
+    override suspend fun finnFilterForFilterBruker(enhetId: String): List<EnhetFilterModel> = dbQuery {
+        (Filter innerJoin EnhetFilter).slice(
+            Filter.filterId,
+            Filter.filterNavn,
+            Filter.valgteFilter,
+            EnhetFilter.enhetId
+        ).select {(EnhetFilter.enhetId.eq(enhetId)) }
+            .mapNotNull { tilEnhetFilterModel(it) }
     }
 
-    override suspend fun finnFilterForFilterBruker(enhetId: String): List<EnhetFilterModel> {
-        return hentFilter(enhetId)
+    override suspend fun slettFilter(filterId: Int, enhetId: String): Int = dbQuery {
+        val removedRows = EnhetFilter.deleteWhere {(EnhetFilter.filterId eq filterId) and (EnhetFilter.enhetId eq enhetId)}
+        if (removedRows > 0) {
+            Filter.deleteWhere { (Filter.filterId eq filterId) }
+        } else {
+            0
+        }
     }
 
-    override suspend fun oppdaterFilter(enhetId: String, filterValg: FilterModel): EnhetFilterModel {
+    override suspend fun oppdaterFilter(enhetId: String, filterValg: FilterModel): FilterModel {
         dbQuery {
-            EnhetFilter.update({ (EnhetFilter.enhet eq enhetId) and (EnhetFilter.filterId eq filterValg.filterId) }) {
-                it[filterNavn] = filterValg.filterNavn
-                it[valgteFilter] = filterValg.filterValg
-                it[enhet] = enhetId
-            }
+            (Filter innerJoin EnhetFilter)
+                .update({ (Filter.filterId eq filterValg.filterId) and (EnhetFilter.enhetId eq enhetId)}) {
+                    it[Filter.filterNavn] = filterValg.filterNavn
+                    it[Filter.valgteFilter] = filterValg.filterValg
+                }
         }
         return hentFilter(filterValg.filterId)!!
     }
 
     override suspend fun lagreFilter(enhetId: String, nyttFilter: NyttFilterModel): EnhetFilterModel {
-        var key = 0
+        var key = 0;
         dbQuery {
-            key = (EnhetFilter.insert {
+            key = (Filter.insert {
                 it[filterNavn] = nyttFilter.filterNavn
                 it[valgteFilter] = nyttFilter.filterValg
-                it[enhet] = enhetId
                 it[opprettetDato] = LocalDateTime.now()
-            } get EnhetFilter.filterId)
+            } get Filter.filterId)
+
+            EnhetFilter.insert {
+                it[filterId] = key
+                it[EnhetFilter.enhetId] = enhetId
+            }
         }
         return hentFilter(key)!!
     }
 
     private fun tilEnhetFilterModel(row: ResultRow): EnhetFilterModel =
         EnhetFilterModel(
-            filterId = row[EnhetFilter.filterId],
-            filterNavn = row[EnhetFilter.filterNavn],
-            filterValg = row[EnhetFilter.valgteFilter],
-            enhetId = row[EnhetFilter.enhet],
-            opprettetDato = row[EnhetFilter.opprettetDato]
+            filterId = row[Filter.filterId],
+            filterNavn = row[Filter.filterNavn],
+            filterValg = row[Filter.valgteFilter],
+            enhetId = row[EnhetFilter.enhetId],
+            opprettetDato = row[Filter.opprettetDato]
         )
-
-    private fun filtrerVeilederSomErIkkePaEnheten (lagretFilter: EnhetFilterModel, veilederePaEnheten: VeiledereResponse): List<String>  =
-        lagretFilter.filterValg.veiledere.filter { veilederIdent ->
-            veilederePaEnheten.veilederListe.map { it.ident }.contains(veilederIdent)
-        }
-
-    private suspend fun hentFilter (enhetId: String) = dbQuery {
-        EnhetFilter.select { (EnhetFilter.enhet eq enhetId) }
-            .mapNotNull { tilEnhetFilterModel(it) }
-    }
 
 }

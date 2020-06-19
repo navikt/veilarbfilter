@@ -13,6 +13,7 @@ import no.nav.pto.veilarbfilter.BadGatewayException
 import no.nav.pto.veilarbfilter.ObjectMapperProvider
 import no.nav.pto.veilarbfilter.config.Configuration
 import org.slf4j.LoggerFactory
+import java.lang.IllegalStateException
 
 data class Enhet(val enhetId: String, val navn: String)
 data class Veileder(val etternavn: String?, val fornavn: String?, val ident: String, val navn: String?)
@@ -39,7 +40,7 @@ class VeilarbveilederClient(config: Configuration) {
                 val response = get(httpClient, enhetId, requestToken)
                 when (response.status.value) {
                     200 -> readResponse(response, enhetId)
-                    else -> throw BadGatewayException("Feilet mot veilarbveileder")
+                    else -> throw IllegalStateException("Feilet mot veilarbveileder")
                 }
             }
         }

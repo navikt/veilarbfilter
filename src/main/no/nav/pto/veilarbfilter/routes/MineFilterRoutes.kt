@@ -7,11 +7,13 @@ import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
 import no.nav.pto.veilarbfilter.JwtUtil
+import no.nav.pto.veilarbfilter.abac.PepClient
+import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import no.nav.pto.veilarbfilter.service.FilterService
 
 
-fun Route.apiMineFilterRoutes(mineFilterService: FilterService) {
+fun Route.mineFilterRoutes(mineFilterService: FilterService, pepClient: PepClient) {
     authenticate {
         route("/api/minefilter") {
             post("/") {
@@ -21,28 +23,30 @@ fun Route.apiMineFilterRoutes(mineFilterService: FilterService) {
                     savedFilter?.let { call.respond(it) } ?: throw IllegalArgumentException()
                 }
             }
-            put("/{enhetId}") {
-                val oppdatertFilter = enhetFilterService.oppdaterEnhetFilter(it, request)
-                call.respond(oppdatertFilter)
+            put("/{filterId}") {
+                JwtUtil.getSubject(call)?.let {
+                    val oppdatertFilter = mineFilterService.oppdaterFilter(it, call.receive())
+                    call.respond(oppdatertFilter)
+                }
             }
-            get("/{enhetId}") {
+            get("/") {
                 pepAuth(pepClient) {
-                    val veilederePaEnheten = veilarbveilederClient
-                            .hentVeilederePaEnheten(it, call.request.cookies["ID_token"])
-                            ?: throw IllegalStateException()
-
-                    val filterListe = enhetFilterService.finnFilterForEnhet(it, veilederePaEnheten)
-                    call.respond(filterListe)
+                    JwtUtil.getSubject(call)?.let { veilederId ->
+                        val filterListe = mineFilterService.finnFilterForFilterBruker(it)
+                        call.respond(filterListe)
+                    }
                 }
             }
             delete("/{enhetId}/filter/{filterId}") {
                 pepAuth(pepClient) {
-                    call.parameters["filterId"]?.let { filter ->
-                        val slettetFilterId = enhetFilterService.slettFilter(it, filter)
-                        if (slettetFilterId == 0) {
-                            call.respond(HttpStatusCode.NotFound)
+                    JwtUtil.getSubject(call)?.let { veilederId ->
+                        call.parameters["filterId"]?.let { filter ->
+                            val slettetFilterId = mineFilterService.slettFilter(filter.toInt(), veilederId)
+                            if (slettetFilterId == 0) {
+                                call.respond(HttpStatusCode.NotFound)
+                            }
+                            call.respond(HttpStatusCode.NoContent)
                         }
-                        call.respond(HttpStatusCode.NoContent)
                     }
                 }
             }

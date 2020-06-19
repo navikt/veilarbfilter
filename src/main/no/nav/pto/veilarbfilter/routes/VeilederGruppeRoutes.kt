@@ -2,21 +2,17 @@ package no.nav.pto.veilarbfilter.routes
 
 import io.ktor.application.ApplicationCall
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
-import no.nav.pto.veilarbfilter.service.EnhetFilterService
 import io.ktor.application.call
 import io.ktor.auth.authenticate
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.HttpStatusCode.Companion.BadGateway
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
 import io.ktor.util.pipeline.PipelineContext
-import no.nav.pto.veilarbfilter.BadGatewayException
 import no.nav.pto.veilarbfilter.JwtUtil.Companion.getSubject
 import no.nav.pto.veilarbfilter.abac.PepClient
-import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.model.FilterModel
-import java.lang.IllegalStateException
+import no.nav.pto.veilarbfilter.service.FilterService
 
 suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(pepClient: PepClient, build: suspend PipelineContext<Unit, ApplicationCall>.(id: String) -> Unit) {
     val ident = getSubject(call)
@@ -33,33 +29,35 @@ suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(pepClient: PepClient,
     }
 }
 
-fun Route.apiRoutes(enhetFilterService: EnhetFilterService, pepClient: PepClient) {
+fun Route.veilederGruppeRoutes(veilederGrupperService: FilterService, pepClient: PepClient) {
     authenticate {
         route("/api/enhet") {
             post("/{enhetId}") {
                 pepAuth(pepClient) {
                     val request = call.receive<NyttFilterModel>()
-                    val nyttfilter = enhetFilterService.lagreEnhetFilter(it, request)
-                    call.respond(nyttfilter)
+                    veilederGrupperService.lagreFilter(it, request)
+                        ?.let {nyttfilter -> call.respond(nyttfilter)}
+                        ?: throw IllegalStateException()
+
                 }
             }
             put("/{enhetId}") {
                 pepAuth(pepClient) {
                     val request = call.receive<FilterModel>()
-                    val oppdatertFilter = enhetFilterService.oppdaterEnhetFilter(it, request)
+                    val oppdatertFilter = veilederGrupperService.oppdaterFilter(it, request)
                     call.respond(oppdatertFilter)
                 }
             }
             get("/{enhetId}") {
                 pepAuth(pepClient) {
-                    val filterListe = enhetFilterService.finnFilterForEnhet(it)
+                    val filterListe = veilederGrupperService.finnFilterForFilterBruker(it)
                     call.respond(filterListe)
                 }
             }
             delete("/{enhetId}/filter/{filterId}") {
                 pepAuth(pepClient) {
                     call.parameters["filterId"]?.let { filter ->
-                        val slettetFilterId = enhetFilterService.slettFilter(it, filter)
+                        val slettetFilterId = veilederGrupperService.slettFilter(it.toInt(), filter)
                         if(slettetFilterId == 0 ) {
                             call.respond(HttpStatusCode.NotFound)
                         }

@@ -9,6 +9,7 @@ import io.ktor.request.ApplicationRequest
 import io.ktor.response.respond
 import org.slf4j.LoggerFactory
 import org.springframework.web.client.HttpServerErrorException
+import java.lang.IllegalStateException
 import java.lang.RuntimeException
 
 private val log = LoggerFactory.getLogger("Exceptionhandler")
@@ -23,6 +24,12 @@ fun StatusPages.Configuration.exceptionHandler() {
     exception<IllegalArgumentException> { cause ->
         call.logErrorAndRespond(cause, HttpStatusCode.BadRequest) {
             "The request was either invalid or lacked required parameters."
+        }
+    }
+
+    exception<IllegalStateException> { cause ->
+        call.logErrorAndRespond(cause, HttpStatusCode.InternalServerError) {
+            "Internal server error"
         }
     }
 

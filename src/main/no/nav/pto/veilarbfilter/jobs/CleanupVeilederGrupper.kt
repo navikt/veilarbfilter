@@ -1,6 +1,7 @@
-package no.nav.pto.veilarbfilter.service
+package no.nav.pto.veilarbfilter.jobs
 
 import kotlinx.coroutines.*
+import no.nav.pto.veilarbfilter.service.VeilederGrupperService
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
@@ -24,7 +25,6 @@ class CleanupVeilederGrupper(val veilederGrupperService: VeilederGrupperService,
             delay(it)
         }
         while (isActive) {
-            veilederGrupperService.fjernIkkeAktiveVeiledereIVeilederGruppe()
             delay(interval)
         }
         println("cleanup ferdig")
