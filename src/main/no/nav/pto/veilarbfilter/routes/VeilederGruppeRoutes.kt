@@ -57,7 +57,7 @@ fun Route.veilederGruppeRoutes(veilederGrupperService: FilterService, pepClient:
             delete("/{enhetId}/filter/{filterId}") {
                 pepAuth(pepClient) {
                     call.parameters["filterId"]?.let { filter ->
-                        val slettetFilterId = veilederGrupperService.slettFilter(it.toInt(), filter)
+                        val slettetFilterId = veilederGrupperService.slettFilter(filter.toInt(), call.parameters["enhetId"]!!)
                         if(slettetFilterId == 0 ) {
                             call.respond(HttpStatusCode.NotFound)
                         }
