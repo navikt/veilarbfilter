@@ -9,6 +9,10 @@ import java.util.concurrent.TimeUnit
 
 data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
 
+
+private val INITIAL_DELAY = TimeUnit.MINUTES.toMillis(5);
+private val INTERVAL = TimeUnit.MINUTES.toMillis(15);
+
 fun main() {
 
     val configuration = Configuration()
@@ -16,7 +20,7 @@ fun main() {
     val applicationState = ApplicationState()
 
     val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration));
-    CleanupVeilederGrupper(veilederGrupperService = veilederGrupperService, initialDelay = TimeUnit.MINUTES.toMillis(5), interval = TimeUnit.MINUTES.toMillis(15));
+    CleanupVeilederGrupper(veilederGrupperService = veilederGrupperService, initialDelay = INITIAL_DELAY, interval = INTERVAL).start();
 
     val applicationServer = createHttpServer(applicationState = applicationState, configuration = configuration, veilederGrupperService = veilederGrupperService);
 
