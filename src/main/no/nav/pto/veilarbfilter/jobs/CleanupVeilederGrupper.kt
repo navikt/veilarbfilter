@@ -2,11 +2,14 @@ package no.nav.pto.veilarbfilter.jobs
 
 import kotlinx.coroutines.*
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
+import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 class CleanupVeilederGrupper(val veilederGrupperService: VeilederGrupperServiceImpl, val interval: Long, val initialDelay: Long?) :
-    CoroutineScope {
+        CoroutineScope {
+    private val log = LoggerFactory.getLogger("CleanupVeilederGrupper")
+
     private val job = Job()
 
     private val singleThreadExecutor = Executors.newSingleThreadExecutor()
@@ -25,8 +28,16 @@ class CleanupVeilederGrupper(val veilederGrupperService: VeilederGrupperServiceI
             delay(it)
         }
         while (isActive) {
+            fjernVeilederSomErIkkeAktive();
             delay(interval)
         }
-        println("cleanup ferdig")
+        log.info("Fjern veileder som er ikke aktive er ferdig")
+    }
+
+    private suspend fun fjernVeilederSomErIkkeAktive() {
+        veilederGrupperService.hentAlleEnheter().forEach {
+            log.info("Fjern veileder for enhet {}", it)
+            veilederGrupperService.slettVeiledereSomIkkeErAktivePaEnheten(it)
+        }
     }
 }

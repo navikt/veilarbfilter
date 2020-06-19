@@ -1,19 +1,19 @@
 package no.nav.pto.veilarbfilter.service
 
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
-import no.nav.pto.veilarbfilter.client.VeiledereResponse
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.db.VeilederGrupperFilter
-import no.nav.pto.veilarbfilter.model.EnhetFilterModel
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import no.nav.pto.veilarbfilter.model.VeilederGruppeFilterModel
 import org.jetbrains.exposed.sql.*
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) : FilterService {
     private val veilarbveilederClient: VeilarbveilederClient = veilarbveilederClient;
+    private val log = LoggerFactory.getLogger("VeilederGrupperServiceImpl")
 
     override suspend fun lagreFilter(enhetId: String, nyttFilter: NyttFilterModel): FilterModel? {
         var key = 0;
@@ -35,10 +35,10 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
     override suspend fun oppdaterFilter(enhetId: String, filterValg: FilterModel): FilterModel {
         dbQuery {
             (Filter innerJoin VeilederGrupperFilter)
-                .update({ (Filter.filterId eq filterValg.filterId) and (VeilederGrupperFilter.enhetId eq enhetId) }) {
-                    it[Filter.filterNavn] = filterValg.filterNavn
-                    it[Filter.valgteFilter] = filterValg.filterValg
-                }
+                    .update({ (Filter.filterId eq filterValg.filterId) and (VeilederGrupperFilter.enhetId eq enhetId) }) {
+                        it[Filter.filterNavn] = filterValg.filterNavn
+                        it[Filter.valgteFilter] = filterValg.filterValg
+                    }
         }
         return hentFilter(filterValg.filterId)!!
     }
@@ -46,38 +46,38 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
 
     override suspend fun hentFilter(filterId: Int): FilterModel? = dbQuery {
         (Filter innerJoin VeilederGrupperFilter).slice(
-            Filter.filterId,
-            Filter.filterNavn,
-            Filter.valgteFilter,
-            VeilederGrupperFilter.enhetId
+                Filter.filterId,
+                Filter.filterNavn,
+                Filter.valgteFilter,
+                VeilederGrupperFilter.enhetId
         ).select { (Filter.filterId eq filterId) }
-            .mapNotNull { tilVeilederGruppeFilterModel(it) }
-            .singleOrNull()
+                .mapNotNull { tilVeilederGruppeFilterModel(it) }
+                .singleOrNull()
     }
 
     private fun tilVeilederGruppeFilterModel(row: ResultRow): FilterModel =
-        VeilederGruppeFilterModel(
-            filterId = row[Filter.filterId],
-            filterNavn = row[Filter.filterNavn],
-            filterValg = row[Filter.valgteFilter],
-            enhetId = row[VeilederGrupperFilter.enhetId],
-            opprettetDato = row[Filter.opprettetDato]
-        )
+            VeilederGruppeFilterModel(
+                    filterId = row[Filter.filterId],
+                    filterNavn = row[Filter.filterNavn],
+                    filterValg = row[Filter.valgteFilter],
+                    enhetId = row[VeilederGrupperFilter.enhetId],
+                    opprettetDato = row[Filter.opprettetDato]
+            )
 
     override suspend fun finnFilterForFilterBruker(enhetId: String): List<FilterModel> = dbQuery {
         (Filter innerJoin VeilederGrupperFilter).slice(
-            Filter.filterId,
-            Filter.filterNavn,
-            Filter.valgteFilter,
-            VeilederGrupperFilter.enhetId
+                Filter.filterId,
+                Filter.filterNavn,
+                Filter.valgteFilter,
+                VeilederGrupperFilter.enhetId
         ).select { (VeilederGrupperFilter.enhetId eq enhetId) }
-            .mapNotNull { tilVeilederGruppeFilterModel(it) }
+                .mapNotNull { tilVeilederGruppeFilterModel(it) }
     }
 
 
     override suspend fun slettFilter(filterId: Int, enhetId: String): Int = dbQuery {
         val removedRows =
-            VeilederGrupperFilter.deleteWhere { (VeilederGrupperFilter.filterId eq filterId) and (VeilederGrupperFilter.enhetId eq enhetId) }
+                VeilederGrupperFilter.deleteWhere { (VeilederGrupperFilter.filterId eq filterId) and (VeilederGrupperFilter.enhetId eq enhetId) }
         if (removedRows > 0) {
             Filter.deleteWhere { (Filter.filterId eq filterId) }
         } else {
@@ -85,50 +85,35 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
         }
     }
 
-     suspend fun slettVeiledereSomIkkeErAktivePaEnheten(enhetId: String) {
-         val veilederePaEnheten = veilarbveilederClient
-             .hentVeilederePaEnheten(enhetId)
-             ?: throw IllegalStateException();
+    suspend fun slettVeiledereSomIkkeErAktivePaEnheten(enhetId: String) {
+        val veilederePaEnheten = veilarbveilederClient
+                .hentVeilederePaEnheten(enhetId)
+                ?: throw IllegalStateException();
 
         val filterForBruker = finnFilterForFilterBruker(enhetId);
 
-         filterForBruker.forEach {
-             val filtrerVeileder = filtrerVeilederSomErIkkePaEnheten(it, veilederePaEnheten)
-             val nyttFilter  = it.filterValg.copy(veiledere = filtrerVeileder)
-             oppdaterFilter(enhetId , FilterModel(it.filterId, it.filterNavn, nyttFilter, null))
-         }
-
-     }
-
-    private fun filtrerVeilederSomErIkkePaEnheten(lagretFilter: FilterModel, veilederePaEnheten: VeiledereResponse): List<String> =
-        lagretFilter.filterValg.veiledere.filter { veilederIdent ->
-            veilederePaEnheten.veilederListe.map { it.ident }.contains(veilederIdent)
+        filterForBruker.forEach {
+            log.info("Veiledergruppe fore filter: {}", it.filterValg.veiledere)
+            val filtrerVeileder = filtrerVeilederSomErIkkePaEnheten(it, veilederePaEnheten)
+            val nyttFilter = it.filterValg.copy(veiledere = filtrerVeileder)
+            log.info("Veiledergruppe etter filter: {}", nyttFilter.veiledere)
+            oppdaterFilter(enhetId, FilterModel(it.filterId, it.filterNavn, nyttFilter, it.opprettetDato))
         }
+    }
 
+    private fun filtrerVeilederSomErIkkePaEnheten(lagretFilter: FilterModel, veilederePaEnheten: List<String>): List<String> =
+            lagretFilter.filterValg.veiledere.filter { veilederIdent ->
+                veilederePaEnheten.contains(veilederIdent)
+            }
 
+    suspend fun hentAlleEnheter(): List<String> =
+            dbQuery {
+                VeilederGrupperFilter.slice(VeilederGrupperFilter.enhetId)
+                        .selectAll()
+                        .distinct()
+                        .mapNotNull { it[VeilederGrupperFilter.enhetId] }
+            }
 }
-/*
-    fetch all rows from table: veiledergrupper
-    for each row
-        - make api request to fetch all veilederer for that enhet
-        - filter all veileder that are not longer active and update db
-        - ask Lars: if groups is empty after cleanup we can remove group as well
- */
-
-/*
-val veilederePaEnheten = veilarbveilederClient
-                .hentVeilederePaEnheten(it, call.request.cookies["ID_token"])
-                ?: throw IllegalStateException()
- */
-
-/*
-private fun cleanupVeilederGrupper(enhetId: String) {
-return listeMedFilter.map {
-    val filtrerVeileder = filtrerVeilederSomErIkkePaEnheten(it, veilederePaEnheten)
-    val nyttFilter  = it.filterValg.copy(veiledere = filtrerVeileder)
-    oppdaterFilter(it.enhetId , FilterModel(it.filterId, it.filterNavn, nyttFilter, null))
-}
- */
 
 
 
