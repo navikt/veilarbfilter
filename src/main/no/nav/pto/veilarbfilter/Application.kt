@@ -30,6 +30,7 @@ fun main() {
         cleanUpVeilederGrupper.stop()
     })
 
-    applicationServer.start(wait = true)
     cleanUpVeilederGrupper.start()
+    applicationServer.start(wait = true)
+
 }

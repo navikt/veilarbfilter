@@ -11,10 +11,10 @@ import java.util.concurrent.TimeUnit
 fun main() {
 
     val configuration = Configuration(
-        clustername = "",
-        serviceUser = NaisUtils.Credentials("foo", "bar"),
-        abac = Configuration.Abac(""),
-        veilarbveilederConfig = Configuration.VeilarbveilederConfig("")
+            clustername = "",
+            serviceUser = NaisUtils.Credentials("foo", "bar"),
+            abac = Configuration.Abac(""),
+            veilarbveilederConfig = Configuration.VeilarbveilederConfig("")
     )
     Database(configuration)
     val applicationState = ApplicationState()
@@ -29,6 +29,7 @@ fun main() {
         applicationServer.stop(5, 5, TimeUnit.SECONDS)
     })
 
-    applicationServer.start(wait = true)
     cleanupVeilederGrupper.start()
+    applicationServer.start(wait = true)
+
 }

@@ -34,11 +34,14 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
 
     override suspend fun oppdaterFilter(enhetId: String, filterValg: FilterModel): FilterModel {
         dbQuery {
-            (Filter innerJoin VeilederGrupperFilter)
-                    .update({ (Filter.filterId eq filterValg.filterId) and (VeilederGrupperFilter.enhetId eq enhetId) }) {
-                        it[Filter.filterNavn] = filterValg.filterNavn
-                        it[Filter.valgteFilter] = filterValg.filterValg
-                    }
+            val isValidUpdate = (VeilederGrupperFilter).select({ (VeilederGrupperFilter.filterId eq filterValg.filterId) and (VeilederGrupperFilter.enhetId eq enhetId) }).count() > 0
+            if (isValidUpdate) {
+                Filter
+                        .update({ (Filter.filterId eq filterValg.filterId) }) {
+                            it[filterNavn] = filterValg.filterNavn
+                            it[valgteFilter] = filterValg.filterValg
+                        }
+            }
         }
         return hentFilter(filterValg.filterId)!!
     }
@@ -70,7 +73,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
                 Filter.filterId,
                 Filter.filterNavn,
                 Filter.valgteFilter,
-                VeilederGrupperFilter.enhetId ,
+                VeilederGrupperFilter.enhetId,
                 Filter.opprettetDato
         ).select { (VeilederGrupperFilter.enhetId eq enhetId) }
                 .mapNotNull { tilVeilederGruppeFilterModel(it) }
