@@ -25,23 +25,17 @@ class Database (configuration: Configuration) {
     }
 
     fun initLocal() {
-
-        val embeddedPostgres = EmbeddedPostgres.builder().start()
-        val pg = "postgres"
-        val jdbcUrl = embeddedPostgres.getJdbcUrl(pg, pg)
-
         val config = HikariConfig()
         config.driverClassName = "org.postgresql.Driver"
-        config.jdbcUrl = jdbcUrl
-        config.username = pg
-        config.password = pg
+        config.jdbcUrl = dbUrl
+        config.username = "user"
+        config.password = "password"
         config.maximumPoolSize = 3
         config.isAutoCommit = false
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         config.validate()
         Database.connect(HikariDataSource(config))
-
-        val flyway = Flyway.configure().dataSource(jdbcUrl, pg, pg).load()
+        val flyway = Flyway.configure().dataSource(dbUrl, "user", "password").load()
         flyway.migrate()
     }
 

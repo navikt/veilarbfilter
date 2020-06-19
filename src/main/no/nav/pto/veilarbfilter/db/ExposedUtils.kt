@@ -1,9 +1,7 @@
-package no.nav.pto.veilarbfilter.model
+package no.nav.pto.veilarbfilter.db
 
 import no.nav.pto.veilarbfilter.ObjectMapperProvider.Companion.objectMapper
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.ColumnType
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.api.PreparedStatementApi
 import org.postgresql.util.PGobject
 
