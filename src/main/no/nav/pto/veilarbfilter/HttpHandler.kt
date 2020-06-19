@@ -19,14 +19,16 @@ import no.nav.log.LogFilter
 import no.nav.pto.veilarbfilter.abac.PepClient
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
-import no.nav.pto.veilarbfilter.config.Database
 import no.nav.pto.veilarbfilter.routes.internalRoutes
-import no.nav.pto.veilarbfilter.routes.apiRoutes
-import no.nav.pto.veilarbfilter.service.EnhetFilterServiceImpl
+import no.nav.pto.veilarbfilter.routes.mineFilterRoutes
+import no.nav.pto.veilarbfilter.routes.veilederGruppeRoutes
+import no.nav.pto.veilarbfilter.service.MineFilterServiceImpl
+import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
 
 fun createHttpServer(applicationState: ApplicationState,
                      port: Int = 8080,
                      configuration: Configuration,
+                     veilederGrupperService: VeilederGrupperServiceImpl,
                      useAuthentication: Boolean = true): ApplicationEngine = embeddedServer(Netty, port) {
     install(StatusPages) {
         exceptionHandler()
@@ -61,12 +63,13 @@ fun createHttpServer(applicationState: ApplicationState,
         register(ContentType.Application.Json, JacksonConverter(ObjectMapperProvider.objectMapper))
     }
 
-    Database(configuration)
+    val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration));
 
     routing {
         route("veilarbfilter") {
             internalRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
-            apiRoutes(EnhetFilterServiceImpl(), PepClient(config = configuration), VeilarbveilederClient(configuration))
+            veilederGruppeRoutes(veilederGrupperService, PepClient(config = configuration))
+            mineFilterRoutes(MineFilterServiceImpl(), PepClient(config = configuration))
         }
     }
 

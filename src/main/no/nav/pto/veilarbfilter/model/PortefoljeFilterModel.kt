@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class EnhetPortefoljeFilter (
+data class PortefoljeFilter (
     val aktiviteter: Aktiviteter,
     val alder: List<String>,
     val ferdigfilterListe: List<String>,
@@ -12,7 +12,7 @@ data class EnhetPortefoljeFilter (
     val formidlingsgruppe: List<String>,
     val hovedmal: List<String>,
     val innsatsgruppe: List<String>,
-    val kjonn: List<String>,
+    val kjonn: String?,
     val manuellBrukerStatus: List<String>,
     val navnEllerFnrQuery: String,
     val rettighetsgruppe: List<String>,
@@ -23,7 +23,6 @@ data class EnhetPortefoljeFilter (
     val ytelse: String?,
     val registreringstype: List<String>?
     )
-
 
 data class Aktiviteter (
     @get:JsonProperty("BEHANDLING") val BEHANDLING: String?,
