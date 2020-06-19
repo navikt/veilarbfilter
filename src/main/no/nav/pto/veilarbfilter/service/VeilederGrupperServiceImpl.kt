@@ -49,7 +49,8 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
                 Filter.filterId,
                 Filter.filterNavn,
                 Filter.valgteFilter,
-                VeilederGrupperFilter.enhetId
+                VeilederGrupperFilter.enhetId,
+                Filter.opprettetDato
         ).select { (Filter.filterId eq filterId) }
                 .mapNotNull { tilVeilederGruppeFilterModel(it) }
                 .singleOrNull()
@@ -69,7 +70,8 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
                 Filter.filterId,
                 Filter.filterNavn,
                 Filter.valgteFilter,
-                VeilederGrupperFilter.enhetId
+                VeilederGrupperFilter.enhetId ,
+                Filter.opprettetDato
         ).select { (VeilederGrupperFilter.enhetId eq enhetId) }
                 .mapNotNull { tilVeilederGruppeFilterModel(it) }
     }
