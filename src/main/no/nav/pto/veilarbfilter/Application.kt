@@ -20,14 +20,16 @@ fun main() {
     val applicationState = ApplicationState()
 
     val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration));
-    CleanupVeilederGrupper(veilederGrupperService = veilederGrupperService, initialDelay = INITIAL_DELAY, interval = INTERVAL).start();
+    val cleanUpVeilederGrupper = CleanupVeilederGrupper(veilederGrupperService = veilederGrupperService, initialDelay = INITIAL_DELAY, interval = INTERVAL)
 
     val applicationServer = createHttpServer(applicationState = applicationState, configuration = configuration, veilederGrupperService = veilederGrupperService);
 
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false
         applicationServer.stop(5, 5, TimeUnit.SECONDS)
+        cleanUpVeilederGrupper.stop()
     })
 
     applicationServer.start(wait = true)
+    cleanUpVeilederGrupper.start()
 }
