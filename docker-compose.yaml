@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+
+  # SQL database
+  postgres:
+    image: "postgres:11.5"
+    volumes:
+      - "veilarbfilter-data:/var/lib/postgresql/data"
+    ports:
+      - "54321:5432"
+    environment:
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "veilarbfilter"
+
+volumes:
+  veilarbfilter-data:

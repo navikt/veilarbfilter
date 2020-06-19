@@ -28,7 +28,7 @@ class CleanupVeilederGrupper(val veilederGrupperService: VeilederGrupperServiceI
             delay(it)
         }
         log.info("isActive: {}", isActive)
-        while (isActive) {
+        while (true) {
             fjernVeilederSomErIkkeAktive()
             delay(interval)
             log.info("Fjern veileder som er ikke aktive er ferdig")
