@@ -16,6 +16,7 @@ class MineFilterServiceImpl() : FilterService {
             Filter.filterId,
             Filter.filterNavn,
             Filter.valgteFilter,
+            Filter.opprettetDato,
             MineFilter.veilederId
         ).select { (Filter.filterId.eq(filterId)) }
             .mapNotNull { tilMineFilterModel(it) }
@@ -73,6 +74,7 @@ class MineFilterServiceImpl() : FilterService {
             Filter.filterId,
             Filter.filterNavn,
             Filter.valgteFilter,
+            Filter.opprettetDato,
             MineFilter.veilederId
         ).select { (MineFilter.veilederId.eq(veilederId)) }
             .mapNotNull { tilMineFilterModel(it) }
