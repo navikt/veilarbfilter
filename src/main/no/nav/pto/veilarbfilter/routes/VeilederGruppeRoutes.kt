@@ -31,7 +31,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(pepClient: PepClient,
 
 fun Route.veilederGruppeRoutes(veilederGrupperService: FilterService, pepClient: PepClient) {
     authenticate {
-        route("/api/enhet") {
+        route("/enhet") {
             post("/{enhetId}") {
                 pepAuth(pepClient) {
                     val request = call.receive<NyttFilterModel>()

@@ -14,8 +14,8 @@ import no.nav.pto.veilarbfilter.service.FilterService
 
 fun Route.mineFilterRoutes(mineFilterService: FilterService, pepClient: PepClient) {
     authenticate {
-        route("/api/minefilter") {
-            post("/") {
+        route("/minefilter") {
+            post {
                 JwtUtil.getSubject(call)?.let { veilederId ->
                     val nyttFilter = call.receive<NyttFilterModel>();
                     val savedFilter = mineFilterService.lagreFilter(veilederId, nyttFilter);
@@ -28,24 +28,20 @@ fun Route.mineFilterRoutes(mineFilterService: FilterService, pepClient: PepClien
                     call.respond(oppdatertFilter)
                 }
             }
-            get("/") {
-                pepAuth(pepClient) {
-                    JwtUtil.getSubject(call)?.let { veilederId ->
-                        val filterListe = mineFilterService.finnFilterForFilterBruker(it)
-                        call.respond(filterListe)
-                    }
+            get {
+                JwtUtil.getSubject(call)?.let { veilederId ->
+                    val filterListe = mineFilterService.finnFilterForFilterBruker(veilederId)
+                    call.respond(filterListe)
                 }
             }
             delete("/{enhetId}/filter/{filterId}") {
-                pepAuth(pepClient) {
-                    JwtUtil.getSubject(call)?.let { veilederId ->
-                        call.parameters["filterId"]?.let { filter ->
-                            val slettetFilterId = mineFilterService.slettFilter(filter.toInt(), veilederId)
-                            if (slettetFilterId == 0) {
-                                call.respond(HttpStatusCode.NotFound)
-                            }
-                            call.respond(HttpStatusCode.NoContent)
+                JwtUtil.getSubject(call)?.let { veilederId ->
+                    call.parameters["filterId"]?.let { filter ->
+                        val slettetFilterId = mineFilterService.slettFilter(filter.toInt(), veilederId)
+                        if (slettetFilterId == 0) {
+                            call.respond(HttpStatusCode.NotFound)
                         }
+                        call.respond(HttpStatusCode.NoContent)
                     }
                 }
             }
