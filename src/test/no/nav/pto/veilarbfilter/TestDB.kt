@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter
 
 import junit.framework.Assert.assertEquals
+import org.flywaydb.core.Flyway
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -17,6 +18,11 @@ class DBTest {
     fun setUp() {
         postgresqlContainer = PostgreSQLContainer<Nothing>("postgres:12-alpine")
         postgresqlContainer.start()
+        val flyway =
+            Flyway.configure()
+                .dataSource(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
+                .load()
+        flyway.migrate()
     }
 
     @After
@@ -26,11 +32,8 @@ class DBTest {
 
     @Test
     fun someTestMethod() {
-        val url: String = postgresqlContainer.getJdbcUrl()
-        var username: String = postgresqlContainer.getUsername()
-        val password: String = postgresqlContainer.getPassword()
         val conn: Connection = DriverManager
-            .getConnection(url, username, password)
+            .getConnection(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
         val resultSet: ResultSet = conn.createStatement().executeQuery("SELECT 1")
         resultSet.next()
         val result = resultSet.getInt(1)
