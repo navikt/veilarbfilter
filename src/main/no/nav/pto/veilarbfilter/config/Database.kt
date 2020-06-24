@@ -34,7 +34,7 @@ class Database(configuration: Configuration) {
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         config.validate()
         Database.connect(HikariDataSource(config))
-        val flyway = Flyway.configure().dataSource(dbUrl, "user", "password").load()
+        val flyway = Flyway.configure().dataSource(dbUrl, config.username, config.password).load()
         flyway.migrate()
     }
 
