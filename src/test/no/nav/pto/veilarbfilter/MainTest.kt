@@ -6,7 +6,6 @@ import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
 import no.nav.pto.veilarbfilter.jobs.CleanupVeilederGrupper
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
-import java.util.concurrent.TimeUnit
 
 fun main() {
 
@@ -20,13 +19,13 @@ fun main() {
     val applicationState = ApplicationState()
 
     val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration));
-    val cleanupVeilederGrupper = CleanupVeilederGrupper(veilederGrupperService = veilederGrupperService, initialDelay = null, interval = 100L);
+    val cleanupVeilederGrupper = CleanupVeilederGrupper(veilederGrupperService = veilederGrupperService, initialDelay = 10_000L, interval = 10_000L);
 
     val applicationServer = createHttpServer(applicationState = applicationState, configuration = configuration, veilederGrupperService = veilederGrupperService, useAuthentication = false);
 
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false
-        applicationServer.stop(5, 5, TimeUnit.SECONDS)
+        applicationServer.stop(5, 5)
     })
 
     cleanupVeilederGrupper.start()

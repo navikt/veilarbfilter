@@ -67,7 +67,7 @@ fun createHttpServer(applicationState: ApplicationState,
             internalRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
             route("/api/") {
                 veilederGruppeRoutes(veilederGrupperService, PepClient(config = configuration))
-                mineFilterRoutes(MineFilterServiceImpl())
+                mineFilterRoutes(MineFilterServiceImpl(), useAuthentication)
             }
         }
     }

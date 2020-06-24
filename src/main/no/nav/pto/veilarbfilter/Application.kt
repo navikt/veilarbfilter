@@ -26,7 +26,7 @@ fun main() {
 
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false
-        applicationServer.stop(5, 5, TimeUnit.SECONDS)
+        applicationServer.stop(5, 5)
         cleanUpVeilederGrupper.stop()
     })
 

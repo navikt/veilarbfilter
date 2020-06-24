@@ -21,7 +21,8 @@ data class PortefoljeFilter (
     val veilederNavnQuery: String,
     val veiledere: List<String>,
     val ytelse: String?,
-    val registreringstype: List<String>?
+    val registreringstype: List<String>?,
+    val cvJobbprofil: String?
     )
 
 data class Aktiviteter (

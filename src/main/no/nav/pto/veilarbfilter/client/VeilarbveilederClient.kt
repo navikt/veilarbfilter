@@ -5,15 +5,13 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.response.HttpResponse
-import io.ktor.client.response.readText
-import io.ktor.http.HttpHeaders
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.HttpStatement
+import io.ktor.client.statement.readText
 import kotlinx.coroutines.runBlocking
 import no.nav.common.utils.IdUtils
-import no.nav.pto.veilarbfilter.BadGatewayException
 import no.nav.pto.veilarbfilter.ObjectMapperProvider
 import no.nav.pto.veilarbfilter.config.Configuration
-import org.slf4j.LoggerFactory
 import java.lang.IllegalStateException
 
 data class Enhet(val enhetId: String, val navn: String)
@@ -61,11 +59,11 @@ class VeilarbveilederClient(config: Configuration) {
         httpClient: HttpClient,
         enhetId: String
     ): HttpResponse {
-        val result = httpClient.get<HttpResponse>("$veilarbveilederClientUrl/api/enhet/$enhetId/identer") {
+       return httpClient.get<HttpStatement>("$veilarbveilederClientUrl/api/enhet/$enhetId/identer") {
             header("Nav-Call-Id", IdUtils.generateId())
             header("Nav-Consumer-Id", "veilarbfilter")
         }
-        return result
+            .execute()
     }
 
 }
