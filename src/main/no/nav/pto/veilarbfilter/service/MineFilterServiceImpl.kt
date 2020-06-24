@@ -51,11 +51,15 @@ class MineFilterServiceImpl() : FilterService {
 
     override suspend fun oppdaterFilter(filterBrukerId: String, filterValg: FilterModel): FilterModel {
         dbQuery {
-            (Filter innerJoin MineFilter)
-                .update({ (Filter.filterId eq filterValg.filterId) and (MineFilter.veilederId eq filterBrukerId)}) {
-                    it[Filter.filterNavn] = filterValg.filterNavn
-                    it[Filter.valgteFilter] = filterValg.filterValg
-                }
+            val isValidUpdate = MineFilter.select {(MineFilter.filterId eq filterValg.filterId) and (MineFilter.veilederId eq filterBrukerId) }
+                .count() > 0
+            if (isValidUpdate) {
+                Filter
+                    .update({ (Filter.filterId eq filterValg.filterId) }) {
+                        it[filterNavn] = filterValg.filterNavn
+                        it[valgteFilter] = filterValg.filterValg
+                    }
+            }
         }
         return hentFilter(filterValg.filterId)!!
     }
