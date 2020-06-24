@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter
 
 import junit.framework.Assert.assertEquals
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.testcontainers.containers.PostgreSQLContainer
@@ -17,7 +18,12 @@ class DBTest {
         postgresqlContainer = PostgreSQLContainer<Nothing>("postgres:12-alpine")
         postgresqlContainer.start()
     }
-    
+
+    @After
+    fun tearDown() {
+        postgresqlContainer.stop()
+    }
+
     @Test
     fun someTestMethod() {
         val url: String = postgresqlContainer.getJdbcUrl()
