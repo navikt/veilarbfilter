@@ -1,23 +1,29 @@
 package no.nav.pto.veilarbfilter
 
-import junit.framework.Assert.assertEquals
+import no.nav.common.utils.NaisUtils
+import no.nav.pto.veilarbfilter.config.Configuration
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpUriRequest
+import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.HttpClientBuilder
-import org.junit.After
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
 
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IntegrationTests {
-    private var postgresqlContainer: PostgreSQLContainer<Nothing>;
-    private var testApplication: MainTest
+    private
+    lateinit var postgresqlContainer: PostgreSQLContainer<Nothing>;
 
-    constructor() {
+    @BeforeAll
+    internal fun setUp() {
         postgresqlContainer = PostgreSQLContainer<Nothing>("postgres:12-alpine").apply {
             withDatabaseName("veilarbfilter")
             withUsername("user")
@@ -25,18 +31,28 @@ class IntegrationTests {
         }
         postgresqlContainer.start()
 
-        testApplication =
-            MainTest(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password);
-        testApplication.start();
+        val configuration = Configuration(
+            clustername = "",
+            serviceUser = NaisUtils.Credentials("foo", "bar"),
+            abac = Configuration.Abac(""),
+            veilarbveilederConfig = Configuration.VeilarbveilederConfig(""),
+            database = Configuration.DB(
+                url = postgresqlContainer.jdbcUrl,
+                username = postgresqlContainer.username,
+                password = postgresqlContainer.password
+            ),
+            httpServerWait = false
+        )
+
+        main(configuration)
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         postgresqlContainer.stop()
-        testApplication.stop()
     }
 
-    @Test(timeout = 2000)
+    @Test
     fun testDatabaseConnection() {
         val conn: Connection = DriverManager
             .getConnection(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
@@ -47,11 +63,39 @@ class IntegrationTests {
         assertEquals(1, result)
     }
 
-    @Test(timeout = 2000)
+    @Test
+    fun testIsAlive() {
+        val request: HttpUriRequest = HttpGet("http://0.0.0.0:8080/veilarbfilter/internal/isAlive")
+        val httpResponse = HttpClientBuilder.create().build().execute(request)
+        val responseString = BasicResponseHandler().handleResponse(httpResponse)
+        assertTrue(httpResponse.statusLine.statusCode == 200)
+        assertTrue(responseString.equals("Alive"))
+    }
+
+    @Test
+    fun testIsReady() {
+        val request: HttpUriRequest = HttpGet("http://0.0.0.0:8080/veilarbfilter/internal/isReady")
+        val httpResponse = HttpClientBuilder.create().build().execute(request)
+        val responseString = BasicResponseHandler().handleResponse(httpResponse)
+        assertTrue(httpResponse.statusLine.statusCode == 200)
+        assertTrue(responseString.equals("Ready"))
+    }
+
+    @Test
+    fun testMetrics() {
+        val request: HttpUriRequest = HttpGet("http://0.0.0.0:8080/veilarbfilter/internal/metrics")
+        val httpResponse = HttpClientBuilder.create().build().execute(request)
+        val responseString = BasicResponseHandler().handleResponse(httpResponse)
+        assertTrue(httpResponse.statusLine.statusCode == 200)
+        assertFalse(responseString.isEmpty())
+    }
+
+    @Test
     fun testSavingMineFilter() {
         val request: HttpUriRequest = HttpGet("http://0.0.0.0:8080/veilarbfilter/internal/isAlive")
         val httpResponse = HttpClientBuilder.create().build().execute(request)
-        Assert.assertTrue(httpResponse.statusLine.statusCode == 200)
+        val responseString = BasicResponseHandler().handleResponse(httpResponse)
+
     }
 
 }

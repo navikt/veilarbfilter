@@ -13,16 +13,25 @@ data class ApplicationState(var running: Boolean = true, var initialized: Boolea
 private val INITIAL_DELAY = TimeUnit.MINUTES.toMillis(5);
 private val INTERVAL = TimeUnit.MINUTES.toMillis(15);
 
-fun main() {
+fun main(inputConfiguration: Configuration?) {
 
-    val configuration = Configuration()
+    val configuration = inputConfiguration ?: Configuration()
+
     Database(configuration)
     val applicationState = ApplicationState()
 
     val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration));
-    val cleanUpVeilederGrupper = CleanupVeilederGrupper(veilederGrupperService = veilederGrupperService, initialDelay = INITIAL_DELAY, interval = INTERVAL)
+    val cleanUpVeilederGrupper = CleanupVeilederGrupper(
+        veilederGrupperService = veilederGrupperService,
+        initialDelay = INITIAL_DELAY,
+        interval = INTERVAL
+    )
 
-    val applicationServer = createHttpServer(applicationState = applicationState, configuration = configuration, veilederGrupperService = veilederGrupperService);
+    val applicationServer = createHttpServer(
+        applicationState = applicationState,
+        configuration = configuration,
+        veilederGrupperService = veilederGrupperService
+    );
 
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false
@@ -31,6 +40,6 @@ fun main() {
     })
 
     cleanUpVeilederGrupper.start()
-    applicationServer.start(wait = true)
+    applicationServer.start(wait = configuration.httpServerWait)
 
 }
