@@ -20,7 +20,11 @@ fun main() {
 
     val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration));
     val cleanupVeilederGrupper =
-        CleanupVeilederGrupper(veilederGrupperService = veilederGrupperService, initialDelay = null, interval = 100L);
+        CleanupVeilederGrupper(
+            veilederGrupperService = veilederGrupperService,
+            initialDelay = null,
+            interval = 100000L
+        );
 
     val applicationServer = createHttpServer(
         applicationState = applicationState,

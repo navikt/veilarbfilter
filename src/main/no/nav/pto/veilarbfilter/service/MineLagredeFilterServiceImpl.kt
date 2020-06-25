@@ -2,29 +2,30 @@ package no.nav.pto.veilarbfilter.service
 
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.Filter
-import no.nav.pto.veilarbfilter.db.MineFilter
+import no.nav.pto.veilarbfilter.db.MineLagredeFilter
 import no.nav.pto.veilarbfilter.model.FilterModel
-import no.nav.pto.veilarbfilter.model.MineFilterModel
+import no.nav.pto.veilarbfilter.model.MineLagredeFilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
 
-class MineFilterServiceImpl() : FilterService {
+class MineLagredeFilterServiceImpl() : FilterService {
 
     override suspend fun hentFilter(filterId: Int): FilterModel? = dbQuery {
-        (Filter innerJoin MineFilter).slice(
+        (Filter innerJoin MineLagredeFilter).slice(
             Filter.filterId,
             Filter.filterNavn,
             Filter.valgteFilter,
             Filter.opprettetDato,
-            MineFilter.veilederId
+            MineLagredeFilter.veilederId
         ).select { (Filter.filterId.eq(filterId)) }
-            .mapNotNull { tilMineFilterModel(it) }
+            .mapNotNull { tilMineLagredeFilterModel(it) }
             .singleOrNull()
     }
 
     override suspend fun slettFilter(filterId: Int, veilederId: String): Int = dbQuery {
-        val removedRows = MineFilter.deleteWhere { (MineFilter.filterId eq filterId) and (MineFilter.veilederId eq veilederId) }
+        val removedRows =
+            MineLagredeFilter.deleteWhere { (MineLagredeFilter.filterId eq filterId) and (MineLagredeFilter.veilederId eq veilederId) }
         if (removedRows > 0) {
             Filter.deleteWhere { (Filter.filterId eq filterId) }
         } else {
@@ -41,9 +42,9 @@ class MineFilterServiceImpl() : FilterService {
                 it[opprettetDato] = LocalDateTime.now()
             } get Filter.filterId)
 
-            MineFilter.insert {
+            MineLagredeFilter.insert {
                 it[filterId] = key
-                it[MineFilter.veilederId] = veilederId
+                it[MineLagredeFilter.veilederId] = veilederId
             }
         }
         return hentFilter(key)
@@ -51,8 +52,9 @@ class MineFilterServiceImpl() : FilterService {
 
     override suspend fun oppdaterFilter(filterBrukerId: String, filterValg: FilterModel): FilterModel {
         dbQuery {
-            val isValidUpdate = MineFilter.select {(MineFilter.filterId eq filterValg.filterId) and (MineFilter.veilederId eq filterBrukerId) }
-                .count() > 0
+            val isValidUpdate =
+                MineLagredeFilter.select { (MineLagredeFilter.filterId eq filterValg.filterId) and (MineLagredeFilter.veilederId eq filterBrukerId) }
+                    .count() > 0
             if (isValidUpdate) {
                 Filter
                     .update({ (Filter.filterId eq filterValg.filterId) }) {
@@ -64,24 +66,24 @@ class MineFilterServiceImpl() : FilterService {
         return hentFilter(filterValg.filterId)!!
     }
 
-    private fun tilMineFilterModel(row: ResultRow): FilterModel =
-        MineFilterModel(
+    private fun tilMineLagredeFilterModel(row: ResultRow): FilterModel =
+        MineLagredeFilterModel(
             filterId = row[Filter.filterId],
             filterNavn = row[Filter.filterNavn],
             filterValg = row[Filter.valgteFilter],
-            veilederId = row[MineFilter.veilederId],
+            veilederId = row[MineLagredeFilter.veilederId],
             opprettetDato = row[Filter.opprettetDato]
         )
 
     override suspend fun finnFilterForFilterBruker(veilederId: String) = dbQuery {
-        (Filter innerJoin MineFilter).slice(
+        (Filter innerJoin MineLagredeFilter).slice(
             Filter.filterId,
             Filter.filterNavn,
             Filter.valgteFilter,
             Filter.opprettetDato,
-            MineFilter.veilederId
-        ).select { (MineFilter.veilederId.eq(veilederId)) }
-            .mapNotNull { tilMineFilterModel(it) }
+            MineLagredeFilter.veilederId
+        ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
+            .mapNotNull { tilMineLagredeFilterModel(it) }
     }
 
 }

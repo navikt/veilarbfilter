@@ -10,6 +10,7 @@ import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
 import no.nav.pto.veilarbfilter.MockPayload
+import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import no.nav.pto.veilarbfilter.service.FilterService
 
@@ -27,32 +28,33 @@ fun Route.conditionalAuthenticate(useAuthentication: Boolean, build: Route.() ->
     return route
 }
 
-fun Route.mineFilterRoutes(mineFilterService: FilterService, useAuthentication: Boolean) {
+fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: FilterService, useAuthentication: Boolean) {
     conditionalAuthenticate(useAuthentication) {
-        route("/minefilter") {
+        route("/minelagredefilter") {
             post {
                 call.getNavident()?.let { veilederId ->
                     val nyttFilter = call.receive<NyttFilterModel>()
-                    val savedFilter = mineFilterService.lagreFilter(veilederId, nyttFilter)
+                    val savedFilter = mineLagredeFilterService.lagreFilter(veilederId, nyttFilter)
                     savedFilter?.let { call.respond(it) } ?: throw IllegalArgumentException()
                 }
             }
             put("/{filterId}") {
                 call.getNavident()?.let {
-                    val oppdatertFilter = mineFilterService.oppdaterFilter(it, call.receive())
+                    val filterModel: FilterModel = call.receive()
+                    val oppdatertFilter = mineLagredeFilterService.oppdaterFilter(it, filterModel)
                     call.respond(oppdatertFilter)
                 }
             }
             get {
                 call.getNavident()?.let { veilederId ->
-                    val filterListe = mineFilterService.finnFilterForFilterBruker(veilederId)
+                    val filterListe = mineLagredeFilterService.finnFilterForFilterBruker(veilederId)
                     call.respond(filterListe)
                 }
             }
             delete("/{enhetId}/filter/{filterId}") {
                 call.getNavident()?.let { veilederId ->
                     call.parameters["filterId"]?.let { filter ->
-                        val slettetFilterId = mineFilterService.slettFilter(filter.toInt(), veilederId)
+                        val slettetFilterId = mineLagredeFilterService.slettFilter(filter.toInt(), veilederId)
                         if (slettetFilterId == 0) {
                             call.respond(HttpStatusCode.NotFound)
                         }

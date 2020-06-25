@@ -30,7 +30,8 @@ data class Configuration(
     val abac: Abac = Abac(),
     val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
     val serviceUser: NaisUtils.Credentials = getCredentials("service_user"),
-    val httpServerWait: Boolean = true
+    val httpServerWait: Boolean = true,
+    val useAuthentication: Boolean = true
 ) {
 
     data class Jwt(

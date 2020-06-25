@@ -30,7 +30,8 @@ fun main(inputConfiguration: Configuration?) {
     val applicationServer = createHttpServer(
         applicationState = applicationState,
         configuration = configuration,
-        veilederGrupperService = veilederGrupperService
+        veilederGrupperService = veilederGrupperService,
+        useAuthentication = configuration.useAuthentication
     );
 
     Runtime.getRuntime().addShutdownHook(Thread {
