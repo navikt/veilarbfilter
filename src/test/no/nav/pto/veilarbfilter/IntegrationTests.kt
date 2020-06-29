@@ -1,14 +1,10 @@
 package no.nav.pto.veilarbfilter
 
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.google.gson.GsonBuilder
 import no.nav.common.utils.NaisUtils
 import no.nav.pto.veilarbfilter.config.Configuration
-import no.nav.pto.veilarbfilter.model.FilterModel
-import no.nav.pto.veilarbfilter.model.MineLagredeFilterModel
-import no.nav.pto.veilarbfilter.model.NyttFilterModel
-import no.nav.pto.veilarbfilter.model.PortefoljeFilter
-import org.apache.http.HttpEntity
+import no.nav.pto.veilarbfilter.model.*
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
@@ -27,6 +23,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
+import java.time.LocalDateTime
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -111,54 +108,67 @@ class IntegrationTests {
                 filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
             )
 
-        addMineLagredeFilter(nyttFilterModel)
+        val newMineLagredeFilter = addMineLagredeFilter(nyttFilterModel)
         updateMineLagredeFilter(
-            1,
+            newMineLagredeFilter.filterId,
             FilterModel(
-                filterId = 1,
+                filterId = newMineLagredeFilter.filterId,
                 filterNavn = "New name",
-                filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K"),
-                opprettetDato = null
+                filterValg = newMineLagredeFilter.filterValg,
+                opprettetDato = newMineLagredeFilter.opprettetDato
             )
         )
-        val mineLagredeFilter = getmineLagredeFilter()
+        val mineLagredeFilter = getMineLagredeFilter()
 
         assertTrue(mineLagredeFilter.get(0).filterId == 1)
-        assertTrue(mineLagredeFilter.get(0).filterNavn == "Test")
+        assertTrue(mineLagredeFilter.get(0).filterNavn == "New name")
         assertFalse(mineLagredeFilter.get(0).filterValg.ferdigfilterListe.isEmpty())
     }
 
-    private fun getmineLagredeFilter(): List<MineLagredeFilterModel> {
+    private fun getMineLagredeFilter(): List<MineLagredeFilterModel> {
         val request: HttpUriRequest = HttpGet("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
         val httpResponse = HttpClientBuilder.create().build().execute(request)
         val responseString = BasicResponseHandler().handleResponse(httpResponse)
-
-        val listType =
-            object : TypeToken<List<MineLagredeFilterModel?>?>() {}.type;
-        return Gson().fromJson(
-            responseString,
-            listType
-        )
+        return deserializeLagredeFilterModels(responseString)
     }
 
-    private fun addMineLagredeFilter(valgteFilter: NyttFilterModel): Boolean {
+    private fun addMineLagredeFilter(valgteFilter: NyttFilterModel): MineLagredeFilterModel {
         val httpclient = HttpClients.createDefault()
         val httpPost = HttpPost("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
         var valgteFilterModelJson = Gson().toJson(valgteFilter)
-        val stringEntity: HttpEntity = StringEntity(valgteFilterModelJson, ContentType.APPLICATION_JSON)
-        httpPost.entity = stringEntity
-        val response = httpclient.execute(httpPost)
-        return response.statusLine.statusCode == 200;
+        httpPost.entity = StringEntity(valgteFilterModelJson, ContentType.APPLICATION_JSON)
+        val httpResponse = httpclient.execute(httpPost)
+        return deserializeLagredeFilterModel(BasicResponseHandler().handleResponse(httpResponse))
     }
 
-    private fun updateMineLagredeFilter(filterId: Int, filterModel: FilterModel): Boolean {
+    private fun updateMineLagredeFilter(filterId: Int, filterModel: FilterModel): MineLagredeFilterModel {
         val httpclient = HttpClients.createDefault()
-        val httpPut = HttpPut("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/" + filterId)
-        var filterModelJson = Gson().toJson(filterModel)
-        val stringEntity: HttpEntity = StringEntity(filterModelJson, ContentType.APPLICATION_JSON)
-        httpPut.entity = stringEntity
-        val response = httpclient.execute(httpPut)
-        return response.statusLine.statusCode == 200;
+        val httpPut = HttpPut("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$filterId")
+        var filterModelJson = serializeLagredeFilterModel(filterModel)
+        httpPut.entity = StringEntity(filterModelJson, ContentType.APPLICATION_JSON)
+        val httpResponse = httpclient.execute(httpPut)
+        return deserializeLagredeFilterModel(BasicResponseHandler().handleResponse(httpResponse))
+    }
+
+    private fun deserializeLagredeFilterModels(inputJson: String): List<MineLagredeFilterModel> {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
+            .create()
+        return gson.fromJson(inputJson, Array<MineLagredeFilterModel>::class.java).toList()
+    }
+
+    private fun deserializeLagredeFilterModel(inputJson: String): MineLagredeFilterModel {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
+            .create()
+        return gson.fromJson(inputJson, MineLagredeFilterModel::class.java)
+    }
+
+    private fun serializeLagredeFilterModel(filterModel: FilterModel): String {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
+            .create()
+        return gson.toJson(filterModel)
     }
 
 
