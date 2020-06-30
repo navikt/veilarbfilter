@@ -51,7 +51,7 @@ fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: FilterService, useAu
                     call.respond(filterListe)
                 }
             }
-            delete("/{enhetId}/filter/{filterId}") {
+            delete("/{veilederId}/filter/{filterId}") {
                 call.getNavident()?.let { veilederId ->
                     call.parameters["filterId"]?.let { filter ->
                         val slettetFilterId = mineLagredeFilterService.slettFilter(filter.toInt(), veilederId)
