@@ -99,17 +99,16 @@ class IntegrationTestsMineFilter {
                 filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "M")
             )
 
-        val lagreNyttFilterRespons = lagreNyttFilterRespons(nyttFilterModelEksisterendeNavn)
-        val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
+        val lagreNyttFilterMedEksisterendeNavn = lagreNyttFilterRespons(nyttFilterModelEksisterendeNavn)
+        val mineLagredeFilterResponsEtterFeilLagring = getMineLagredeFilter()
 
-        if (mineLagredeFilterResponse.responseValue == null || mineLagredeFilterResponseEtterFeilLagring.responseValue == null) {
+        if (mineLagredeFilterResponse.responseValue == null || mineLagredeFilterResponsEtterFeilLagring.responseValue == null) {
             Assert.fail()
             return
         }
 
-        //TODO don't allow two names
-
-        Assert.assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponseEtterFeilLagring.responseValue.size)
+        Assert.assertEquals(lagreNyttFilterMedEksisterendeNavn.errorMessage, "Navn eksisterer i et annet lagret filter")
+        Assert.assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponsEtterFeilLagring.responseValue.size)
     }
 
     @Test
@@ -119,19 +118,22 @@ class IntegrationTestsMineFilter {
 
         val nyttFilterModelEksisterendeFilter =
             NyttFilterModel(
-                filterNavn = "Blablaba",
+                filterNavn = "Team Voff",
                 filterValg = filterModel.filterValg
             )
 
-        lagreNyttFilterRespons(nyttFilterModelEksisterendeFilter)
+        val lagreNyttFilterMedEksisterendeFilterKombinasjon = lagreNyttFilterRespons(nyttFilterModelEksisterendeFilter)
         val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
 
         if (mineLagredeFilterResponse.responseValue == null || mineLagredeFilterResponseEtterFeilLagring.responseValue == null) {
             Assert.fail()
             return
         }
-        //TODO don't allow two similar filtercombinations
 
+        Assert.assertEquals(
+            lagreNyttFilterMedEksisterendeFilterKombinasjon.errorMessage,
+            "Filterkombinasjon eksisterer i et annet lagret filter"
+        )
         Assert.assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponseEtterFeilLagring.responseValue.size)
     }
 

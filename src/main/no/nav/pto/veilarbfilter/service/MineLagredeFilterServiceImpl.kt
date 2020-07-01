@@ -65,8 +65,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
 
         }
-        require(!erUgyldigNavn) { "Navn finnes fra før" }
-        require(!erUgyldigFiltervalg) { "Filterkombinasjon finnes fra før" }
+        require(!erUgyldigNavn) { "Navn eksisterer i et annet lagret filter" }
+        require(!erUgyldigFiltervalg) { "Filterkombinasjon eksisterer i et annet lagret filter" }
 
         dbQuery {
             key = (Filter.insert {
@@ -85,14 +85,14 @@ class MineLagredeFilterServiceImpl() : FilterService {
     }
 
     override suspend fun oppdaterFilter(
-        filterBrukerId: String,
+        veilederId: String,
         filterValg: FilterModel
     ): FilterModel {
         dbQuery {
             val isValidUpdate =
                 MineLagredeFilter.select {
                     (MineLagredeFilter.filterId eq filterValg.filterId) and
-                            (MineLagredeFilter.veilederId eq filterBrukerId)
+                            (MineLagredeFilter.veilederId eq veilederId)
                 }
                     .count() > 0
             if (isValidUpdate) {
