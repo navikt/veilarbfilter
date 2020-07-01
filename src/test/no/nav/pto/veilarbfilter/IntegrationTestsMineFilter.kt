@@ -11,6 +11,7 @@ import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
+import org.apache.http.util.EntityUtils
 import org.junit.Assert
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
+import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 
 
@@ -122,6 +124,7 @@ class IntegrationTestsMineFilter {
             )
 
         val newMineLagredeFilter = lagreNyttFilterRespons(nyttFilterModel)
+        assertTrue(newMineLagredeFilter.responseCode == 400)
         //TODO: add validation for saving filter, and expect exception in case when name  is empty
     }
 
@@ -141,6 +144,12 @@ class IntegrationTestsMineFilter {
     @Test
     fun testOppdaterLagredeFilterGyldig() {
         var nyttFilter = lagreNyttFilterVerdi(filterModel)
+
+        if (nyttFilter == null) {
+            Assert.fail()
+            return;
+        }
+
         nyttFilter.filterNavn = "New name"
         nyttFilter.filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"))
 
@@ -161,6 +170,11 @@ class IntegrationTestsMineFilter {
     @Test
     fun testSlettLagretFilterGyldig() {
         val lagretMineLagredeFilterResponse = lagreNyttFilterVerdi(filterModel)
+
+        if (lagretMineLagredeFilterResponse == null) {
+            Assert.fail()
+            return
+        }
 
         val responseCode = deleteMineLagredeFilter(
             lagretMineLagredeFilterResponse.filterId,
@@ -192,23 +206,23 @@ class IntegrationTestsMineFilter {
     @Test
     fun testTomtNavnForOppdatertLagretFilter() {
         var nyttFilter = lagreNyttFilterRespons(filterModel).responseValue
-        nyttFilter.filterNavn = ""
+        nyttFilter?.filterNavn = ""
 
-        val endepunktRespons = oppdaterMineLagredeFilter(nyttFilter)
+        val endepunktRespons = nyttFilter?.let { oppdaterMineLagredeFilter(it) }
 
         //TODO give meaningful error for empty name
-        assertTrue(endepunktRespons.responseCode == 200)
+        assertTrue(endepunktRespons?.responseCode == 200)
     }
 
     @Test
     fun testTomtFilterValgForOppdatertLagretFilter() {
         var nyttFilter = lagreNyttFilterRespons(filterModel).responseValue
-        nyttFilter.filterValg = PortefoljeFilter()
+        nyttFilter?.filterValg = PortefoljeFilter()
 
-        val endepunktRespons = oppdaterMineLagredeFilter(nyttFilter)
+        val endepunktRespons = nyttFilter?.let { oppdaterMineLagredeFilter(it) }
 
         //TODO give meaningful error for empty filters
-        assertTrue(endepunktRespons.responseCode == 200)
+        assertTrue(endepunktRespons?.responseCode == 200)
     }
 
     private fun testSlettLagretFilterUgyldig() {
@@ -240,7 +254,7 @@ class IntegrationTestsMineFilter {
                 )
             )
         assertTrue(endepunktRespons.responseCode == 200)
-        assertTrue(endepunktRespons.responseValue.filterNavn == "æøåöäáâò")
+        assertTrue(endepunktRespons.responseValue?.filterNavn == "æøåöäáâò")
     }
 
     /** HJELPEFUNKSJONER  **/
@@ -251,16 +265,27 @@ class IntegrationTestsMineFilter {
         return ApiResponse(httpResponse.statusLine.statusCode, deserializeLagredeFilterModels(responseString))
     }
 
-    private fun lagreNyttFilterRespons(valgteFilter: NyttFilterModel): ApiResponse<MineLagredeFilterModel> {
+    private fun lagreNyttFilterRespons(valgteFilter: NyttFilterModel): ApiResponse<MineLagredeFilterModel?> {
         val httpclient = HttpClients.createDefault()
         val httpPost = HttpPost("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
         var valgteFilterModelJson = Gson().toJson(valgteFilter)
         httpPost.entity = StringEntity(valgteFilterModelJson, ContentType.APPLICATION_JSON)
         val httpResponse = httpclient.execute(httpPost)
-        return ApiResponse(
-            httpResponse.statusLine.statusCode,
-            deserializeLagredeFilterModel(BasicResponseHandler().handleResponse(httpResponse))
-        )
+
+        print(EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8))
+
+        if (httpResponse.statusLine.statusCode == 200) {
+            return ApiResponse(
+                httpResponse.statusLine.statusCode,
+                deserializeLagredeFilterModel(
+                    BasicResponseHandler().handleResponse(
+                        httpResponse
+                    )
+                )
+            )
+        } else {
+            return ApiResponse(httpResponse.statusLine.statusCode, null)
+        }
     }
 
     private fun oppdaterMineLagredeFilter(
@@ -306,7 +331,7 @@ class IntegrationTestsMineFilter {
         return gson.toJson(filterModel)
     }
 
-    private fun lagreNyttFilterVerdi(filterModel: NyttFilterModel): MineLagredeFilterModel {
+    private fun lagreNyttFilterVerdi(filterModel: NyttFilterModel): MineLagredeFilterModel? {
         val lagretMineLagredeFilterResponse = lagreNyttFilterRespons(filterModel)
 
         Assert.assertTrue(lagretMineLagredeFilterResponse.responseCode == 200)

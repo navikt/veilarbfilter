@@ -34,6 +34,7 @@ class MineLagredeFilterServiceImpl() : FilterService {
     }
 
     override suspend fun lagreFilter(veilederId: String, nyttFilter: NyttFilterModel): FilterModel? {
+        require(nyttFilter.filterNavn.isNotEmpty()) { "Navn kan ikke være tomt" }
         var key = 0;
         dbQuery {
             key = (Filter.insert {
