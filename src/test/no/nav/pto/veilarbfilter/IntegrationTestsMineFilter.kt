@@ -5,9 +5,11 @@ import com.google.gson.GsonBuilder
 import no.nav.common.utils.NaisUtils
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.model.*
-import org.apache.http.client.methods.*
+import org.apache.http.client.fluent.Request
+import org.apache.http.client.methods.HttpDelete
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.entity.ContentType
-import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
@@ -19,7 +21,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
-import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 
 
@@ -70,8 +71,18 @@ class IntegrationTestsMineFilter {
     fun testLagreLagredeFilterGyldig() {
         val mineLagredeFilterResponse = getMineLagredeFilter()
 
+        if (mineLagredeFilterResponse.responseValue == null) {
+            Assert.fail()
+            return
+        }
+
         lagreNyttFilterRespons(filterModel)
         val mineLagredeFilterNyResponsEtterLagring = getMineLagredeFilter()
+
+        if (mineLagredeFilterNyResponsEtterLagring.responseValue == null) {
+            Assert.fail()
+            return
+        }
 
         Assert.assertTrue(mineLagredeFilterResponse.responseValue.size < mineLagredeFilterNyResponsEtterLagring.responseValue.size)
     }
@@ -91,6 +102,13 @@ class IntegrationTestsMineFilter {
         lagreNyttFilterRespons(nyttFilterModelEksisterendeNavn)
         val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
 
+        if (mineLagredeFilterResponse.responseValue == null || mineLagredeFilterResponseEtterFeilLagring.responseValue == null) {
+            Assert.fail()
+            return
+        }
+
+        //TODO don't allow two names
+
         Assert.assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponseEtterFeilLagring.responseValue.size)
     }
 
@@ -107,6 +125,12 @@ class IntegrationTestsMineFilter {
 
         lagreNyttFilterRespons(nyttFilterModelEksisterendeFilter)
         val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
+
+        if (mineLagredeFilterResponse.responseValue == null || mineLagredeFilterResponseEtterFeilLagring.responseValue == null) {
+            Assert.fail()
+            return
+        }
+        //TODO don't allow two similar filtercombinations
 
         Assert.assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponseEtterFeilLagring.responseValue.size)
     }
@@ -156,6 +180,12 @@ class IntegrationTestsMineFilter {
         val mineLagredeFilterResponse = getMineLagredeFilter()
         Assert.assertTrue(mineLagredeFilterResponse.responseCode == 200)
         val mineLagredeFilterList = mineLagredeFilterResponse.responseValue
+
+        if (mineLagredeFilterList == null) {
+            Assert.fail()
+            return;
+        }
+
         val oppdatertFilter =
             mineLagredeFilterList.filter { x -> x.filterId == nyttFilter.filterId }.first()
 
@@ -179,7 +209,14 @@ class IntegrationTestsMineFilter {
         Assert.assertTrue(responseCode == 200 || responseCode == 204)
 
         val mineLagredeFilterResponse = getMineLagredeFilter()
+
+        if (mineLagredeFilterResponse.responseValue == null) {
+            Assert.fail()
+            return
+        }
+
         val mineLagredeFilter = mineLagredeFilterResponse.responseValue
+
         Assert.assertTrue(mineLagredeFilter.filter { x -> x.filterId == lagretMineLagredeFilterResponse.filterId }
             .count() == 0)
     }
@@ -261,41 +298,42 @@ class IntegrationTestsMineFilter {
         return ApiResponse(httpResponse.statusLine.statusCode, deserializeLagredeFilterModels(responseString))
     }
 
-    private fun lagreNyttFilterRespons(valgteFilter: NyttFilterModel): ApiResponse<MineLagredeFilterModel?> {
-        val httpclient = HttpClients.createDefault()
-        val httpPost = HttpPost("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
-        var valgteFilterModelJson = Gson().toJson(valgteFilter)
-        httpPost.entity = StringEntity(valgteFilterModelJson, ContentType.APPLICATION_JSON)
-        val httpResponse = httpclient.execute(httpPost)
+    private fun lagreNyttFilterRespons(valgteFilter: NyttFilterModel): ApiResponse<MineLagredeFilterModel> {
+        val response = Request.Post("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
+            .bodyString(Gson().toJson(valgteFilter), ContentType.APPLICATION_JSON)
+            .connectTimeout(1000)
+            .execute()
+            .returnResponse()
 
-        print(EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8))
+        val statusCode = response.statusLine.statusCode
+        val responseContent = EntityUtils.toString(response.entity)
 
-        if (httpResponse.statusLine.statusCode == 200) {
-            return ApiResponse(
-                httpResponse.statusLine.statusCode,
-                deserializeLagredeFilterModel(
-                    BasicResponseHandler().handleResponse(
-                        httpResponse
-                    )
-                )
+        if (statusCode == 200) return ApiResponse(
+            responseCode = statusCode,
+            responseValue = deserializeLagredeFilterModel(
+                responseContent
             )
-        } else {
-            return ApiResponse(httpResponse.statusLine.statusCode, null)
-        }
+        ) else return ApiResponse(responseCode = statusCode, errorMessage = responseContent)
     }
 
     private fun oppdaterMineLagredeFilter(
         filterModel: FilterModel
-    ): ApiResponse<MineLagredeFilterModel> {
-        val httpclient = HttpClients.createDefault()
-        val httpPut = HttpPut("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/${filterModel.filterId}")
-        var filterModelJson = serializeLagredeFilterModel(filterModel)
-        httpPut.entity = StringEntity(filterModelJson, ContentType.APPLICATION_JSON)
-        val httpResponse = httpclient.execute(httpPut)
-        return ApiResponse(
-            httpResponse.statusLine.statusCode,
-            deserializeLagredeFilterModel(BasicResponseHandler().handleResponse(httpResponse))
-        )
+    ): ApiResponse<MineLagredeFilterModel?> {
+        val response = Request.Put("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/${filterModel.filterId}")
+            .bodyString(serializeLagredeFilterModel(filterModel), ContentType.APPLICATION_JSON)
+            .connectTimeout(1000)
+            .execute()
+            .returnResponse()
+
+        val statusCode = response.statusLine.statusCode
+        val responseContent = EntityUtils.toString(response.entity)
+
+        if (statusCode == 200) return ApiResponse(
+            responseCode = statusCode,
+            responseValue = deserializeLagredeFilterModel(
+                responseContent
+            )
+        ) else return ApiResponse(responseCode = statusCode, errorMessage = responseContent)
     }
 
     private fun deleteMineLagredeFilter(filterId: Int, veilederId: String): Int {
