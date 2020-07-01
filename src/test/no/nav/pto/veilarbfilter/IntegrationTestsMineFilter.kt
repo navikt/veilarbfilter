@@ -91,8 +91,6 @@ class IntegrationTestsMineFilter {
         lagreNyttFilterRespons(nyttFilterModelEksisterendeNavn)
         val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
 
-        //TODO don't allow two names
-
         Assert.assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponseEtterFeilLagring.responseValue.size)
     }
 
@@ -109,8 +107,6 @@ class IntegrationTestsMineFilter {
 
         lagreNyttFilterRespons(nyttFilterModelEksisterendeFilter)
         val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
-
-        //TODO don't allow two similar filtercombinations
 
         Assert.assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponseEtterFeilLagring.responseValue.size)
     }

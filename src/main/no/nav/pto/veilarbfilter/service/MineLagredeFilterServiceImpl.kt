@@ -33,9 +33,33 @@ class MineLagredeFilterServiceImpl() : FilterService {
         }
     }
 
-    override suspend fun lagreFilter(veilederId: String, nyttFilter: NyttFilterModel): FilterModel? {
+    override suspend fun lagreFilter(
+        veilederId: String,
+        nyttFilter: NyttFilterModel
+    ): FilterModel? {
         require(nyttFilter.filterNavn.isNotEmpty()) { "Navn kan ikke være tomt" }
         var key = 0;
+        var erUgyldigNavn = true;
+        var erUgyldigFiltervalg = true;
+
+        dbQuery {
+            erUgyldigNavn = MineLagredeFilter.select {
+                (Filter.filterNavn eq nyttFilter.filterNavn) and
+                        (MineLagredeFilter.veilederId eq veilederId)
+            }.count() > 0
+        }
+
+        dbQuery {
+            erUgyldigFiltervalg = MineLagredeFilter.select {
+                (Filter.valgteFilter eq nyttFilter.filterValg) and
+                        (MineLagredeFilter.veilederId eq veilederId)
+            }.count() > 0
+
+
+        }
+        require(!erUgyldigNavn) { "Navn finnes fra før" }
+        require(!erUgyldigFiltervalg) { "Filterkombinasjon finnes fra før" }
+
         dbQuery {
             key = (Filter.insert {
                 it[filterNavn] = nyttFilter.filterNavn
@@ -47,14 +71,21 @@ class MineLagredeFilterServiceImpl() : FilterService {
                 it[filterId] = key
                 it[MineLagredeFilter.veilederId] = veilederId
             }
+
         }
         return hentFilter(key)
     }
 
-    override suspend fun oppdaterFilter(filterBrukerId: String, filterValg: FilterModel): FilterModel {
+    override suspend fun oppdaterFilter(
+        filterBrukerId: String,
+        filterValg: FilterModel
+    ): FilterModel {
         dbQuery {
             val isValidUpdate =
-                MineLagredeFilter.select { (MineLagredeFilter.filterId eq filterValg.filterId) and (MineLagredeFilter.veilederId eq filterBrukerId) }
+                MineLagredeFilter.select {
+                    (MineLagredeFilter.filterId eq filterValg.filterId) and
+                            (MineLagredeFilter.veilederId eq filterBrukerId)
+                }
                     .count() > 0
             if (isValidUpdate) {
                 Filter
