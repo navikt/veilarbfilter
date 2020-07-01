@@ -99,7 +99,7 @@ class IntegrationTestsMineFilter {
                 filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "M")
             )
 
-        lagreNyttFilterRespons(nyttFilterModelEksisterendeNavn)
+        val lagreNyttFilterRespons = lagreNyttFilterRespons(nyttFilterModelEksisterendeNavn)
         val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
 
         if (mineLagredeFilterResponse.responseValue == null || mineLagredeFilterResponseEtterFeilLagring.responseValue == null) {

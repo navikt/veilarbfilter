@@ -43,14 +43,22 @@ class MineLagredeFilterServiceImpl() : FilterService {
         var erUgyldigFiltervalg = true;
 
         dbQuery {
-            erUgyldigNavn = MineLagredeFilter.select {
+            erUgyldigNavn = (Filter innerJoin MineLagredeFilter).slice(
+                Filter.filterNavn,
+                Filter.filterId,
+                MineLagredeFilter.veilederId
+            ).select {
                 (Filter.filterNavn eq nyttFilter.filterNavn) and
                         (MineLagredeFilter.veilederId eq veilederId)
             }.count() > 0
         }
 
         dbQuery {
-            erUgyldigFiltervalg = MineLagredeFilter.select {
+            erUgyldigFiltervalg = (Filter innerJoin MineLagredeFilter).slice(
+                Filter.valgteFilter,
+                Filter.filterId,
+                MineLagredeFilter.veilederId
+            ).select {
                 (Filter.valgteFilter eq nyttFilter.filterValg) and
                         (MineLagredeFilter.veilederId eq veilederId)
             }.count() > 0
