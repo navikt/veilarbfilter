@@ -1,11 +1,13 @@
 package no.nav.pto.veilarbfilter.model
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDateTime
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 open class FilterModel(
     val filterId: Int,
-    val filterNavn: String,
-    val filterValg: PortefoljeFilter,
+    var filterNavn: String,
+    var filterValg: PortefoljeFilter,
     val opprettetDato: LocalDateTime?
 )
 

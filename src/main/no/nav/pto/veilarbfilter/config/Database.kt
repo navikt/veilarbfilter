@@ -33,6 +33,7 @@ class Database(configuration: Configuration) {
         config.isAutoCommit = false
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         config.validate()
+        config.connectionTimeout = 10000
         Database.connect(HikariDataSource(config))
         val flyway = Flyway.configure().dataSource(dbUrl, config.username, config.password).load()
         flyway.migrate()

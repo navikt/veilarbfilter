@@ -13,7 +13,6 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.junit.Assert
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -26,6 +25,12 @@ import java.time.LocalDateTime
 class IntegrationTestsMineFilter {
     private
     lateinit var postgresqlContainer: PostgreSQLContainer<Nothing>;
+
+    val filterModel =
+        NyttFilterModel(
+            filterNavn = "Test",
+            filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
+        )
 
     @BeforeAll
     internal fun setUp() {
@@ -58,108 +63,187 @@ class IntegrationTestsMineFilter {
         postgresqlContainer.stop()
     }
 
-
+    /** TESTER RELATERT TIL GYLDIGHET FOR LAGRING AV NYTT FILTER **/
     @Test
-    fun testLagreLagredeFilterGylig() {
-
-    }
-
-    @Test
-    fun testLagreLagredeFilterUgylig() {
-
-    }
-
-    @Test
-    fun testOppdaterLagredeFilterGyldig() {
-        //add new filter
-        val nyttFilterModel =
-            NyttFilterModel(
-                filterNavn = "Test",
-                filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
-            )
-
-        val lagretMineLagredeFilterResponse = lagreMineLagredeFilter(nyttFilterModel)
-
-        Assert.assertTrue(lagretMineLagredeFilterResponse.responseCode == 200)
-        val lagretMineLagredeFilter = lagretMineLagredeFilterResponse.responseValue
-
-        //update filter
-        val oppdaterMineLagredeFilterResponse = oppdaterMineLagredeFilter(
-            lagretMineLagredeFilter.filterId,
-            FilterModel(
-                filterId = lagretMineLagredeFilter.filterId,
-                filterNavn = "New name",
-                filterValg = lagretMineLagredeFilter.filterValg,
-                opprettetDato = lagretMineLagredeFilter.opprettetDato
-            )
-        )
-
-        Assert.assertTrue(oppdaterMineLagredeFilterResponse.responseCode == 200)
-
-        //get all saved filters
+    fun testLagreLagredeFilterGyldig() {
         val mineLagredeFilterResponse = getMineLagredeFilter()
 
-        Assert.assertTrue(mineLagredeFilterResponse.responseCode == 200)
-        val mineLagredeFilterList = mineLagredeFilterResponse.responseValue
-        val oppdatertFilter =
-            mineLagredeFilterList.filter { x -> x.filterId == lagretMineLagredeFilter.filterId }.first()
+        lagreNyttFilterRespons(filterModel)
+        val mineLagredeFilterNyResponsEtterLagring = getMineLagredeFilter()
 
-        assertTrue(oppdatertFilter.filterNavn == "New name")
-        assertFalse(oppdatertFilter.filterValg.ferdigfilterListe.isEmpty())
+        Assert.assertTrue(mineLagredeFilterResponse.responseValue.size < mineLagredeFilterNyResponsEtterLagring.responseValue.size)
     }
 
-    fun testOppdaterLagredeFilterUgyldig() {
+    /** TESTER RELATERT TIL UGYLDIGHET FOR LAGRING AV NYTT FILTER **/
+    @Test
+    fun testLagretFilterNavnEksistererForNyttFilter() {
+        lagreNyttFilterRespons(filterModel)
+        val mineLagredeFilterResponse = getMineLagredeFilter()
 
+        val nyttFilterModelEksisterendeNavn =
+            NyttFilterModel(
+                filterNavn = filterModel.filterNavn,
+                filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "M")
+            )
+
+        lagreNyttFilterRespons(nyttFilterModelEksisterendeNavn)
+        val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
+
+        //TODO don't allow two names
+
+        Assert.assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponseEtterFeilLagring.responseValue.size)
     }
 
     @Test
-    fun testTomtNavn() {
+    fun testLagretFilterValgEksistererForNyttFilter() {
+        lagreNyttFilterRespons(filterModel)
+        val mineLagredeFilterResponse = getMineLagredeFilter()
+
+        val nyttFilterModelEksisterendeFilter =
+            NyttFilterModel(
+                filterNavn = "Blablaba",
+                filterValg = filterModel.filterValg
+            )
+
+        lagreNyttFilterRespons(nyttFilterModelEksisterendeFilter)
+        val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
+
+        //TODO don't allow two similar filtercombinations
+
+        Assert.assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponseEtterFeilLagring.responseValue.size)
+    }
+
+    @Test
+    fun testTomtNavnForNyttLagretFilter() {
         val nyttFilterModel =
             NyttFilterModel(
                 filterNavn = "",
                 filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
             )
 
-        val newMineLagredeFilter = lagreMineLagredeFilter(nyttFilterModel)
+        val newMineLagredeFilter = lagreNyttFilterRespons(nyttFilterModel)
         //TODO: add validation for saving filter, and expect exception in case when name  is empty
     }
 
     @Test
-    fun testTomtFilterValg() {
+    fun testTomtFilterValgForNyttLagretFilter() {
         val nyttFilterModel =
             NyttFilterModel(
                 filterNavn = "Nytt filter",
                 filterValg = PortefoljeFilter()
             )
 
-        val newMineLagredeFilter = lagreMineLagredeFilter(nyttFilterModel)
+        val newMineLagredeFilter = lagreNyttFilterRespons(nyttFilterModel)
         //TODO: add validation for saving filter, and expect exception in case when valgt filter are empty
+    }
+
+    /** TESTER RELATERT TIL GYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER**/
+    @Test
+    fun testOppdaterLagredeFilterGyldig() {
+        var nyttFilter = lagreNyttFilterVerdi(filterModel)
+        nyttFilter.filterNavn = "New name"
+        nyttFilter.filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"))
+
+        val oppdaterMineLagredeFilterResponse = oppdaterMineLagredeFilter(nyttFilter)
+
+        Assert.assertTrue(oppdaterMineLagredeFilterResponse.responseCode == 200)
+
+        val mineLagredeFilterResponse = getMineLagredeFilter()
+        Assert.assertTrue(mineLagredeFilterResponse.responseCode == 200)
+        val mineLagredeFilterList = mineLagredeFilterResponse.responseValue
+        val oppdatertFilter =
+            mineLagredeFilterList.filter { x -> x.filterId == nyttFilter.filterId }.first()
+
+        assertTrue(oppdatertFilter.filterNavn == "New name")
+        assertTrue(oppdatertFilter.filterValg == nyttFilter.filterValg)
     }
 
     @Test
     fun testSlettLagretFilterGyldig() {
-        val nyttFilterModel =
-            NyttFilterModel(
-                filterNavn = "Test",
-                filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
-            )
+        val lagretMineLagredeFilterResponse = lagreNyttFilterVerdi(filterModel)
 
-        val lagretMineLagredeFilterResponse = lagreMineLagredeFilter(nyttFilterModel)
-        Assert.assertTrue(lagretMineLagredeFilterResponse.responseCode == 200)
-        val lagretMineLagredeFilter = lagretMineLagredeFilterResponse.responseValue
-
-        val responseCode = deleteMineLagredeFilter(lagretMineLagredeFilter.filterId, lagretMineLagredeFilter.veilederId)
-        Assert.assertTrue(responseCode == 200)
+        val responseCode = deleteMineLagredeFilter(
+            lagretMineLagredeFilterResponse.filterId,
+            lagretMineLagredeFilterResponse.veilederId
+        )
+        Assert.assertTrue(responseCode == 200 || responseCode == 204)
 
         val mineLagredeFilterResponse = getMineLagredeFilter()
         val mineLagredeFilter = mineLagredeFilterResponse.responseValue
-        Assert.assertTrue(mineLagredeFilter.filter { x -> x.filterId == lagretMineLagredeFilter.filterId }.count() == 0)
+        Assert.assertTrue(mineLagredeFilter.filter { x -> x.filterId == lagretMineLagredeFilterResponse.filterId }
+            .count() == 0)
+    }
+
+    /** TESTER RELATERT TIL UGYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER **/
+    @Test
+    fun testLangtNavnForOppdatertLagretFilter() {
+        val endepunktRespons =
+            lagreNyttFilterRespons(
+                NyttFilterModel(
+                    filterNavn = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                    filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
+                )
+            )
+
+        //TODO make exception to fail
+        assertTrue(endepunktRespons.responseCode != 200)
+    }
+
+    @Test
+    fun testTomtNavnForOppdatertLagretFilter() {
+        var nyttFilter = lagreNyttFilterRespons(filterModel).responseValue
+        nyttFilter.filterNavn = ""
+
+        val endepunktRespons = oppdaterMineLagredeFilter(nyttFilter)
+
+        //TODO give meaningful error for empty name
+        assertTrue(endepunktRespons.responseCode == 200)
+    }
+
+    @Test
+    fun testTomtFilterValgForOppdatertLagretFilter() {
+        var nyttFilter = lagreNyttFilterRespons(filterModel).responseValue
+        nyttFilter.filterValg = PortefoljeFilter()
+
+        val endepunktRespons = oppdaterMineLagredeFilter(nyttFilter)
+
+        //TODO give meaningful error for empty filters
+        assertTrue(endepunktRespons.responseCode == 200)
     }
 
     private fun testSlettLagretFilterUgyldig() {
         //todo: try to delete filter that doesnt belong to veileder, check error code
     }
 
+    /** DATABASE **/
+    @Test
+    fun testLagreFilterNårDatabaseErNede() {
+        val mineLagredeFilterResponse = getMineLagredeFilter()
+
+        postgresqlContainer.stop()
+//        postgresqlContainer.start()
+        setUp()
+
+        //TODO: add timeout logic
+        val statusKode = lagreNyttFilterRespons(filterModel).responseCode;
+    }
+
+
+    /** TESTER RELATERT TIL GYLDIGHET FOR BÅDE LAGRING OG OPPDATERING **/
+    @Test
+    fun testNorskeBokstaverINavnForLagretFilter() {
+        val endepunktRespons =
+            lagreNyttFilterRespons(
+                NyttFilterModel(
+                    filterNavn = "æøåöäáâò",
+                    filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
+                )
+            )
+        assertTrue(endepunktRespons.responseCode == 200)
+        assertTrue(endepunktRespons.responseValue.filterNavn == "æøåöäáâò")
+    }
+
+    /** HJELPEFUNKSJONER  **/
     private fun getMineLagredeFilter(): ApiResponse<List<MineLagredeFilterModel>> {
         val request: HttpUriRequest = HttpGet("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
         val httpResponse = HttpClientBuilder.create().build().execute(request)
@@ -167,7 +251,7 @@ class IntegrationTestsMineFilter {
         return ApiResponse(httpResponse.statusLine.statusCode, deserializeLagredeFilterModels(responseString))
     }
 
-    private fun lagreMineLagredeFilter(valgteFilter: NyttFilterModel): ApiResponse<MineLagredeFilterModel> {
+    private fun lagreNyttFilterRespons(valgteFilter: NyttFilterModel): ApiResponse<MineLagredeFilterModel> {
         val httpclient = HttpClients.createDefault()
         val httpPost = HttpPost("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
         var valgteFilterModelJson = Gson().toJson(valgteFilter)
@@ -180,11 +264,10 @@ class IntegrationTestsMineFilter {
     }
 
     private fun oppdaterMineLagredeFilter(
-        filterId: Int,
         filterModel: FilterModel
     ): ApiResponse<MineLagredeFilterModel> {
         val httpclient = HttpClients.createDefault()
-        val httpPut = HttpPut("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$filterId")
+        val httpPut = HttpPut("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/${filterModel.filterId}")
         var filterModelJson = serializeLagredeFilterModel(filterModel)
         httpPut.entity = StringEntity(filterModelJson, ContentType.APPLICATION_JSON)
         val httpResponse = httpclient.execute(httpPut)
@@ -196,8 +279,9 @@ class IntegrationTestsMineFilter {
 
     private fun deleteMineLagredeFilter(filterId: Int, veilederId: String): Int {
         val httpclient = HttpClients.createDefault()
-        val httpPut = HttpDelete("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$veilederId/filter/$filterId")
-        val httpResponse = httpclient.execute(httpPut)
+        val httpDelete =
+            HttpDelete("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$veilederId/filter/$filterId")
+        val httpResponse = httpclient.execute(httpDelete)
         return httpResponse.statusLine.statusCode
     }
 
@@ -220,5 +304,12 @@ class IntegrationTestsMineFilter {
             .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
             .create()
         return gson.toJson(filterModel)
+    }
+
+    private fun lagreNyttFilterVerdi(filterModel: NyttFilterModel): MineLagredeFilterModel {
+        val lagretMineLagredeFilterResponse = lagreNyttFilterRespons(filterModel)
+
+        Assert.assertTrue(lagretMineLagredeFilterResponse.responseCode == 200)
+        return lagretMineLagredeFilterResponse.responseValue
     }
 }
