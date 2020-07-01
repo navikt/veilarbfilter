@@ -23,7 +23,33 @@ data class PortefoljeFilter(
     val ytelse: String? = "",
     val registreringstype: List<String>? = emptyList(),
     val cvJobbprofil: String? = ""
-)
+) {
+
+    fun isNotEmpty(): Boolean {
+        return listOf(
+            kjonn,
+            navnEllerFnrQuery,
+            veilederNavnQuery,
+            ytelse,
+            cvJobbprofil
+        ).any { it != null && it.isNotEmpty() }
+                || listOf(
+            alder,
+            ferdigfilterListe,
+            fodselsdagIMnd,
+            formidlingsgruppe,
+            hovedmal,
+            innsatsgruppe,
+            manuellBrukerStatus,
+            rettighetsgruppe,
+            servicegruppe,
+            tiltakstyper,
+            veiledere,
+            registreringstype
+        ).any { it != null && it.isNotEmpty() }
+                || aktiviteter != null
+    }
+}
 
 data class Aktiviteter(
     @get:JsonProperty("BEHANDLING") val BEHANDLING: String?,

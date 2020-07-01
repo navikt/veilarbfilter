@@ -57,7 +57,6 @@ class IntegrationTestsMineFilter {
             httpServerWait = false,
             useAuthentication = false
         )
-
         main(configuration)
     }
 
@@ -145,9 +144,11 @@ class IntegrationTestsMineFilter {
                 filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
             )
 
-        val newMineLagredeFilter = lagreNyttFilterRespons(nyttFilterModel)
-        assertTrue(newMineLagredeFilter.responseCode == 400)
-        //TODO: add validation for saving filter, and expect exception in case when name  is empty
+        val lagreNyttFilterMedTomtFilterNavn = lagreNyttFilterRespons(nyttFilterModel)
+        assertTrue(lagreNyttFilterMedTomtFilterNavn.responseCode == 400)
+
+        Assert.assertEquals(lagreNyttFilterMedTomtFilterNavn.errorMessage, "Navn kan ikke være tomt")
+
     }
 
     @Test
@@ -158,8 +159,9 @@ class IntegrationTestsMineFilter {
                 filterValg = PortefoljeFilter()
             )
 
-        val newMineLagredeFilter = lagreNyttFilterRespons(nyttFilterModel)
-        //TODO: add validation for saving filter, and expect exception in case when valgt filter are empty
+        val lagreNyttFilterMedTomFilterKombinasjon = lagreNyttFilterRespons(nyttFilterModel)
+        assertTrue(lagreNyttFilterMedTomFilterKombinasjon.responseCode == 400)
+        Assert.assertEquals(lagreNyttFilterMedTomFilterKombinasjon.errorMessage, "Filtervalg kan ikke være tomt")
     }
 
     /** TESTER RELATERT TIL GYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER**/
@@ -264,18 +266,18 @@ class IntegrationTestsMineFilter {
         //todo: try to delete filter that doesnt belong to veileder, check error code
     }
 
-    /** DATABASE **/
-    @Test
-    fun testLagreFilterNårDatabaseErNede() {
-        val mineLagredeFilterResponse = getMineLagredeFilter()
-
-        postgresqlContainer.stop()
-//        postgresqlContainer.start()
-        setUp()
-
-        //TODO: add timeout logic
-        val statusKode = lagreNyttFilterRespons(filterModel).responseCode;
-    }
+//    /** DATABASE **/
+//    @Test
+//    fun testLagreFilterNårDatabaseErNede() {
+//        val mineLagredeFilterResponse = getMineLagredeFilter()
+//
+//        postgresqlContainer.stop()
+////        postgresqlContainer.start()
+//        setUp()
+//
+//        //TODO: add timeout logic
+//        val statusKode = lagreNyttFilterRespons(filterModel).responseCode;
+//    }
 
 
     /** TESTER RELATERT TIL GYLDIGHET FOR BÅDE LAGRING OG OPPDATERING **/
@@ -285,7 +287,7 @@ class IntegrationTestsMineFilter {
             lagreNyttFilterRespons(
                 NyttFilterModel(
                     filterNavn = "æøåöäáâò",
-                    filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
+                    filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "M")
                 )
             )
         assertTrue(endepunktRespons.responseCode == 200)

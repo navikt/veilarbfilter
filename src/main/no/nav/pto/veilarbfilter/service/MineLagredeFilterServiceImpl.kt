@@ -38,6 +38,7 @@ class MineLagredeFilterServiceImpl() : FilterService {
         nyttFilter: NyttFilterModel
     ): FilterModel? {
         require(nyttFilter.filterNavn.isNotEmpty()) { "Navn kan ikke være tomt" }
+        require(nyttFilter.filterValg.isNotEmpty()) { "Filtervalg kan ikke være tomt" }
         var key = 0;
         var erUgyldigNavn = true;
         var erUgyldigFiltervalg = true;
@@ -88,6 +89,7 @@ class MineLagredeFilterServiceImpl() : FilterService {
         veilederId: String,
         filterValg: FilterModel
     ): FilterModel {
+        require(filterValg.filterNavn.isNotEmpty()) { "Navn kan ikke være tomt" }
         dbQuery {
             val isValidUpdate =
                 MineLagredeFilter.select {
