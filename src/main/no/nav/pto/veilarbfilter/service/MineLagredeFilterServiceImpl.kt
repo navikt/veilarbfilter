@@ -6,6 +6,7 @@ import no.nav.pto.veilarbfilter.db.MineLagredeFilter
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.MineLagredeFilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
+import no.nav.pto.veilarbfilter.model.PortefoljeFilter
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
 
@@ -37,11 +38,12 @@ class MineLagredeFilterServiceImpl() : FilterService {
         veilederId: String,
         nyttFilter: NyttFilterModel
     ): FilterModel? {
-        require(nyttFilter.filterNavn.isNotEmpty()) { "Navn kan ikke være tomt" }
-        require(nyttFilter.filterValg.isNotEmpty()) { "Filtervalg kan ikke være tomt" }
         var key = 0;
         var erUgyldigNavn = true;
         var erUgyldigFiltervalg = true;
+
+        validerNavn(nyttFilter.filterNavn)
+        validerValg(nyttFilter.filterValg)
 
         dbQuery {
             erUgyldigNavn = (Filter innerJoin MineLagredeFilter).slice(
@@ -63,11 +65,9 @@ class MineLagredeFilterServiceImpl() : FilterService {
                 (Filter.valgteFilter eq nyttFilter.filterValg) and
                         (MineLagredeFilter.veilederId eq veilederId)
             }.count() > 0
-
-
         }
-        require(!erUgyldigNavn) { "Navn eksisterer i et annet lagret filter" }
-        require(!erUgyldigFiltervalg) { "Filterkombinasjon eksisterer i et annet lagret filter" }
+
+        validerUnikhet(!erUgyldigNavn, !erUgyldigFiltervalg)
 
         dbQuery {
             key = (Filter.insert {
@@ -87,25 +87,56 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
     override suspend fun oppdaterFilter(
         veilederId: String,
-        filterValg: FilterModel
+        filter: FilterModel
     ): FilterModel {
-        require(filterValg.filterNavn.isNotEmpty()) { "Navn kan ikke være tomt" }
+        var erUgyldigNavn = true;
+        var erUgyldigFiltervalg = true;
+
+        validerValg(filter.filterValg)
+        validerNavn(filter.filterNavn)
+        
+        dbQuery {
+            erUgyldigNavn = (Filter innerJoin MineLagredeFilter).slice(
+                Filter.filterNavn,
+                Filter.filterId,
+                MineLagredeFilter.veilederId
+            ).select {
+                (Filter.filterNavn eq filter.filterNavn) and
+                        (MineLagredeFilter.veilederId eq veilederId) and
+                        (Filter.filterId neq filter.filterId)
+            }.count() > 0
+        }
+
+        dbQuery {
+            erUgyldigFiltervalg = (Filter innerJoin MineLagredeFilter).slice(
+                Filter.valgteFilter,
+                Filter.filterId,
+                MineLagredeFilter.veilederId
+            ).select {
+                (Filter.valgteFilter eq filter.filterValg) and
+                        (MineLagredeFilter.veilederId eq veilederId) and
+                        (Filter.filterId neq filter.filterId)
+            }.count() > 0
+        }
+
+        validerUnikhet(!erUgyldigNavn, !erUgyldigFiltervalg)
+
         dbQuery {
             val isValidUpdate =
                 MineLagredeFilter.select {
-                    (MineLagredeFilter.filterId eq filterValg.filterId) and
+                    (MineLagredeFilter.filterId eq filter.filterId) and
                             (MineLagredeFilter.veilederId eq veilederId)
                 }
                     .count() > 0
             if (isValidUpdate) {
                 Filter
-                    .update({ (Filter.filterId eq filterValg.filterId) }) {
-                        it[filterNavn] = filterValg.filterNavn
-                        it[valgteFilter] = filterValg.filterValg
+                    .update({ (Filter.filterId eq filter.filterId) }) {
+                        it[filterNavn] = filter.filterNavn
+                        it[valgteFilter] = filter.filterValg
                     }
             }
         }
-        return hentFilter(filterValg.filterId)!!
+        return hentFilter(filter.filterId)!!
     }
 
     private fun tilMineLagredeFilterModel(row: ResultRow): FilterModel =
@@ -116,6 +147,20 @@ class MineLagredeFilterServiceImpl() : FilterService {
             veilederId = row[MineLagredeFilter.veilederId],
             opprettetDato = row[Filter.opprettetDato]
         )
+
+    private fun validerNavn(navn: String) {
+        require(navn.length < 255) { "Lengden på navnet kan ikke være mer enn 255 karakterer" }
+        require(navn.isNotEmpty()) { "Navn kan ikke være tomt" }
+    }
+
+    private fun validerValg(valg: PortefoljeFilter) {
+        require(valg.isNotEmpty()) { "Filtervalg kan ikke være tomt" }
+    }
+
+    private fun validerUnikhet(navn: Boolean, valg: Boolean) {
+        require(navn) { "Navn eksisterer i et annet lagret filter" }
+        require(valg) { "Filterkombinasjon eksisterer i et annet lagret filter" }
+    }
 
     override suspend fun finnFilterForFilterBruker(veilederId: String) = dbQuery {
         (Filter innerJoin MineLagredeFilter).slice(
