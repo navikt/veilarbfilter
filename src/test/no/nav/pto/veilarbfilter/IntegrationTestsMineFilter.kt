@@ -23,30 +23,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
 import java.time.LocalDateTime
+import kotlin.random.Random
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IntegrationTestsMineFilter {
     private
     lateinit var postgresqlContainer: PostgreSQLContainer<Nothing>;
-
-    private val defaultFilterModel =
-        NyttFilterModel(
-            filterNavn = "Test",
-            filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
-        )
-
-    private val gyldigFilterModel =
-        NyttFilterModel(
-            filterNavn = "Heiheiheihei",
-            filterValg = PortefoljeFilter(kjonn = "M")
-        )
-
-    private val gyldigFilterModelOppdatering =
-        NyttFilterModel(
-            filterNavn = "Hei Drago",
-            filterValg = PortefoljeFilter(kjonn = "K")
-        )
 
     @BeforeAll
     internal fun setUp() {
@@ -88,7 +71,7 @@ class IntegrationTestsMineFilter {
             return
         }
 
-        lagreNyttFilterRespons(gyldigFilterModel)
+        lagreNyttFilterRespons(getRandomNyttFilter())
         val mineLagredeFilterNyResponsEtterLagring = getMineLagredeFilter()
 
         if (mineLagredeFilterNyResponsEtterLagring.responseValue == null) {
@@ -102,12 +85,14 @@ class IntegrationTestsMineFilter {
     /** TESTER RELATERT TIL UGYLDIGHET FOR LAGRING AV NYTT FILTER **/
     @Test
     fun testLagretFilterNavnEksistererForNyttFilter() {
-        lagreNyttFilterRespons(defaultFilterModel)
+        val randomNyttFilter = getRandomNyttFilter()
+
+        lagreNyttFilterRespons(randomNyttFilter)
         val mineLagredeFilterResponse = getMineLagredeFilter()
 
         val nyttFilterModelEksisterendeNavn =
             NyttFilterModel(
-                filterNavn = defaultFilterModel.filterNavn,
+                filterNavn = randomNyttFilter.filterNavn,
                 filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "M")
             )
 
@@ -125,13 +110,15 @@ class IntegrationTestsMineFilter {
 
     @Test
     fun testLagretFilterValgEksistererForNyttFilter() {
-        lagreNyttFilterRespons(defaultFilterModel)
+        val randomNyttFilter = getRandomNyttFilter()
+
+        lagreNyttFilterRespons(randomNyttFilter)
         val mineLagredeFilterResponse = getMineLagredeFilter()
 
         val nyttFilterModelEksisterendeFilter =
             NyttFilterModel(
                 filterNavn = "Team Voff",
-                filterValg = defaultFilterModel.filterValg
+                filterValg = randomNyttFilter.filterValg
             )
 
         val lagreNyttFilterMedEksisterendeFilterKombinasjon = lagreNyttFilterRespons(nyttFilterModelEksisterendeFilter)
@@ -180,7 +167,7 @@ class IntegrationTestsMineFilter {
     /** TESTER RELATERT TIL GYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER**/
     @Test
     fun testOppdaterLagredeFilterGyldig() {
-        var nyttFilter = lagreNyttFilterVerdi(gyldigFilterModelOppdatering)
+        var nyttFilter = lagreNyttFilterVerdi(getRandomNyttFilter())
 
         if (nyttFilter == null) {
             fail()
@@ -210,7 +197,7 @@ class IntegrationTestsMineFilter {
 
     @Test
     fun testSlettLagretFilterGyldig() {
-        val lagretMineLagredeFilterResponse = lagreNyttFilterVerdi(defaultFilterModel)
+        val lagretMineLagredeFilterResponse = lagreNyttFilterVerdi(getRandomNyttFilter())
 
         if (lagretMineLagredeFilterResponse == null) {
             fail()
@@ -253,7 +240,7 @@ class IntegrationTestsMineFilter {
 
     @Test
     fun testTomtNavnForOppdatertLagretFilter() {
-        var nyttFilter = lagreNyttFilterRespons(defaultFilterModel).responseValue
+        var nyttFilter = lagreNyttFilterRespons(getRandomNyttFilter()).responseValue
 
         if (nyttFilter == null) {
             fail()
@@ -270,7 +257,7 @@ class IntegrationTestsMineFilter {
 
     @Test
     fun testTomtFilterValgForOppdatertLagretFilter() {
-        var nyttFilter = lagreNyttFilterRespons(defaultFilterModel).responseValue
+        var nyttFilter = lagreNyttFilterRespons(getRandomNyttFilter()).responseValue
 
         if (nyttFilter == null) {
             fail()
@@ -398,5 +385,18 @@ class IntegrationTestsMineFilter {
 
         assertTrue(lagretMineLagredeFilterResponse.responseCode == 200)
         return lagretMineLagredeFilterResponse.responseValue
+    }
+
+    private fun getRandomNyttFilter(): NyttFilterModel {
+        var alderVelg = listOf<String>("19-og-under", "20-24", "25-29", "30-39", "40-49", "50-59", "60-66", "67-70")
+
+        return NyttFilterModel(
+            filterNavn = "Filter navn " + Random.nextInt(10, 1000),
+            filterValg = PortefoljeFilter(
+                kjonn = "K",
+                fodselsdagIMnd = listOf(Random.nextInt(1, 31).toString(), Random.nextInt(1, 31).toString()),
+                alder = listOf(alderVelg.random())
+            )
+        )
     }
 }
