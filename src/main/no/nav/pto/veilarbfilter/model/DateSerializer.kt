@@ -10,15 +10,16 @@ import java.time.format.DateTimeParseException
 
 class DateSerializer : JsonDeserializer<LocalDateTime>, JsonSerializer<LocalDateTime> {
     private val log = LoggerFactory.getLogger("DateDeserializer")
+
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
 
     @Throws(JsonParseException::class)
     override fun deserialize(element: JsonElement, typeOf: Type?, arg2: JsonDeserializationContext?): LocalDateTime? {
         val date = element.asString
         return try {
-            LocalDateTime.parse(date, formatter);
+            LocalDateTime.parse(date);
         } catch (e: DateTimeParseException) {
-            log.warn("Can't parse date:$date, error: ", e)
+            log.warn("Can't parse date: $date, error: ", e)
             null
         }
     }
