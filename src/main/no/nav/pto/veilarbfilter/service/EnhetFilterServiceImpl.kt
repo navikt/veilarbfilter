@@ -42,15 +42,15 @@ class EnhetFilterServiceImpl() : FilterService {
         }
     }
 
-    override suspend fun oppdaterFilter(enhetId: String, filterValg: FilterModel): FilterModel {
+    override suspend fun oppdaterFilter(enhetId: String, filter: FilterModel): FilterModel {
         dbQuery {
             (Filter innerJoin EnhetensLagredeFilter)
-                .update({ (Filter.filterId eq filterValg.filterId) and (EnhetensLagredeFilter.enhetId eq enhetId) }) {
-                    it[Filter.filterNavn] = filterValg.filterNavn
-                    it[Filter.valgteFilter] = filterValg.filterValg
+                .update({ (Filter.filterId eq filter.filterId) and (EnhetensLagredeFilter.enhetId eq enhetId) }) {
+                    it[Filter.filterNavn] = filter.filterNavn
+                    it[Filter.valgteFilter] = filter.filterValg
                 }
         }
-        return hentFilter(filterValg.filterId)!!
+        return hentFilter(filter.filterId)!!
     }
 
     override suspend fun lagreFilter(enhetId: String, nyttFilter: NyttFilterModel): EnhetensLagredeFilterModel {

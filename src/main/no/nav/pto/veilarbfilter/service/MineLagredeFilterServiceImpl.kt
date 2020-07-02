@@ -94,7 +94,7 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
         validerValg(filter.filterValg)
         validerNavn(filter.filterNavn)
-        
+
         dbQuery {
             erUgyldigNavn = (Filter innerJoin MineLagredeFilter).slice(
                 Filter.filterNavn,
@@ -149,17 +149,17 @@ class MineLagredeFilterServiceImpl() : FilterService {
         )
 
     private fun validerNavn(navn: String) {
-        require(navn.length < 255) { "Lengden på navnet kan ikke være mer enn 255 karakterer" }
-        require(navn.isNotEmpty()) { "Navn kan ikke være tomt" }
+        require(navn.length < 255) { LagredeFilterFeilmeldinger.NAVN_FOR_LANGT.message }
+        require(navn.isNotEmpty()) { LagredeFilterFeilmeldinger.NAVN_TOMT.message }
     }
 
     private fun validerValg(valg: PortefoljeFilter) {
-        require(valg.isNotEmpty()) { "Filtervalg kan ikke være tomt" }
+        require(valg.isNotEmpty()) { LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message }
     }
 
     private fun validerUnikhet(navn: Boolean, valg: Boolean) {
-        require(navn) { "Navn eksisterer i et annet lagret filter" }
-        require(valg) { "Filterkombinasjon eksisterer i et annet lagret filter" }
+        require(navn) { LagredeFilterFeilmeldinger.NAVN_EKSISTERER.message }
+        require(valg) { LagredeFilterFeilmeldinger.FILTERVALG_EKSISTERER.message }
     }
 
     override suspend fun finnFilterForFilterBruker(veilederId: String) = dbQuery {
@@ -172,5 +172,4 @@ class MineLagredeFilterServiceImpl() : FilterService {
         ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
             .mapNotNull { tilMineLagredeFilterModel(it) }
     }
-
 }

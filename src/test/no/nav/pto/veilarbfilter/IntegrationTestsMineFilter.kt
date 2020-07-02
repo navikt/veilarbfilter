@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import no.nav.common.utils.NaisUtils
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.model.*
+import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger
 import org.apache.http.client.fluent.Request
 import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpGet
@@ -24,7 +25,6 @@ import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
 import java.time.LocalDateTime
 import kotlin.random.Random
-
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IntegrationTestsMineFilter {
@@ -104,7 +104,10 @@ class IntegrationTestsMineFilter {
             return
         }
 
-        assertEquals(lagreNyttFilterMedEksisterendeNavn.errorMessage, "Navn eksisterer i et annet lagret filter")
+        assertEquals(
+            lagreNyttFilterMedEksisterendeNavn.errorMessage,
+            LagredeFilterFeilmeldinger.NAVN_EKSISTERER.message
+        )
         assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponsEtterFeilLagring.responseValue.size)
     }
 
@@ -131,7 +134,7 @@ class IntegrationTestsMineFilter {
 
         assertEquals(
             lagreNyttFilterMedEksisterendeFilterKombinasjon.errorMessage,
-            "Filterkombinasjon eksisterer i et annet lagret filter"
+            LagredeFilterFeilmeldinger.FILTERVALG_EKSISTERER.message
         )
         assertTrue(lagreNyttFilterMedEksisterendeFilterKombinasjon.responseCode == 400)
         assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponseEtterFeilLagring.responseValue.size)
@@ -148,7 +151,7 @@ class IntegrationTestsMineFilter {
         val lagreNyttFilterMedTomtFilterNavn = lagreNyttFilterRespons(nyttFilterModel)
 
         assertTrue(lagreNyttFilterMedTomtFilterNavn.responseCode == 400)
-        assertEquals(lagreNyttFilterMedTomtFilterNavn.errorMessage, "Navn kan ikke være tomt")
+        assertEquals(lagreNyttFilterMedTomtFilterNavn.errorMessage, LagredeFilterFeilmeldinger.NAVN_TOMT.message)
     }
 
     @Test
@@ -161,13 +164,16 @@ class IntegrationTestsMineFilter {
 
         val lagreNyttFilterMedTomFilterKombinasjon = lagreNyttFilterRespons(nyttFilterModel)
         assertTrue(lagreNyttFilterMedTomFilterKombinasjon.responseCode == 400)
-        assertEquals(lagreNyttFilterMedTomFilterKombinasjon.errorMessage, "Filtervalg kan ikke være tomt")
+        assertEquals(
+            lagreNyttFilterMedTomFilterKombinasjon.errorMessage,
+            LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message
+        )
     }
 
     /** TESTER RELATERT TIL GYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER**/
     @Test
     fun testOppdaterLagredeFilterGyldig() {
-        var nyttFilter = lagreNyttFilterVerdi(getRandomNyttFilter())
+        val nyttFilter = lagreNyttFilterVerdi(getRandomNyttFilter())
 
         if (nyttFilter == null) {
             fail()
@@ -234,13 +240,13 @@ class IntegrationTestsMineFilter {
                 )
             )
 
-        assertEquals(endepunktRespons.errorMessage, "Lengden på navnet kan ikke være mer enn 255 karakterer")
+        assertEquals(endepunktRespons.errorMessage, LagredeFilterFeilmeldinger.NAVN_FOR_LANGT.message)
         assertTrue(endepunktRespons.responseCode != 200)
     }
 
     @Test
     fun testTomtNavnForOppdatertLagretFilter() {
-        var nyttFilter = lagreNyttFilterRespons(getRandomNyttFilter()).responseValue
+        val nyttFilter = lagreNyttFilterRespons(getRandomNyttFilter()).responseValue
 
         if (nyttFilter == null) {
             fail()
@@ -251,13 +257,13 @@ class IntegrationTestsMineFilter {
 
         val endepunktRespons = oppdaterMineLagredeFilter(nyttFilter)
 
-        assertEquals(endepunktRespons.errorMessage, "Navn kan ikke være tomt")
+        assertEquals(endepunktRespons.errorMessage, LagredeFilterFeilmeldinger.NAVN_TOMT.message)
         assertTrue(endepunktRespons.responseCode == 400)
     }
 
     @Test
     fun testTomtFilterValgForOppdatertLagretFilter() {
-        var nyttFilter = lagreNyttFilterRespons(getRandomNyttFilter()).responseValue
+        val nyttFilter = lagreNyttFilterRespons(getRandomNyttFilter()).responseValue
 
         if (nyttFilter == null) {
             fail()
@@ -268,7 +274,7 @@ class IntegrationTestsMineFilter {
 
         val endepunktRespons = oppdaterMineLagredeFilter(nyttFilter)
 
-        assertEquals(endepunktRespons.errorMessage, "Filtervalg kan ikke være tomt")
+        assertEquals(endepunktRespons.errorMessage, LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message)
         assertTrue(endepunktRespons.responseCode == 400)
     }
 
@@ -294,15 +300,16 @@ class IntegrationTestsMineFilter {
     /** TESTER RELATERT TIL GYLDIGHET FOR BÅDE LAGRING OG OPPDATERING **/
     @Test
     fun testNorskeBokstaverINavnForLagretFilter() {
+        val spesialbokstaverFilterNavn = "æøåöäáâò"
         val endepunktRespons =
             lagreNyttFilterRespons(
                 NyttFilterModel(
-                    filterNavn = "æøåöäáâò",
+                    filterNavn = spesialbokstaverFilterNavn,
                     filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "M")
                 )
             )
         assertTrue(endepunktRespons.responseCode == 200)
-        assertTrue(endepunktRespons.responseValue?.filterNavn == "æøåöäáâò")
+        assertTrue(endepunktRespons.responseValue?.filterNavn == spesialbokstaverFilterNavn)
     }
 
     /** HJELPEFUNKSJONER  **/
@@ -388,7 +395,7 @@ class IntegrationTestsMineFilter {
     }
 
     private fun getRandomNyttFilter(): NyttFilterModel {
-        var alderVelg = listOf<String>("19-og-under", "20-24", "25-29", "30-39", "40-49", "50-59", "60-66", "67-70")
+        val alderVelg = listOf("19-og-under", "20-24", "25-29", "30-39", "40-49", "50-59", "60-66", "67-70")
 
         return NyttFilterModel(
             filterNavn = "Filter navn " + Random.nextInt(10, 1000),
