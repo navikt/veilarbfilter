@@ -63,7 +63,7 @@ class IntegrationTestsMineFilter {
 
     /** TESTER RELATERT TIL GYLDIGHET FOR LAGRING AV NYTT FILTER **/
     @Test
-    fun testLagreLagredeFilterGyldig() {
+    fun `Lagring av nytt filter er gyldig`() {
         val mineLagredeFilterResponse = getMineLagredeFilter()
 
         if (mineLagredeFilterResponse.responseValue == null) {
@@ -84,7 +84,7 @@ class IntegrationTestsMineFilter {
 
     /** TESTER RELATERT TIL UGYLDIGHET FOR LAGRING AV NYTT FILTER **/
     @Test
-    fun testLagretFilterNavnEksistererForNyttFilter() {
+    fun `Filternavn eksisterer allerede for nytt filter`() {
         val randomNyttFilter = getRandomNyttFilter()
 
         lagreNyttFilterRespons(randomNyttFilter)
@@ -112,7 +112,7 @@ class IntegrationTestsMineFilter {
     }
 
     @Test
-    fun testLagretFilterValgEksistererForNyttFilter() {
+    fun `Filtervalg eksisterer allerede for nytt filter`() {
         val randomNyttFilter = getRandomNyttFilter()
 
         lagreNyttFilterRespons(randomNyttFilter)
@@ -124,7 +124,8 @@ class IntegrationTestsMineFilter {
                 filterValg = randomNyttFilter.filterValg
             )
 
-        val lagreNyttFilterMedEksisterendeFilterKombinasjon = lagreNyttFilterRespons(nyttFilterModelEksisterendeFilter)
+        val lagreNyttFilterMedEksisterendeFilterKombinasjon =
+            lagreNyttFilterRespons(nyttFilterModelEksisterendeFilter)
         val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
 
         if (mineLagredeFilterResponse.responseValue == null || mineLagredeFilterResponseEtterFeilLagring.responseValue == null) {
@@ -141,7 +142,7 @@ class IntegrationTestsMineFilter {
     }
 
     @Test
-    fun testTomtNavnForNyttLagretFilter() {
+    fun `Tomt navn er ugyldig for nytt filter`() {
         val nyttFilterModel =
             NyttFilterModel(
                 filterNavn = "",
@@ -155,7 +156,7 @@ class IntegrationTestsMineFilter {
     }
 
     @Test
-    fun testTomtFilterValgForNyttLagretFilter() {
+    fun `Tomt filtervalg er ugyldig for nytt filter`() {
         val nyttFilterModel =
             NyttFilterModel(
                 filterNavn = "Nytt filter",
@@ -172,7 +173,7 @@ class IntegrationTestsMineFilter {
 
     /** TESTER RELATERT TIL GYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER**/
     @Test
-    fun testOppdaterLagredeFilterGyldig() {
+    fun `Oppdatering av filter er gyldig`() {
         val nyttFilter = lagreNyttFilterVerdi(getRandomNyttFilter())
 
         if (nyttFilter == null) {
@@ -202,7 +203,7 @@ class IntegrationTestsMineFilter {
     }
 
     @Test
-    fun testSlettLagretFilterGyldig() {
+    fun `Sletting av filter er gyldig`() {
         val lagretMineLagredeFilterResponse = lagreNyttFilterVerdi(getRandomNyttFilter())
 
         if (lagretMineLagredeFilterResponse == null) {
@@ -231,7 +232,7 @@ class IntegrationTestsMineFilter {
 
     /** TESTER RELATERT TIL UGYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER **/
     @Test
-    fun testLangtNavnForOppdatertLagretFilter() {
+    fun `For langt navn er ugyldig`() {
         val endepunktRespons =
             lagreNyttFilterRespons(
                 NyttFilterModel(
@@ -245,7 +246,7 @@ class IntegrationTestsMineFilter {
     }
 
     @Test
-    fun testTomtNavnForOppdatertLagretFilter() {
+    fun `Tomt navn er ugyldig for oppdatering av filter`() {
         val nyttFilter = lagreNyttFilterRespons(getRandomNyttFilter()).responseValue
 
         if (nyttFilter == null) {
@@ -262,7 +263,7 @@ class IntegrationTestsMineFilter {
     }
 
     @Test
-    fun testTomtFilterValgForOppdatertLagretFilter() {
+    fun `Tomt filtervalg er ugyldig for oppdatert filter`() {
         val nyttFilter = lagreNyttFilterRespons(getRandomNyttFilter()).responseValue
 
         if (nyttFilter == null) {
@@ -278,14 +279,14 @@ class IntegrationTestsMineFilter {
         assertTrue(endepunktRespons.responseCode == 400)
     }
 
-    private fun testSlettLagretFilterUgyldig() {
+    fun `test at sletting av andre veileders filtere er ugyldig`() {
         //todo: try to delete filter that doesnt belong to veileder, check error code
     }
 
     //TODO: write test for when database is down
 //    /** DATABASE **/
 //    @Test
-//    fun testLagreFilterNårDatabaseErNede() {
+//    fun `Ingen lagring når databasen er nede`() {
 //        val mineLagredeFilterResponse = getMineLagredeFilter()
 //
 //        postgresqlContainer.stop()
@@ -299,7 +300,7 @@ class IntegrationTestsMineFilter {
 
     /** TESTER RELATERT TIL GYLDIGHET FOR BÅDE LAGRING OG OPPDATERING **/
     @Test
-    fun testNorskeBokstaverINavnForLagretFilter() {
+    fun `Spesialbokstaver fungerer`() {
         val spesialbokstaverFilterNavn = "æøåöäáâò"
         val endepunktRespons =
             lagreNyttFilterRespons(
@@ -341,11 +342,12 @@ class IntegrationTestsMineFilter {
     private fun oppdaterMineLagredeFilter(
         filterModel: FilterModel
     ): ApiResponse<MineLagredeFilterModel?> {
-        val response = Request.Put("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/${filterModel.filterId}")
-            .bodyString(serializeLagredeFilterModel(filterModel), ContentType.APPLICATION_JSON)
-            .connectTimeout(1000)
-            .execute()
-            .returnResponse()
+        val response =
+            Request.Put("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/${filterModel.filterId}")
+                .bodyString(serializeLagredeFilterModel(filterModel), ContentType.APPLICATION_JSON)
+                .connectTimeout(1000)
+                .execute()
+                .returnResponse()
 
         val statusCode = response.statusLine.statusCode
         val responseContent = EntityUtils.toString(response.entity)
