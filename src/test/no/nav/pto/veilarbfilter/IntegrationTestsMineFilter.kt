@@ -282,7 +282,7 @@ class IntegrationTestsMineFilter {
     fun `test at sletting av andre veileders filtere er ugyldig`() {
         //todo: try to delete filter that doesnt belong to veileder, check error code
     }
-    
+
     /** TESTER RELATERT TIL GYLDIGHET FOR BÅDE LAGRING OG OPPDATERING **/
     @Test
     fun `Spesialbokstaver fungerer`() {
@@ -328,7 +328,7 @@ class IntegrationTestsMineFilter {
             filterModel: FilterModel
     ): ApiResponse<MineLagredeFilterModel?> {
         val response =
-                Request.Put("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/${filterModel.filterId}")
+                Request.Put("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
                         .bodyString(serializeLagredeFilterModel(filterModel), ContentType.APPLICATION_JSON)
                         .connectTimeout(1000)
                         .execute()
@@ -348,7 +348,7 @@ class IntegrationTestsMineFilter {
     private fun deleteMineLagredeFilter(filterId: Int, veilederId: String): Int {
         val httpclient = HttpClients.createDefault()
         val httpDelete =
-                HttpDelete("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$veilederId/filter/$filterId")
+                HttpDelete("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$filterId")
         val httpResponse = httpclient.execute(httpDelete)
         return httpResponse.statusLine.statusCode
     }

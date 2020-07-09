@@ -38,10 +38,10 @@ fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: FilterService, useAu
                     savedFilter?.let { call.respond(it) } ?: throw IllegalArgumentException()
                 }
             }
-            put("/{filterId}") {
-                call.getNavident()?.let {
+            put {
+                call.getNavident()?.let { veilederId ->
                     val filterModel: FilterModel = call.receive()
-                    val oppdatertFilter = mineLagredeFilterService.oppdaterFilter(it, filterModel)
+                    val oppdatertFilter = mineLagredeFilterService.oppdaterFilter(veilederId, filterModel)
                     call.respond(oppdatertFilter)
                 }
             }
@@ -51,7 +51,7 @@ fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: FilterService, useAu
                     call.respond(filterListe)
                 }
             }
-            delete("/{veilederId}/filter/{filterId}") {
+            delete("/{filterId}") {
                 call.getNavident()?.let { veilederId ->
                     call.parameters["filterId"]?.let { filter ->
                         val slettetFilterId = mineLagredeFilterService.slettFilter(filter.toInt(), veilederId)
@@ -68,6 +68,6 @@ fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: FilterService, useAu
 
 private fun ApplicationCall.getNavident(): String? {
     return this.principal<JWTPrincipal>()
-        ?.payload
-        ?.subject
+            ?.payload
+            ?.subject
 }
