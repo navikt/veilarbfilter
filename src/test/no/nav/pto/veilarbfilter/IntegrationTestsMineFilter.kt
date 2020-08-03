@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.springframework.util.Assert
 import org.testcontainers.containers.PostgreSQLContainer
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -41,17 +42,17 @@ class IntegrationTestsMineFilter {
         postgresqlContainer.start()
 
         val configuration = Configuration(
-                clustername = "",
-                serviceUser = NaisUtils.Credentials("foo", "bar"),
-                abac = Configuration.Abac(""),
-                veilarbveilederConfig = Configuration.VeilarbveilederConfig(""),
-                database = Configuration.DB(
-                        url = postgresqlContainer.jdbcUrl,
-                        username = postgresqlContainer.username,
-                        password = postgresqlContainer.password
-                ),
-                httpServerWait = false,
-                useAuthentication = false
+            clustername = "",
+            serviceUser = NaisUtils.Credentials("foo", "bar"),
+            abac = Configuration.Abac(""),
+            veilarbveilederConfig = Configuration.VeilarbveilederConfig(""),
+            database = Configuration.DB(
+                url = postgresqlContainer.jdbcUrl,
+                username = postgresqlContainer.username,
+                password = postgresqlContainer.password
+            ),
+            httpServerWait = false,
+            useAuthentication = false
         )
         main(configuration)
     }
@@ -91,10 +92,10 @@ class IntegrationTestsMineFilter {
         val mineLagredeFilterResponse = getMineLagredeFilter()
 
         val nyttFilterModelEksisterendeNavn =
-                NyttFilterModel(
-                        filterNavn = randomNyttFilter.filterNavn,
-                        filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "M")
-                )
+            NyttFilterModel(
+                filterNavn = randomNyttFilter.filterNavn,
+                filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "M")
+            )
 
         val lagreNyttFilterMedEksisterendeNavn = lagreNyttFilterRespons(nyttFilterModelEksisterendeNavn)
         val mineLagredeFilterResponsEtterFeilLagring = getMineLagredeFilter()
@@ -105,8 +106,8 @@ class IntegrationTestsMineFilter {
         }
 
         assertEquals(
-                lagreNyttFilterMedEksisterendeNavn.errorMessage,
-                LagredeFilterFeilmeldinger.NAVN_EKSISTERER.message
+            lagreNyttFilterMedEksisterendeNavn.errorMessage,
+            LagredeFilterFeilmeldinger.NAVN_EKSISTERER.message
         )
         assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponsEtterFeilLagring.responseValue.size)
     }
@@ -119,13 +120,13 @@ class IntegrationTestsMineFilter {
         val mineLagredeFilterResponse = getMineLagredeFilter()
 
         val nyttFilterModelEksisterendeFilter =
-                NyttFilterModel(
-                        filterNavn = "Team Voff",
-                        filterValg = randomNyttFilter.filterValg
-                )
+            NyttFilterModel(
+                filterNavn = "Team Voff",
+                filterValg = randomNyttFilter.filterValg
+            )
 
         val lagreNyttFilterMedEksisterendeFilterKombinasjon =
-                lagreNyttFilterRespons(nyttFilterModelEksisterendeFilter)
+            lagreNyttFilterRespons(nyttFilterModelEksisterendeFilter)
         val mineLagredeFilterResponseEtterFeilLagring = getMineLagredeFilter()
 
         if (mineLagredeFilterResponse.responseValue == null || mineLagredeFilterResponseEtterFeilLagring.responseValue == null) {
@@ -134,8 +135,8 @@ class IntegrationTestsMineFilter {
         }
 
         assertEquals(
-                lagreNyttFilterMedEksisterendeFilterKombinasjon.errorMessage,
-                LagredeFilterFeilmeldinger.FILTERVALG_EKSISTERER.message
+            lagreNyttFilterMedEksisterendeFilterKombinasjon.errorMessage,
+            LagredeFilterFeilmeldinger.FILTERVALG_EKSISTERER.message
         )
         assertTrue(lagreNyttFilterMedEksisterendeFilterKombinasjon.responseCode == 400)
         assertTrue(mineLagredeFilterResponse.responseValue.size == mineLagredeFilterResponseEtterFeilLagring.responseValue.size)
@@ -144,10 +145,10 @@ class IntegrationTestsMineFilter {
     @Test
     fun `Tomt navn er ugyldig for nytt filter`() {
         val nyttFilterModel =
-                NyttFilterModel(
-                        filterNavn = "",
-                        filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
-                )
+            NyttFilterModel(
+                filterNavn = "",
+                filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
+            )
 
         val lagreNyttFilterMedTomtFilterNavn = lagreNyttFilterRespons(nyttFilterModel)
 
@@ -158,16 +159,16 @@ class IntegrationTestsMineFilter {
     @Test
     fun `Tomt filtervalg er ugyldig for nytt filter`() {
         val nyttFilterModel =
-                NyttFilterModel(
-                        filterNavn = "Nytt filter",
-                        filterValg = PortefoljeFilter()
-                )
+            NyttFilterModel(
+                filterNavn = "Nytt filter",
+                filterValg = PortefoljeFilter()
+            )
 
         val lagreNyttFilterMedTomFilterKombinasjon = lagreNyttFilterRespons(nyttFilterModel)
         assertTrue(lagreNyttFilterMedTomFilterKombinasjon.responseCode == 400)
         assertEquals(
-                lagreNyttFilterMedTomFilterKombinasjon.errorMessage,
-                LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message
+            lagreNyttFilterMedTomFilterKombinasjon.errorMessage,
+            LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message
         )
     }
 
@@ -196,7 +197,7 @@ class IntegrationTestsMineFilter {
         }
 
         val oppdatertFilter =
-                mineLagredeFilterList.filter { elem -> elem.filterId == nyttFilter.filterId }.first()
+            mineLagredeFilterList.filter { elem -> elem.filterId == nyttFilter.filterId }.first()
 
         assertTrue(oppdatertFilter.filterNavn == nyttFilter.filterNavn)
         assertTrue(oppdatertFilter.filterValg == nyttFilter.filterValg)
@@ -212,8 +213,8 @@ class IntegrationTestsMineFilter {
         }
 
         val responseCode = deleteMineLagredeFilter(
-                lagretMineLagredeFilterResponse.filterId,
-                lagretMineLagredeFilterResponse.veilederId
+            lagretMineLagredeFilterResponse.filterId,
+            lagretMineLagredeFilterResponse.veilederId
         )
         assertTrue(responseCode == 200 || responseCode == 204)
 
@@ -227,19 +228,19 @@ class IntegrationTestsMineFilter {
         val mineLagredeFilter = mineLagredeFilterResponse.responseValue
 
         assertTrue(mineLagredeFilter.filter { elem -> elem.filterId == lagretMineLagredeFilterResponse.filterId }
-                .count() == 0)
+            .count() == 0)
     }
 
     /** TESTER RELATERT TIL UGYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER **/
     @Test
     fun `For langt navn er ugyldig`() {
         val endepunktRespons =
-                lagreNyttFilterRespons(
-                        NyttFilterModel(
-                                filterNavn = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                                filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
-                        )
+            lagreNyttFilterRespons(
+                NyttFilterModel(
+                    filterNavn = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                    filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
                 )
+            )
 
         assertEquals(endepunktRespons.errorMessage, LagredeFilterFeilmeldinger.NAVN_FOR_LANGT.message)
         assertTrue(endepunktRespons.responseCode != 200)
@@ -266,6 +267,7 @@ class IntegrationTestsMineFilter {
     fun `Tomt filtervalg er ugyldig for oppdatert filter`() {
         val nyttFilter = lagreNyttFilterRespons(getRandomNyttFilter()).responseValue
 
+        Assert.notNull(nyttFilter)
         if (nyttFilter == null) {
             fail()
             return
@@ -288,12 +290,12 @@ class IntegrationTestsMineFilter {
     fun `Spesialbokstaver fungerer`() {
         val spesialbokstaverFilterNavn = "æøåöäáâò"
         val endepunktRespons =
-                lagreNyttFilterRespons(
-                        NyttFilterModel(
-                                filterNavn = spesialbokstaverFilterNavn,
-                                filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "M")
-                        )
+            lagreNyttFilterRespons(
+                NyttFilterModel(
+                    filterNavn = spesialbokstaverFilterNavn,
+                    filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "M")
                 )
+            )
         assertTrue(endepunktRespons.responseCode == 200)
         assertTrue(endepunktRespons.responseValue?.filterNavn == spesialbokstaverFilterNavn)
     }
@@ -308,7 +310,28 @@ class IntegrationTestsMineFilter {
 
     private fun lagreNyttFilterRespons(valgteFilter: NyttFilterModel): ApiResponse<MineLagredeFilterModel> {
         val response = Request.Post("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
-                .bodyString(Gson().toJson(valgteFilter), ContentType.APPLICATION_JSON)
+            .bodyString(Gson().toJson(valgteFilter), ContentType.APPLICATION_JSON)
+            .connectTimeout(1000)
+            .execute()
+            .returnResponse()
+
+        val statusCode = response.statusLine.statusCode
+        val responseContent = EntityUtils.toString(response.entity)
+
+        if (statusCode == 200) return ApiResponse(
+            responseCode = statusCode,
+            responseValue = deserializeLagredeFilterModel(
+                responseContent
+            )
+        ) else return ApiResponse(responseCode = statusCode, errorMessage = responseContent)
+    }
+
+    private fun oppdaterMineLagredeFilter(
+        filterModel: FilterModel
+    ): ApiResponse<MineLagredeFilterModel?> {
+        val response =
+            Request.Put("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
+                .bodyString(serializeLagredeFilterModel(filterModel), ContentType.APPLICATION_JSON)
                 .connectTimeout(1000)
                 .execute()
                 .returnResponse()
@@ -317,60 +340,39 @@ class IntegrationTestsMineFilter {
         val responseContent = EntityUtils.toString(response.entity)
 
         if (statusCode == 200) return ApiResponse(
-                responseCode = statusCode,
-                responseValue = deserializeLagredeFilterModel(
-                        responseContent
-                )
-        ) else return ApiResponse(responseCode = statusCode, errorMessage = responseContent)
-    }
-
-    private fun oppdaterMineLagredeFilter(
-            filterModel: FilterModel
-    ): ApiResponse<MineLagredeFilterModel?> {
-        val response =
-                Request.Put("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
-                        .bodyString(serializeLagredeFilterModel(filterModel), ContentType.APPLICATION_JSON)
-                        .connectTimeout(1000)
-                        .execute()
-                        .returnResponse()
-
-        val statusCode = response.statusLine.statusCode
-        val responseContent = EntityUtils.toString(response.entity)
-
-        if (statusCode == 200) return ApiResponse(
-                responseCode = statusCode,
-                responseValue = deserializeLagredeFilterModel(
-                        responseContent
-                )
+            responseCode = statusCode,
+            responseValue = deserializeLagredeFilterModel(
+                responseContent
+            )
         ) else return ApiResponse(responseCode = statusCode, errorMessage = responseContent)
     }
 
     private fun deleteMineLagredeFilter(filterId: Int, veilederId: String): Int {
         val httpclient = HttpClients.createDefault()
         val httpDelete =
-                HttpDelete("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$filterId")
+            HttpDelete("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$filterId")
         val httpResponse = httpclient.execute(httpDelete)
         return httpResponse.statusLine.statusCode
     }
 
     private fun deserializeLagredeFilterModels(inputJson: String): List<MineLagredeFilterModel> {
         val gson = GsonBuilder()
-                .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
-                .create()
+            .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
+            .create()
         return gson.fromJson(inputJson, Array<MineLagredeFilterModel>::class.java).toList()
     }
 
     private fun deserializeLagredeFilterModel(inputJson: String): MineLagredeFilterModel {
         val gson = GsonBuilder()
-                .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
-                .create()
+            .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
+            .create()
         return gson.fromJson(inputJson, MineLagredeFilterModel::class.java)
     }
 
     private fun serializeLagredeFilterModel(filterModel: FilterModel): String {
         val gson = GsonBuilder()
-                .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
-                .create()
+            .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
+            .create()
         return gson.toJson(filterModel)
     }
 
@@ -385,12 +387,12 @@ class IntegrationTestsMineFilter {
         val alderVelg = listOf("19-og-under", "20-24", "25-29", "30-39", "40-49", "50-59", "60-66", "67-70")
 
         return NyttFilterModel(
-                filterNavn = "Filter navn " + Random.nextInt(10, 1000),
-                filterValg = PortefoljeFilter(
-                        kjonn = "K",
-                        fodselsdagIMnd = listOf(Random.nextInt(1, 31).toString(), Random.nextInt(1, 31).toString()),
-                        alder = listOf(alderVelg.random())
-                )
+            filterNavn = "Filter navn " + Random.nextInt(10, 1000),
+            filterValg = PortefoljeFilter(
+                kjonn = "K",
+                fodselsdagIMnd = listOf(Random.nextInt(1, 31).toString(), Random.nextInt(1, 31).toString()),
+                alder = listOf(alderVelg.random())
+            )
         )
     }
 }
