@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
@@ -25,6 +26,7 @@ data class PortefoljeFilter(
         val cvJobbprofil: String? = ""
 ) {
 
+    @JsonIgnore
     fun isNotEmpty(): Boolean {
         return listOf(
                 kjonn,
