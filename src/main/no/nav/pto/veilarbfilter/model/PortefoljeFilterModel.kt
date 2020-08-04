@@ -54,13 +54,13 @@ data class PortefoljeFilter(
 }
 
 data class Aktiviteter(
-        @get:JsonProperty("BEHANDLING") val BEHANDLING: String = "NA",
-        @get:JsonProperty("EGEN") val EGEN: String = "NA",
-        @get:JsonProperty("GRUPPEAKTIVITET") val GRUPPEAKTIVITET: String = "NA",
-        @get:JsonProperty("IJOBB") val IJOBB: String = "NA",
-        @get:JsonProperty("MOTE") val MOTE: String = "NA",
-        @get:JsonProperty("SOKEAVTALE") val SOKEAVTALE: String = "NA",
-        @get:JsonProperty("STILLING") val STILLING: String = "NA",
-        @get:JsonProperty("TILTAK") val TILTAK: String = "NA",
-        @get:JsonProperty("UTDANNINGAKTIVITET") val UTDANNINGAKTIVITET: String = "NA"
+        @get:JsonProperty("BEHANDLING") val BEHANDLING: String? = "NA",
+        @get:JsonProperty("EGEN") val EGEN: String? = "NA",
+        @get:JsonProperty("GRUPPEAKTIVITET") val GRUPPEAKTIVITET: String? = "NA",
+        @get:JsonProperty("IJOBB") val IJOBB: String? = "NA",
+        @get:JsonProperty("MOTE") val MOTE: String? = "NA",
+        @get:JsonProperty("SOKEAVTALE") val SOKEAVTALE: String? = "NA",
+        @get:JsonProperty("STILLING") val STILLING: String? = "NA",
+        @get:JsonProperty("TILTAK") val TILTAK: String? = "NA",
+        @get:JsonProperty("UTDANNINGAKTIVITET") val UTDANNINGAKTIVITET: String? = "NA"
 )
