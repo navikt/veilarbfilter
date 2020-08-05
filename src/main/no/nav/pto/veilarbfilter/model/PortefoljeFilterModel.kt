@@ -23,7 +23,8 @@ data class PortefoljeFilter(
         val veiledere: List<String> = emptyList(),
         val ytelse: String? = "",
         val registreringstype: List<String>? = emptyList(),
-        val cvJobbprofil: String? = ""
+        val cvJobbprofil: String? = "",
+        val arbeidslisteKategori: List<KategoriModell>? = emptyList()
 ) {
 
     @JsonIgnore
@@ -64,3 +65,11 @@ data class Aktiviteter(
         @get:JsonProperty("TILTAK") val TILTAK: String? = "NA",
         @get:JsonProperty("UTDANNINGAKTIVITET") val UTDANNINGAKTIVITET: String? = "NA"
 )
+
+data class KategoriModell(
+        @get:JsonProperty("BLA") val BLA: String,
+        @get:JsonProperty("LILLA") val LILLA: String,
+        @get:JsonProperty("GRONN") val GRONN: String,
+        @get:JsonProperty("GUL") val GUL: String
+)
+
