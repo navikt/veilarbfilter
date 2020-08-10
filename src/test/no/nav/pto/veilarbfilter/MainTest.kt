@@ -8,6 +8,7 @@ import no.nav.pto.veilarbfilter.jobs.CleanupVeilederGrupper
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
 
 fun main() {
+    System.setProperty("NAIS_APP_NAME", "local")
 
     val configuration = Configuration(
         clustername = "",
