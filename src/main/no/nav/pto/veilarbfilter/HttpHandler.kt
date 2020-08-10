@@ -15,7 +15,8 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import no.nav.log.LogFilter
+import no.nav.common.log.LogFilter
+import no.nav.common.utils.EnvironmentUtils
 import no.nav.pto.veilarbfilter.abac.PepClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.routes.internalRoutes
@@ -57,7 +58,7 @@ fun createHttpServer(
     }
 
     install(CallLogging) {
-        LogFilter()
+        LogFilter(EnvironmentUtils.requireApplicationName(), EnvironmentUtils.isDevelopment().orElse(false))
     }
 
     install(ContentNegotiation) {

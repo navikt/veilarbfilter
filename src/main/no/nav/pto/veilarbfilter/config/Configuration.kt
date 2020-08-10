@@ -2,12 +2,11 @@ package no.nav.pto.veilarbfilter.config
 
 import com.auth0.jwk.JwkProvider
 import com.natpryce.konfig.*
-import no.nav.common.utils.NaisUtils
+import no.nav.common.utils.Credentials
+import no.nav.common.utils.EnvironmentUtils.requireNamespace
 import no.nav.common.utils.NaisUtils.getCredentials
 import no.nav.pto.veilarbfilter.JwtUtil
-import no.nav.sbl.util.EnvironmentUtils
 
-private const val secret = ""
 private const val notUsedLocally = ""
 private val defaultProperties = ConfigurationMap(
     mapOf(
@@ -25,11 +24,12 @@ private val defaultProperties = ConfigurationMap(
 
 data class Configuration(
     val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
+    val stsDiscoveryUrl: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
     val database: DB = DB(),
     val jwt: Jwt = Jwt(),
     val abac: Abac = Abac(),
     val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
-    val serviceUser: NaisUtils.Credentials = getCredentials("service_user"),
+    val serviceUser: Credentials = getCredentials("service_user"),
     val httpServerWait: Boolean = true,
     val useAuthentication: Boolean = true
 ) {
@@ -52,7 +52,7 @@ data class Configuration(
     )
 
     data class VeilarbveilederConfig(
-        val url: String = "http://veilarbveileder.${EnvironmentUtils.requireNamespace()}.svc.nais.local/veilarbveileder"
+        val url: String = "http://veilarbveileder.${requireNamespace()}.svc.nais.local/veilarbveileder"
     )
 }
 

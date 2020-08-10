@@ -2,7 +2,7 @@ package no.nav.pto.veilarbfilter
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import no.nav.common.utils.NaisUtils
+import no.nav.common.utils.Credentials
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.model.*
 import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger
@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.springframework.util.Assert
 import org.testcontainers.containers.PostgreSQLContainer
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -43,7 +42,7 @@ class IntegrationTestsMineFilter {
 
         val configuration = Configuration(
             clustername = "",
-            serviceUser = NaisUtils.Credentials("foo", "bar"),
+            serviceUser = Credentials("foo", "bar"),
             abac = Configuration.Abac(""),
             veilarbveilederConfig = Configuration.VeilarbveilederConfig(""),
             database = Configuration.DB(
@@ -267,7 +266,6 @@ class IntegrationTestsMineFilter {
     fun `Tomt filtervalg er ugyldig for oppdatert filter`() {
         val nyttFilter = lagreNyttFilterRespons(getRandomNyttFilter()).responseValue
 
-        Assert.notNull(nyttFilter)
         if (nyttFilter == null) {
             fail()
             return

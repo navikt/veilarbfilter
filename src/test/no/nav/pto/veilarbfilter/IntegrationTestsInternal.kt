@@ -1,6 +1,6 @@
 package no.nav.pto.veilarbfilter
 
-import no.nav.common.utils.NaisUtils
+import no.nav.common.utils.Credentials
 import no.nav.pto.veilarbfilter.config.Configuration
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpUriRequest
@@ -33,7 +33,7 @@ class IntegrationTestsInternal {
 
         val configuration = Configuration(
             clustername = "",
-            serviceUser = NaisUtils.Credentials("foo", "bar"),
+            serviceUser = Credentials("foo", "bar"),
             abac = Configuration.Abac(""),
             veilarbveilederConfig = Configuration.VeilarbveilederConfig(""),
             database = Configuration.DB(

@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter
 
+import no.nav.common.sts.NaisSystemUserTokenProvider
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
@@ -20,8 +21,9 @@ fun main() {
 fun main(configuration: Configuration) {
     Database(configuration)
     val applicationState = ApplicationState()
+    val systemUserTokenProvider = NaisSystemUserTokenProvider(configuration.stsDiscoveryUrl, configuration.serviceUser.username, configuration.serviceUser.password)
+    val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration, systemUserTokenProvider = systemUserTokenProvider));
 
-    val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration));
     val cleanUpVeilederGrupper = CleanupVeilederGrupper(
             veilederGrupperService = veilederGrupperService,
             initialDelay = INITIAL_DELAY,

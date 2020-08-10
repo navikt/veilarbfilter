@@ -1,6 +1,6 @@
 package no.nav.pto.veilarbfilter
 
-import no.nav.common.utils.NaisUtils
+import no.nav.common.utils.Credentials
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
@@ -11,14 +11,14 @@ fun main() {
 
     val configuration = Configuration(
         clustername = "",
-        serviceUser = NaisUtils.Credentials("foo", "bar"),
+        serviceUser = Credentials("foo", "bar"),
         abac = Configuration.Abac(""),
         veilarbveilederConfig = Configuration.VeilarbveilederConfig("")
     )
     Database(configuration)
     val applicationState = ApplicationState()
 
-    val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration));
+    val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration, systemUserTokenProvider = null));
     val cleanupVeilederGrupper =
         CleanupVeilederGrupper(
             veilederGrupperService = veilederGrupperService,

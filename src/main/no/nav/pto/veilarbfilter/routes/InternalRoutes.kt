@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.routes
 
+import ch.qos.logback.classic.LoggerContext
 import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.http.ContentType.Text.Html
@@ -11,7 +12,8 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.exporter.common.TextFormat
-import no.nav.sbl.util.LogUtils
+import org.slf4j.LoggerFactory
+
 
 fun Route.internalRoutes(
     readinessCheck: () -> Boolean,
@@ -44,11 +46,12 @@ fun Route.internalRoutes(
         }
 
         get("/loginfo") {
-            val loggers = LogUtils.getAllLoggers()
+            val loggerContext: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext;
+            val loggers =  loggerContext.loggerList
             val rootLevel = loggers.get(0).level
 
             val loggerAndLevel = loggers
-                .filter { logger -> logger.effectiveLevel != LogUtils.getRootLevel() }
+                .filter { logger -> logger.effectiveLevel != loggerContext.getLogger("ROOT").level }
                 .map { logger -> "<div> ${logger.name} - ${logger.effectiveLevel} </div>" }
                 .joinToString { " " }
 
