@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <include resource="logback-default-without-abac.xml"/>
+    <include resource="no/nav/common/log/logback-default.xml"/>
 </configuration>

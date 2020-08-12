@@ -11,12 +11,12 @@ object Filter : Table() {
     val opprettetDato = datetime("opprettet")
 }
 
-object EnhetFilter : Table() {
+object EnhetensLagredeFilter : Table() {
     val filterId = integer("enhet_filter_id") references Filter.filterId;
     val enhetId = varchar("enhet_id", 32)
 }
 
-object MineFilter : Table() {
+object MineLagredeFilter : Table() {
     val filterId = integer("mine_filter_id") references Filter.filterId;
     val veilederId = varchar("veileder_id", 32)
 }

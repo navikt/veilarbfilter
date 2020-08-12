@@ -7,14 +7,12 @@ import io.ktor.features.origin
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.ApplicationRequest
 import io.ktor.response.respond
+import io.ktor.response.respondText
 import org.slf4j.LoggerFactory
-import org.springframework.web.client.HttpServerErrorException
-import java.lang.IllegalStateException
-import java.lang.RuntimeException
 
 private val log = LoggerFactory.getLogger("Exceptionhandler")
 
-class BadGatewayException(message:String): Exception(message)
+class BadGatewayException(message: String) : Exception(message)
 
 fun StatusPages.Configuration.exceptionHandler() {
     exception<Throwable> { cause ->
@@ -23,7 +21,7 @@ fun StatusPages.Configuration.exceptionHandler() {
 
     exception<IllegalArgumentException> { cause ->
         call.logErrorAndRespond(cause, HttpStatusCode.BadRequest) {
-            "The request was either invalid or lacked required parameters."
+            cause.message ?: "The request was either invalid or lacked required parameters."
         }
     }
 
@@ -66,7 +64,8 @@ private suspend inline fun ApplicationCall.logErrorAndRespond(
         message = message,
         code = status
     )
-    this.respond(status, response)
+
+    this.respondText(status = status) { message }
 }
 
 internal data class HttpErrorResponse(

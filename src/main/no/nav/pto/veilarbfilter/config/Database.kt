@@ -1,16 +1,15 @@
 package no.nav.pto.veilarbfilter.config
 
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
+import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.flywaydb.core.Flyway
-import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
 
-class Database (configuration: Configuration) {
+class Database(configuration: Configuration) {
     private val APPLICATION_NAME = "veilarbfilter"
 
     private val dbUrl = configuration.database.url
@@ -34,12 +33,13 @@ class Database (configuration: Configuration) {
         config.isAutoCommit = false
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         config.validate()
+        config.connectionTimeout = 10000
         Database.connect(HikariDataSource(config))
-        val flyway = Flyway.configure().dataSource(dbUrl, "user", "password").load()
+        val flyway = Flyway.configure().dataSource(dbUrl, config.username, config.password).load()
         flyway.migrate()
     }
 
-    fun initRemote () {
+    fun initRemote() {
         val adminDataSource = dataSource("admin")
         migrateDatabase(adminDataSource)
         adminDataSource.close()

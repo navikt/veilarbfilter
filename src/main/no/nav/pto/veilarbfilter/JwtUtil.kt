@@ -4,6 +4,7 @@ import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
 import com.auth0.jwt.JWT
 import com.auth0.jwt.impl.JWTParser
+import com.auth0.jwt.interfaces.Claim
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.auth0.jwt.interfaces.Payload
 import io.ktor.application.ApplicationCall
@@ -15,9 +16,9 @@ import java.net.URL
 import java.util.*
 import java.util.concurrent.TimeUnit
 import org.slf4j.LoggerFactory
-import java.lang.IllegalStateException
 
 private val log = LoggerFactory.getLogger("veilarbfilter.JwtConfig")
+
 class JwtUtil {
     companion object {
         fun useJwtFromCookie(call: ApplicationCall): HttpAuthHeader? {
@@ -25,20 +26,19 @@ class JwtUtil {
                 val token = call.request.cookies["ID_token"]
                 io.ktor.http.auth.parseAuthorizationHeader("Bearer $token")
             } catch (ex: Throwable) {
-                log.info("Illegal HTTP auth header", ex)
+                log.error("Illegal HTTP auth header", ex)
                 null
             }
         }
 
-        fun getSubject(call: ApplicationCall): String? {
+        fun getSubject(call: ApplicationCall): String {
             return try {
                 useJwtFromCookie(call)
                     ?.getBlob()
                     ?.let { blob -> JWT.decode(blob).parsePayload().subject }
-                    ?: throw IllegalStateException()
+                    ?: "Unauthenticated"
             } catch (e: Throwable) {
-                log.error("JWT not found", e)
-                null
+                "JWT not found"
             }
         }
 
@@ -58,7 +58,7 @@ class JwtUtil {
             }
         }
 
-        fun HttpAuthHeader.getBlob() = when {
+        private fun HttpAuthHeader.getBlob() = when {
             this is HttpAuthHeader.Single -> blob
             else -> null
         }
@@ -67,5 +67,43 @@ class JwtUtil {
             val payloadString = String(Base64.getUrlDecoder().decode(payload))
             return JWTParser().parsePayload(payloadString)
         }
+    }
+}
+
+class MockPayload(val staticSubject: String) : Payload {
+    override fun getSubject(): String {
+        return staticSubject
+    }
+
+    override fun getExpiresAt(): Date {
+        TODO("not implemented")
+    }
+
+    override fun getIssuer(): String {
+        TODO("not implemented")
+    }
+
+    override fun getAudience(): MutableList<String> {
+        TODO("not implemented")
+    }
+
+    override fun getId(): String {
+        TODO("not implemented")
+    }
+
+    override fun getClaims(): MutableMap<String, Claim> {
+        TODO("not implemented")
+    }
+
+    override fun getIssuedAt(): Date {
+        TODO("not implemented")
+    }
+
+    override fun getClaim(name: String?): Claim {
+        TODO("not implemented")
+    }
+
+    override fun getNotBefore(): Date {
+        TODO("not implemented")
     }
 }

@@ -1,13 +1,18 @@
 package no.nav.pto.veilarbfilter.jobs
 
 import kotlinx.coroutines.*
+import no.nav.common.sts.NaisSystemUserTokenProvider
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
-class CleanupVeilederGrupper(val veilederGrupperService: VeilederGrupperServiceImpl, val interval: Long, val initialDelay: Long?) :
-        CoroutineScope {
+class CleanupVeilederGrupper(
+    val veilederGrupperService: VeilederGrupperServiceImpl,
+    val interval: Long,
+    val initialDelay: Long?
+) :
+    CoroutineScope {
     private val log = LoggerFactory.getLogger("CleanupVeilederGrupper")
 
     private val job = Job()

@@ -54,3 +54,5 @@ spec:
       value: https://veilarbveileder.nais.adeo.no/veilarbveileder/api
     - name: ABAC_PDP_ENDPOINT_URL
       value: https://wasapp.adeo.no/asm-pdp/authorize
+    - name: SECURITY_TOKEN_SERVICE_DISCOVERY_URL
+      value: https://security-token-service.nais.adeo.no/rest/v1/sts/.well-known/openid-configuration

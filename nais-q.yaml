@@ -51,6 +51,8 @@ spec:
     - name: VAULT_MOUNT_PATH
       value: postgresql/preprod-fss
     - name: VEILARBVEILEDERAPI_URL
-      value: https://veilarbveileder-q0.nais.preprod.local/veilarbveileder/api
+      value: https://veilarbveileder-{{namespace}}.nais.preprod.local/veilarbveileder/api
     - name: ABAC_PDP_ENDPOINT_URL
-      value: https://wasapp-q0.adeo.no/asm-pdp/authorize
+      value: https://wasapp-{{namespace}}.adeo.no/asm-pdp/authorize
+    - name: SECURITY_TOKEN_SERVICE_DISCOVERY_URL
+      value: https://security-token-service.nais.preprod.local/rest/v1/sts/.well-known/openid-configuration

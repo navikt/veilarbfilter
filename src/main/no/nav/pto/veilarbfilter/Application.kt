@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter
 
+import no.nav.common.sts.NaisSystemUserTokenProvider
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
@@ -14,23 +15,35 @@ private val INITIAL_DELAY = TimeUnit.MINUTES.toMillis(5);
 private val INTERVAL = TimeUnit.MINUTES.toMillis(15);
 
 fun main() {
+    main(Configuration())
+}
 
-    val configuration = Configuration()
+fun main(configuration: Configuration) {
     Database(configuration)
     val applicationState = ApplicationState()
+    val systemUserTokenProvider = NaisSystemUserTokenProvider(configuration.stsDiscoveryUrl, configuration.serviceUser.username, configuration.serviceUser.password)
+    val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration, systemUserTokenProvider = systemUserTokenProvider));
 
-    val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration));
-    val cleanUpVeilederGrupper = CleanupVeilederGrupper(veilederGrupperService = veilederGrupperService, initialDelay = INITIAL_DELAY, interval = INTERVAL)
+    val cleanUpVeilederGrupper = CleanupVeilederGrupper(
+            veilederGrupperService = veilederGrupperService,
+            initialDelay = INITIAL_DELAY,
+            interval = INTERVAL
+    )
 
-    val applicationServer = createHttpServer(applicationState = applicationState, configuration = configuration, veilederGrupperService = veilederGrupperService);
+    val applicationServer = createHttpServer(
+            applicationState = applicationState,
+            configuration = configuration,
+            veilederGrupperService = veilederGrupperService,
+            useAuthentication = configuration.useAuthentication
+    );
 
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false
-        applicationServer.stop(5, 5, TimeUnit.SECONDS)
+        applicationServer.stop(5, 5)
         cleanUpVeilederGrupper.stop()
     })
 
     cleanUpVeilederGrupper.start()
-    applicationServer.start(wait = true)
+    applicationServer.start(wait = configuration.httpServerWait)
 
 }

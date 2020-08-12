@@ -15,20 +15,23 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import no.nav.log.LogFilter
+import no.nav.common.log.LogFilter
+import no.nav.common.utils.EnvironmentUtils
 import no.nav.pto.veilarbfilter.abac.PepClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.routes.internalRoutes
-import no.nav.pto.veilarbfilter.routes.mineFilterRoutes
+import no.nav.pto.veilarbfilter.routes.mineLagredeFilterRoutes
 import no.nav.pto.veilarbfilter.routes.veilederGruppeRoutes
-import no.nav.pto.veilarbfilter.service.MineFilterServiceImpl
+import no.nav.pto.veilarbfilter.service.MineLagredeFilterServiceImpl
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
 
-fun createHttpServer(applicationState: ApplicationState,
-                     port: Int = 8080,
-                     configuration: Configuration,
-                     veilederGrupperService: VeilederGrupperServiceImpl,
-                     useAuthentication: Boolean = true): ApplicationEngine = embeddedServer(Netty, port) {
+fun createHttpServer(
+    applicationState: ApplicationState,
+    port: Int = 8080,
+    configuration: Configuration,
+    veilederGrupperService: VeilederGrupperServiceImpl,
+    useAuthentication: Boolean = true
+): ApplicationEngine = embeddedServer(Netty, port) {
     install(StatusPages) {
         exceptionHandler()
         notFoundHandler()
@@ -55,7 +58,7 @@ fun createHttpServer(applicationState: ApplicationState,
     }
 
     install(CallLogging) {
-        LogFilter()
+        LogFilter(EnvironmentUtils.requireApplicationName(), EnvironmentUtils.isDevelopment().orElse(false))
     }
 
     install(ContentNegotiation) {
@@ -64,10 +67,12 @@ fun createHttpServer(applicationState: ApplicationState,
 
     routing {
         route("veilarbfilter") {
-            internalRoutes(readinessCheck = { applicationState.initialized }, livenessCheck = { applicationState.running })
+            internalRoutes(
+                readinessCheck = { applicationState.initialized },
+                livenessCheck = { applicationState.running })
             route("/api/") {
                 veilederGruppeRoutes(veilederGrupperService, PepClient(config = configuration))
-                mineFilterRoutes(MineFilterServiceImpl())
+                mineLagredeFilterRoutes(MineLagredeFilterServiceImpl(), useAuthentication)
             }
         }
     }
