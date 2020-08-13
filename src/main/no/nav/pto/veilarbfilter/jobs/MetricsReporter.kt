@@ -1,6 +1,8 @@
 package no.nav.pto.veilarbfilter.jobs
 
 import kotlinx.coroutines.*
+import no.nav.metrics.MetricsClient
+import no.nav.metrics.MetricsConfig
 import no.nav.metrics.MetricsFactory
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterServiceImpl
 import org.slf4j.LoggerFactory
@@ -9,13 +11,24 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 class MetricsReporter(
-        val interval: Long,
-        val initialDelay: Long?,
-        val mineLagredeFilterServiceImpl: MineLagredeFilterServiceImpl
+
 ) : CoroutineScope {
     private val job = Job()
     private val singleThreadExecutor = Executors.newSingleThreadExecutor()
     private val log = LoggerFactory.getLogger("MetricsReporter")
+    private var interval: Long = 0;
+    private var initialDelay: Long = 0;
+    private lateinit var mineLagredeFilterServiceImpl: MineLagredeFilterServiceImpl;
+
+    constructor(interval: Long,
+                initialDelay: Long,
+                mineLagredeFilterServiceImpl: MineLagredeFilterServiceImpl) {
+
+        this.interval = interval;
+        this.initialDelay = initialDelay;
+        this.mineLagredeFilterServiceImpl = mineLagredeFilterServiceImpl;
+        MetricsClient.enableMetrics(MetricsConfig.resolveNaisConfig());
+    }
 
     override val coroutineContext: CoroutineContext
         get() = job + singleThreadExecutor.asCoroutineDispatcher()
