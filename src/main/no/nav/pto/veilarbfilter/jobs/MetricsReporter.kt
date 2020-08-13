@@ -10,15 +10,13 @@ import org.springframework.util.DigestUtils
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
-class MetricsReporter(
-
-) : CoroutineScope {
+class MetricsReporter : CoroutineScope {
     private val job = Job()
     private val singleThreadExecutor = Executors.newSingleThreadExecutor()
     private val log = LoggerFactory.getLogger("MetricsReporter")
     private var interval: Long = 0;
     private var initialDelay: Long = 0;
-    private lateinit var mineLagredeFilterServiceImpl: MineLagredeFilterServiceImpl;
+    private var mineLagredeFilterServiceImpl: MineLagredeFilterServiceImpl;
 
     constructor(interval: Long,
                 initialDelay: Long,
