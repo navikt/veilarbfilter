@@ -1,18 +1,17 @@
 package no.nav.pto.veilarbfilter.jobs
 
 import kotlinx.coroutines.*
-import no.nav.common.sts.NaisSystemUserTokenProvider
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 class CleanupVeilederGrupper(
-    val veilederGrupperService: VeilederGrupperServiceImpl,
-    val interval: Long,
-    val initialDelay: Long?
+        val veilederGrupperService: VeilederGrupperServiceImpl,
+        val interval: Long,
+        val initialDelay: Long?
 ) :
-    CoroutineScope {
+        CoroutineScope {
     private val log = LoggerFactory.getLogger("CleanupVeilederGrupper")
 
     private val job = Job()
@@ -33,9 +32,9 @@ class CleanupVeilederGrupper(
             delay(it)
         }
         while (isActive) {
+            log.info("Fjern veileder som er ikke aktive er ferdig")
             fjernVeilederSomErIkkeAktive()
             delay(interval)
-            log.info("Fjern veileder som er ikke aktive er ferdig")
         }
     }
 

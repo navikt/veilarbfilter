@@ -13,7 +13,6 @@ import no.nav.common.sts.NaisSystemUserTokenProvider
 import no.nav.common.utils.IdUtils
 import no.nav.pto.veilarbfilter.ObjectMapperProvider
 import no.nav.pto.veilarbfilter.config.Configuration
-import java.lang.IllegalStateException
 
 
 private val veilederPaEnhetenCache = VeilederCache()
@@ -35,35 +34,35 @@ class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: Nais
                 val response = get(httpClient, enhetId)
                 when (response.status.value) {
                     200 -> readResponse(response, enhetId)
-                    else -> throw IllegalStateException("Feilet mot veilarbveileder")
+                    else -> throw IllegalStateException("Feilet mot veilarbveileder " + response.status.value)
                 }
             }
         }
     }
 
     private suspend fun readResponse(
-        response: HttpResponse,
-        enhetId: String
+            response: HttpResponse,
+            enhetId: String
     ): List<String>? {
         val res = response.readText()
         val veiledereResponse: List<String> =
-            ObjectMapperProvider.objectMapper.readValue(res, object : TypeReference<List<String>>() {});
+                ObjectMapperProvider.objectMapper.readValue(res, object : TypeReference<List<String>>() {});
         veilederPaEnhetenCache.leggTilEnhetICachen(enhetId, veiledereResponse)
         return veiledereResponse
     }
 
     private suspend fun get(
-        httpClient: HttpClient,
-        enhetId: String
+            httpClient: HttpClient,
+            enhetId: String
     ): HttpResponse {
-       return httpClient.get<HttpStatement>("$veilarbveilederClientUrl/api/enhet/$enhetId/identer") {
+        return httpClient.get<HttpStatement>("$veilarbveilederClientUrl/api/enhet/$enhetId/identer") {
             header("Nav-Call-Id", IdUtils.generateId())
             header("Nav-Consumer-Id", "veilarbfilter")
-           if (systemUserTokenProvider != null) {
-               header("Authorization", "Bearer " + systemUserTokenProvider.systemUserToken)
-           }
+            if (systemUserTokenProvider != null) {
+                header("Authorization", "Bearer " + systemUserTokenProvider.systemUserToken)
+            }
         }
-            .execute()
+                .execute()
     }
 
 }
