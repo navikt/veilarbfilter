@@ -1,7 +1,7 @@
 package no.nav.pto.veilarbfilter.jobs
 
 import kotlinx.coroutines.*
-import no.nav.metrics.MetricsFactory.createEvent
+import no.nav.metrics.MetricsFactory
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterServiceImpl
 import org.slf4j.LoggerFactory
 import org.springframework.util.DigestUtils
@@ -38,7 +38,7 @@ class MetricsReporter(
 
     private suspend fun reportLagradeFilter() {
         mineLagredeFilterServiceImpl.hentAllLagredeFilter().forEach {
-            val metrikk = createEvent("portefolje.metrikker.lagredefilter.veileder-filter-counter")
+            val metrikk = MetricsFactory.createEvent("portefolje.metrikker.lagredefilter.veileder-filter-counter")
             metrikk.addFieldToReport("id", getHash(it.veilederId))
             val filterValg = it.filterValg
             if (filterValg.aktiviteter != null) {
