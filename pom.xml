@@ -217,6 +217,11 @@
 
         <dependency>
             <groupId>no.nav.common</groupId>
+            <artifactId>util</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>no.nav.common</groupId>
             <artifactId>sts</artifactId>
             <version>${common.version}</version>
         </dependency>
