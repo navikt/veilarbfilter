@@ -54,7 +54,7 @@ class MetricsReporter : CoroutineScope {
             val metrikk = Event("portefolje.metrikker.lagredefilter.veileder-filter-counter")
             metrikk.addFieldToReport("navn-lengde", it.filterNavn.length)
             metrikk.addTagToReport("id", getHash(it.veilederId))
-            metrikk.addTagToReport("filterId", it.filterId.toString())
+            metrikk.addFieldToReport("filterId", it.filterId)
             val filterValg = it.filterValg
             var antallFiltre = 0
 
