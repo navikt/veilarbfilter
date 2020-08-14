@@ -51,9 +51,9 @@ class MetricsReporter : CoroutineScope {
     private suspend fun reportLagradeFilter() {
         mineLagredeFilterServiceImpl.hentAllLagredeFilter().forEach {
             val metrikk = Event("portefolje.metrikker.lagredefilter.veileder-filter-counter")
-            metrikk.addFieldToReport("id", getHash(it.veilederId))
-            metrikk.addFieldToReport("filterId", it.filterId)
             metrikk.addFieldToReport("navn-lengde", it.filterNavn.length)
+            metrikk.addTagToReport("id", getHash(it.veilederId))
+            metrikk.addTagToReport("filterId", it.filterId.toString())
             val filterValg = it.filterValg
             if (filterValg.aktiviteter != null) {
                 metrikk.addTagToReport("aktiviteter", "1")
