@@ -212,13 +212,7 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>metrics</artifactId>
-            <version>1.2020.05.06_16.29-028d26fc1c42</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.nav.common</groupId>
-            <artifactId>util</artifactId>
-            <version>1.2020.05.06_16.29-028d26fc1c42</version>
+            <version>${common.version}</version>
         </dependency>
 
         <dependency>
