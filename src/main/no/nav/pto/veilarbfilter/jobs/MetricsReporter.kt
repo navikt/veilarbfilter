@@ -99,6 +99,7 @@ class MetricsReporter : CoroutineScope {
             }
             if (filterValg.alder.isNotEmpty()) {
                 metrikk.addTagToReport("alder", "1")
+                addValuesAsTags(metrikk, filterValg.alder)
                 antallFiltre += filterValg.alder.size
             }
             if (filterValg.ferdigfilterListe.isNotEmpty()) {
