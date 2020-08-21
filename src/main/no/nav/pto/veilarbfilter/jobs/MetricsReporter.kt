@@ -141,7 +141,7 @@ class MetricsReporter : CoroutineScope {
             }
             if (filterValg.servicegruppe.isNotEmpty()) {
                 metrikk.addTagToReport("servicegruppe", "1")
-                addValuesAsTags(metrikk, filterValg.rettighetsgruppe)
+                addValuesAsTags(metrikk, filterValg.servicegruppe)
                 antallFiltre += filterValg.servicegruppe.size
             }
             if (filterValg.tiltakstyper.isNotEmpty()) {
