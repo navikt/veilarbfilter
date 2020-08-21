@@ -128,6 +128,7 @@ class MetricsReporter : CoroutineScope {
             }
             if (filterValg.kjonn != null && filterValg.kjonn.isNotEmpty()) {
                 metrikk.addTagToReport("kjonn", "1")
+                metrikk.addTagToReport(filterValg.kjonn, "1")
                 antallFiltre++
             }
             if (filterValg.manuellBrukerStatus.isNotEmpty()) {
@@ -160,6 +161,7 @@ class MetricsReporter : CoroutineScope {
             }
             if (filterValg.ytelse != null && filterValg.ytelse.isNotEmpty()) {
                 metrikk.addTagToReport("ytelse", "1")
+                metrikk.addTagToReport(filterValg.ytelse, "1")
                 antallFiltre++
             }
             if (filterValg.registreringstype != null && filterValg.registreringstype.isNotEmpty()) {
@@ -169,6 +171,7 @@ class MetricsReporter : CoroutineScope {
             }
             if (filterValg.cvJobbprofil != null && filterValg.cvJobbprofil.isNotEmpty()) {
                 metrikk.addTagToReport("cvJobbprofil", "1")
+                metrikk.addTagToReport(filterValg.cvJobbprofil, "1")
                 antallFiltre++
             }
             if (filterValg.arbeidslisteKategori != null && filterValg.arbeidslisteKategori.isNotEmpty()) {
