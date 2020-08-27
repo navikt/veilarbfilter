@@ -22,8 +22,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
                     Filter.filterNavn,
                     Filter.valgteFilter,
                     Filter.opprettetDato,
-                    MineLagredeFilter.veilederId,
-                    MineLagredeFilter.sortOrder
+                        MineLagredeFilter.veilederId,
+                        MineLagredeFilter.sortOrder
                 ).select { (Filter.filterId.eq(filterId)) }
                     .mapNotNull { tilFilterModel(it) }
                     .singleOrNull()
@@ -180,8 +180,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
             Filter.filterNavn,
             Filter.valgteFilter,
             Filter.opprettetDato,
-            MineLagredeFilter.veilederId,
-            MineLagredeFilter.sortOrder
+                MineLagredeFilter.veilederId,
+                MineLagredeFilter.sortOrder
         ).selectAll()
             .mapNotNull { tilMineLagredeFilterModel(it) }
     }
@@ -192,8 +192,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
             filterNavn = row[Filter.filterNavn],
             filterValg = row[Filter.valgteFilter],
             veilederId = row[MineLagredeFilter.veilederId],
-            opprettetDato = row[Filter.opprettetDato],
-            sortOrder = row[MineLagredeFilter.sortOrder]
+                    opprettetDato = row[Filter.opprettetDato],
+                    sortOrder = row[MineLagredeFilter.sortOrder]
         )
 
     private fun tilMineLagredeFilterModel(row: ResultRow): MineLagredeFilterModel =
@@ -202,8 +202,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
             filterNavn = row[Filter.filterNavn],
             filterValg = row[Filter.valgteFilter],
             veilederId = row[MineLagredeFilter.veilederId],
-            opprettetDato = row[Filter.opprettetDato],
-            sortOrder = row[MineLagredeFilter.sortOrder]
+                    opprettetDato = row[Filter.opprettetDato],
+                    sortOrder = row[MineLagredeFilter.sortOrder]
         )
 
     private fun validerNavn(navn: String) {
@@ -228,8 +228,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
                     Filter.filterNavn,
                     Filter.valgteFilter,
                     Filter.opprettetDato,
-                    MineLagredeFilter.veilederId,
-                    MineLagredeFilter.sortOrder
+                        MineLagredeFilter.veilederId,
+                        MineLagredeFilter.sortOrder
                 ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
                     .mapNotNull { tilFilterModel(it) }
             }
