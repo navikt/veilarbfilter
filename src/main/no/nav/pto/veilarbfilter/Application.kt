@@ -52,11 +52,11 @@ fun main(configuration: Configuration) {
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false
         applicationServer.stop(5, 5)
-        cleanUpVeilederGrupper.stop()
+        //cleanUpVeilederGrupper.stop()
         metrikker.stop()
     })
 
-    cleanUpVeilederGrupper.start()
+    //cleanUpVeilederGrupper.start()
     metrikker.start()
     applicationServer.start(wait = configuration.httpServerWait)
 
