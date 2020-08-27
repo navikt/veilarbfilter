@@ -8,20 +8,30 @@ import no.nav.pto.veilarbfilter.model.MineLagredeFilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import no.nav.pto.veilarbfilter.model.PortefoljeFilter
 import org.jetbrains.exposed.sql.*
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 class MineLagredeFilterServiceImpl() : FilterService {
+    private val log = LoggerFactory.getLogger("Exceptionhandler")
 
-    override suspend fun hentFilter(filterId: Int): FilterModel? = dbQuery {
-        (Filter innerJoin MineLagredeFilter).slice(
-                Filter.filterId,
-                Filter.filterNavn,
-                Filter.valgteFilter,
-                Filter.opprettetDato,
-                MineLagredeFilter.veilederId
-        ).select { (Filter.filterId.eq(filterId)) }
-                .mapNotNull { tilFilterModel(it) }
-                .singleOrNull()
+    override suspend fun hentFilter(filterId: Int): FilterModel? {
+        try {
+            return dbQuery {
+
+                (Filter innerJoin MineLagredeFilter).slice(
+                        Filter.filterId,
+                        Filter.filterNavn,
+                        Filter.valgteFilter,
+                        Filter.opprettetDato,
+                        MineLagredeFilter.veilederId
+                ).select { (Filter.filterId.eq(filterId)) }
+                        .mapNotNull { tilFilterModel(it) }
+                        .singleOrNull()
+            }
+        } catch (e: Exception) {
+            log.error("Hent filter error", e)
+            return null
+        }
     }
 
     override suspend fun slettFilter(filterId: Int, veilederId: String): Int = dbQuery {
