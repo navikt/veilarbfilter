@@ -222,12 +222,12 @@ class IntegrationTestsMineFilter {
     @Test
     fun `For langt navn er ugyldig`() {
         val endepunktRespons =
-            lagreNyttFilterRespons(
-                NyttFilterModel(
-                    filterNavn = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                    filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
+                lagreNyttFilterRespons(
+                        NyttFilterModel(
+                                filterNavn = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                                filterValg = PortefoljeFilter(ferdigfilterListe = listOf("UFORDELTE_BRUKERE"), kjonn = "K")
+                        )
                 )
-            )
 
         assertEquals(endepunktRespons.errorMessage, LagredeFilterFeilmeldinger.NAVN_FOR_LANGT.message)
         assertTrue(endepunktRespons.responseCode != 200)
