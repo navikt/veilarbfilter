@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
 
 
-private val INITIAL_DELAY_CLEANUP = TimeUnit.MINUTES.toMillis(5);
+private val INITIAL_DELAY_CLEANUP = TimeUnit.MINUTES.toMillis(1);
 private val INTERVAL_CLEANUP = TimeUnit.MINUTES.toMillis(15);
 
 private val INITIAL_DELAY_METRICS = TimeUnit.MINUTES.toMillis(2);
