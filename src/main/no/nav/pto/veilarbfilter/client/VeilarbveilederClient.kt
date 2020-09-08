@@ -1,13 +1,10 @@
 package no.nav.pto.veilarbfilter.client
 
 import com.fasterxml.jackson.core.type.TypeReference
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.apache.Apache
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.HttpStatement
-import io.ktor.client.statement.readText
+import io.ktor.client.*
+import io.ktor.client.engine.apache.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
 import no.nav.common.sts.NaisSystemUserTokenProvider
 import no.nav.common.utils.IdUtils
@@ -55,6 +52,8 @@ class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: Nais
             httpClient: HttpClient,
             enhetId: String
     ): HttpResponse {
+        System.out.println("ENDPOINT $veilarbveilederClientUrl/api/enhet/$enhetId/identer")
+        System.out.println(systemUserTokenProvider?.systemUserToken)
         return httpClient.get<HttpStatement>("$veilarbveilederClientUrl/api/enhet/$enhetId/identer") {
             header("Nav-Call-Id", IdUtils.generateId())
             header("Nav-Consumer-Id", "veilarbfilter")
