@@ -16,6 +16,7 @@ spec:
   ingresses:
     - https://veilarbfilter-{{namespace}}.nais.preprod.local
     - https://app-{{namespace}}.adeo.no/veilarbfilter
+  webproxy: true
   vault:
     enabled: true
     paths:
