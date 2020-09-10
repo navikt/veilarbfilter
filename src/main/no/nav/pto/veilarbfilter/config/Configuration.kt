@@ -23,15 +23,15 @@ private val defaultProperties = ConfigurationMap(
 
 
 data class Configuration(
-    val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
-    val stsDiscoveryUrl: String = config()[Key("SECURITY_TOKEN_SERVICE_DISCOVERY_URL", stringType)],
-    val database: DB = DB(),
-    val jwt: Jwt = Jwt(),
-    val abac: Abac = Abac(),
-    val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
-    val serviceUser: Credentials = getCredentials("service_user"),
-    val httpServerWait: Boolean = true,
-    val useAuthentication: Boolean = true
+        val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
+        val stsDiscoveryUrl: String = config()[Key("SECURITYTOKENSERVICE_URL", stringType)],
+        val database: DB = DB(),
+        val jwt: Jwt = Jwt(),
+        val abac: Abac = Abac(),
+        val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
+        val serviceUser: Credentials = getCredentials("service_user"),
+        val httpServerWait: Boolean = true,
+        val useAuthentication: Boolean = true
 ) {
 
     data class Jwt(
