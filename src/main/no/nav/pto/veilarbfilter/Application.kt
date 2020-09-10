@@ -9,9 +9,7 @@ import no.nav.pto.veilarbfilter.jobs.CleanupVeilederGrupper
 import no.nav.pto.veilarbfilter.jobs.MetricsReporter
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterServiceImpl
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
-import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLContext
 
 data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
 
@@ -27,9 +25,6 @@ fun main() {
 }
 
 fun main(configuration: Configuration) {
-    val sslContext = SSLContext.getInstance("TLSv1.2")
-    sslContext.init(null, null, SecureRandom())
-    SSLContext.setDefault(sslContext)
     SslUtils.setupTruststore();
     Database(configuration)
     val applicationState = ApplicationState()
