@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter
 
 import no.nav.common.sts.NaisSystemUserTokenProvider
+import no.nav.common.utils.SslUtils
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
@@ -24,6 +25,7 @@ fun main() {
 }
 
 fun main(configuration: Configuration) {
+    SslUtils.setupTruststore();
     Database(configuration)
     val applicationState = ApplicationState()
     val systemUserTokenProvider = NaisSystemUserTokenProvider(configuration.stsDiscoveryUrl, configuration.serviceUser.username, configuration.serviceUser.password)
