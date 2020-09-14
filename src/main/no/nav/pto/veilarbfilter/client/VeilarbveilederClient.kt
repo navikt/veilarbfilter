@@ -9,6 +9,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.common.sts.NaisSystemUserTokenProvider
 import no.nav.common.utils.IdUtils
 import no.nav.pto.veilarbfilter.ObjectMapperProvider
+import no.nav.pto.veilarbfilter.client.dto.VeiledereResponse
 import no.nav.pto.veilarbfilter.config.Configuration
 
 
@@ -42,17 +43,18 @@ class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: Nais
             enhetId: String
     ): List<String>? {
         val res = response.readText()
-        val veiledereResponse: List<String> =
-                ObjectMapperProvider.objectMapper.readValue(res, object : TypeReference<List<String>>() {});
-        veilederPaEnhetenCache.leggTilEnhetICachen(enhetId, veiledereResponse)
-        return veiledereResponse
+        val veiledereResponse: VeiledereResponse =
+                ObjectMapperProvider.objectMapper.readValue(res, object : TypeReference<VeiledereResponse>() {});
+        val veilederIdentList = veiledereResponse.veilederListe.map { it.ident }
+        veilederPaEnhetenCache.leggTilEnhetICachen(enhetId, veilederIdentList)
+        return veilederIdentList
     }
 
     private suspend fun get(
             httpClient: HttpClient,
             enhetId: String
     ): HttpResponse {
-        return httpClient.get<HttpStatement>("$veilarbveilederClientUrl/api/enhet/$enhetId/identer") {
+        return httpClient.get<HttpStatement>("$veilarbveilederClientUrl/api/enhet/$enhetId/veiledere") {
             header("Nav-Call-Id", IdUtils.generateId())
             header("Nav-Consumer-Id", "veilarbfilter")
             if (systemUserTokenProvider != null) {
