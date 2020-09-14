@@ -7,5 +7,5 @@ import java.util.List;
 @Value
 public class VeiledereResponse {
     PortefoljeEnhet enhet;
-    List<Veileder> veilederListe;
+    public List<Veileder> veilederListe;
 }
