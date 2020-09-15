@@ -53,7 +53,6 @@ class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: Nais
         enhetId: String
     ): HttpResponse {
         return httpClient.get<HttpStatement>("$veilarbveilederClientUrl/api/enhet/$enhetId/identer") {
-            
             header("Nav-Call-Id", IdUtils.generateId())
             header("Nav-Consumer-Id", "veilarbfilter")
             if (systemUserTokenProvider != null) {
