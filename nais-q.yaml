@@ -20,7 +20,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: serviceuser/data/dev/srvveilarbfilter
+      - kvPath: serviceuser/data/dev/srvveilarbportefolje
         mountPath: /var/run/secrets/nais.io/service_user
   healthcheck:
     liveness:
