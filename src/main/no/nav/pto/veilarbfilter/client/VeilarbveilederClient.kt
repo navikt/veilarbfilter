@@ -11,14 +11,15 @@ import no.nav.common.utils.IdUtils
 import no.nav.pto.veilarbfilter.ObjectMapperProvider
 import no.nav.pto.veilarbfilter.client.dto.VeiledereResponse
 import no.nav.pto.veilarbfilter.config.Configuration
+import org.slf4j.LoggerFactory
 
 
 private val veilederPaEnhetenCache = VeilederCache()
 
-
 class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: NaisSystemUserTokenProvider?) {
     private val veilarbveilederClientUrl = config.veilarbveilederConfig.url
     private val systemUserTokenProvider = systemUserTokenProvider;
+    private val log = LoggerFactory.getLogger("VeilarbveilederClient")
 
     fun hentVeilederePaEnheten(enhetId: String): List<String>? {
         val veilederCacheValue = veilederPaEnhetenCache.veilederePaEnheten(enhetId)
@@ -59,6 +60,8 @@ class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: Nais
             header("Nav-Consumer-Id", "veilarbfilter")
             if (systemUserTokenProvider != null) {
                 header("Authorization", "Bearer " + systemUserTokenProvider.systemUserToken)
+            } else {
+                log.warn("System user token er null")
             }
         }
             .execute()
