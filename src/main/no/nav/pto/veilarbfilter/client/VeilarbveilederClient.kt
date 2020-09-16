@@ -59,6 +59,7 @@ class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: Nais
             header("Nav-Call-Id", IdUtils.generateId())
             header("Nav-Consumer-Id", "veilarbfilter")
             if (systemUserTokenProvider != null) {
+                log.info("Adding user token, token length: " + systemUserTokenProvider.systemUserToken.length)
                 header("Authorization", "Bearer " + systemUserTokenProvider.systemUserToken)
             } else {
                 log.warn("System user token er null")
