@@ -100,10 +100,12 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
         val filterForBruker = finnFilterForFilterBruker(enhetId);
 
         filterForBruker.forEach {
-            log.info("Veiledergruppe fore filter: {}", it.filterValg.veiledere)
-            val filtrerVeileder = filtrerVeilederSomErIkkePaEnheten(it, veilederePaEnheten)
+            val filtrerVeileder = it.filterValg.veiledere.filter { veilederIdent ->
+                veilederePaEnheten.contains(veilederIdent)
+            }
+            val removedVeileder = it.filterValg.veiledere.filter { veilederIdent -> !filtrerVeileder.contains(veilederIdent) }
+            log.warn("Removed veileder: $removedVeileder")
             val nyttFilter = it.filterValg.copy(veiledere = filtrerVeileder)
-            log.info("Veiledergruppe etter filter: {}", nyttFilter.veiledere)
             oppdaterFilter(enhetId, FilterModel(it.filterId, it.filterNavn, nyttFilter, it.opprettetDato))
         }
     }
