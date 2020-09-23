@@ -28,4 +28,3 @@ Prod credentials:
 Opprett en issue i GitHub for eventuelle spørsmål.s
 
 Er du ansatt i NAV kan du stille spørsmål på Slack i kanalen #pto.
- 
