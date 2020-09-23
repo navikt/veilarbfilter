@@ -7,11 +7,11 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 class CleanupVeilederGrupper(
-        val veilederGrupperService: VeilederGrupperServiceImpl,
-        val interval: Long,
-        val initialDelay: Long?
+    val veilederGrupperService: VeilederGrupperServiceImpl,
+    val interval: Long,
+    val initialDelay: Long?
 ) :
-        CoroutineScope {
+    CoroutineScope {
     private val log = LoggerFactory.getLogger("CleanupVeilederGrupper")
 
     private val job = Job()
@@ -32,8 +32,8 @@ class CleanupVeilederGrupper(
             delay(it)
         }
         while (isActive) {
-            log.info("Fjern veileder som er ikke aktive er ferdig")
             fjernVeilederSomErIkkeAktive()
+            log.info("Fjern veileder som er ikke aktive er ferdig")
             delay(interval)
         }
     }
