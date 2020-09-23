@@ -40,7 +40,6 @@ class CleanupVeilederGrupper(
 
     private suspend fun fjernVeilederSomErIkkeAktive() {
         veilederGrupperService.hentAlleEnheter().forEach {
-            log.info("Fjern veileder for enhet {}", it)
             veilederGrupperService.slettVeiledereSomIkkeErAktivePaEnheten(it)
         }
     }
