@@ -32,6 +32,7 @@ class CleanupVeilederGrupper(
             delay(it)
         }
         while (isActive) {
+            log.info("Fjern veileder som er ikke aktive...")
             fjernVeilederSomErIkkeAktive()
             log.info("Fjern veileder som er ikke aktive er ferdig")
             delay(interval)
