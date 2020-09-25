@@ -5,6 +5,7 @@ import no.nav.common.utils.Credentials
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
+import no.nav.pto.veilarbfilter.jobs.CleanupVeilederGrupper
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
 
 
@@ -37,10 +38,10 @@ fun mainTest(jdbcUrl: String, dbUsername: String, dbPass: String): ApplicationEn
         );
 
     val applicationServer = createHttpServer(
-            applicationState = applicationState,
-            configuration = configuration,
-            veilederGrupperService = veilederGrupperService,
-            useAuthentication = false
+        applicationState = applicationState,
+        configuration = configuration,
+        veilederGrupperService = veilederGrupperService,
+        useAuthentication = false
     );
 
     Runtime.getRuntime().addShutdownHook(Thread {
