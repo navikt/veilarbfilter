@@ -107,8 +107,28 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
         filterForBruker.forEach {
             val alleVeiledere = it.filterValg.veiledere;
             val aktiveVeileder = alleVeiledere.filter { veilederIdent ->
+            val alleVeiledere = it.filterValg.veiledere;
+            val aktiveVeileder = alleVeiledere.filter { veilederIdent ->
                 veilederePaEnheten.contains(veilederIdent)
             }
+
+            if (aktiveVeileder.size < alleVeiledere.size) {
+                val removedVeileder =
+                    it.filterValg.veiledere.filter { veilederIdent -> !aktiveVeileder.contains(veilederIdent) }
+                log.warn("Removed veileder: $removedVeileder")
+                val nyttFilter = it.filterValg.copy(veiledere = aktiveVeileder)
+                oppdaterFilter(enhetId, FilterModel(it.filterId, it.filterNavn, nyttFilter, it.opprettetDato))
+            }
+        }
+    }
+
+    private fun filtrerVeilederSomErIkkePaEnheten(
+        lagretFilter: FilterModel,
+        veilederePaEnheten: List<String>
+    ): List<String> =
+        lagretFilter.filterValg.veiledere.filter { veilederIdent ->
+            veilederePaEnheten.contains(veilederIdent)
+        }
 
             if (aktiveVeileder.size < alleVeiledere.size) {
                 val removedVeileder =
