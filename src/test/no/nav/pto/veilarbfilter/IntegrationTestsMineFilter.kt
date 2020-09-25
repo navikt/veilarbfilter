@@ -2,8 +2,7 @@ package no.nav.pto.veilarbfilter
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import no.nav.common.utils.Credentials
-import no.nav.pto.veilarbfilter.config.Configuration
+import io.ktor.server.engine.*
 import no.nav.pto.veilarbfilter.model.*
 import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger
 import org.apache.http.client.fluent.Request
@@ -30,6 +29,7 @@ import kotlin.random.Random
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IntegrationTestsMineFilter {
     lateinit var postgresqlContainer: PostgreSQLContainer<Nothing>;
+    lateinit var applicationEngine: ApplicationEngine;
 
     @BeforeAll
     internal fun setUp() {
@@ -39,26 +39,14 @@ class IntegrationTestsMineFilter {
             withPassword("password")
         }
         postgresqlContainer.start()
-
-        val configuration = Configuration(
-                clustername = "",
-                serviceUser = Credentials("foo", "bar"),
-                abac = Configuration.Abac(""),
-                veilarbveilederConfig = Configuration.VeilarbveilederConfig(""),
-                database = Configuration.DB(
-                        url = postgresqlContainer.jdbcUrl,
-                        username = postgresqlContainer.username,
-                        password = postgresqlContainer.password
-                ),
-                httpServerWait = false,
-                useAuthentication = false
-        )
-        mainTest(configuration)
+        applicationEngine =
+            mainTest(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
     }
 
     @AfterAll
     fun tearDown() {
         postgresqlContainer.stop()
+        applicationEngine.stop(0, 0)
     }
 
     /** TESTER RELATERT TIL GYLDIGHET FOR LAGRING AV NYTT FILTER **/

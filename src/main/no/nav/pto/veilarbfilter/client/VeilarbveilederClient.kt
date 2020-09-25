@@ -1,13 +1,10 @@
 package no.nav.pto.veilarbfilter.client
 
 import com.fasterxml.jackson.core.type.TypeReference
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.apache.Apache
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.HttpStatement
-import io.ktor.client.statement.readText
+import io.ktor.client.*
+import io.ktor.client.engine.apache.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
 import no.nav.common.sts.NaisSystemUserTokenProvider
 import no.nav.common.utils.IdUtils
@@ -41,19 +38,19 @@ class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: Nais
     }
 
     private suspend fun readResponse(
-            response: HttpResponse,
-            enhetId: String
+        response: HttpResponse,
+        enhetId: String
     ): List<String>? {
         val res = response.readText()
         val veiledereResponse: List<String> =
-                ObjectMapperProvider.objectMapper.readValue(res, object : TypeReference<List<String>>() {});
+            ObjectMapperProvider.objectMapper.readValue(res, object : TypeReference<List<String>>() {});
         veilederPaEnhetenCache.leggTilEnhetICachen(enhetId, veiledereResponse)
         return veiledereResponse
     }
 
     private suspend fun get(
-            httpClient: HttpClient,
-            enhetId: String
+        httpClient: HttpClient,
+        enhetId: String
     ): HttpResponse {
         return httpClient.get<HttpStatement>("$veilarbveilederClientUrl/api/enhet/$enhetId/identer") {
             header("Nav-Call-Id", IdUtils.generateId())
@@ -62,7 +59,7 @@ class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: Nais
                 header("Authorization", "Bearer " + systemUserTokenProvider.systemUserToken)
             }
         }
-                .execute()
+            .execute()
     }
 
 }

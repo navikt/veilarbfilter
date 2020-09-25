@@ -12,7 +12,7 @@ import kotlin.streams.toList
 
 class MineLagredeFilterServiceImpl() : FilterService {
     private val log = LoggerFactory.getLogger("MineLagredeFilterServiceImpl")
-
+  
     override suspend fun hentFilter(filterId: Int): FilterModel? {
         try {
             return dbQuery {
