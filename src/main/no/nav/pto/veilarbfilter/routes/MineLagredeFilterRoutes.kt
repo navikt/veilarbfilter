@@ -1,23 +1,19 @@
 package no.nav.pto.veilarbfilter.routes
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import io.ktor.application.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.ApplicationCallPipeline
+import io.ktor.application.call
 import io.ktor.auth.*
-import io.ktor.auth.jwt.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
+import io.ktor.auth.jwt.JWTPrincipal
+import io.ktor.http.HttpStatusCode
+import io.ktor.request.receive
+import io.ktor.response.respond
 import io.ktor.routing.*
 import no.nav.pto.veilarbfilter.MockPayload
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
-import no.nav.pto.veilarbfilter.model.SortOrder
 import no.nav.pto.veilarbfilter.service.FilterService
-import org.slf4j.LoggerFactory
 
-
-private val log = LoggerFactory.getLogger("MineLagredeFilterRoutes")
 
 fun Route.conditionalAuthenticate(useAuthentication: Boolean, build: Route.() -> Unit): Route {
     if (useAuthentication) {
@@ -63,17 +59,6 @@ fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: FilterService, useAu
                             call.respond(HttpStatusCode.NotFound)
                         }
                         call.respond(HttpStatusCode.NoContent)
-                    }
-                }
-            }
-            post("/lagresortering") {
-                call.getNavident()?.let { veilederId ->
-                    try {
-                        val sortOrder = jacksonObjectMapper().readValue<List<SortOrder>>(call.receiveText())
-                        val lagreSortering = mineLagredeFilterService.lagreSortering(veilederId, sortOrder)
-                        lagreSortering?.let { call.respond(it) }
-                    } catch (e: Exception) {
-                        log.error("Lagre sortering fail:$e", e)
                     }
                 }
             }

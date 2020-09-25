@@ -41,10 +41,18 @@ spec:
     requests:
       cpu: 500m
       memory: 2Gi
-  envFrom:
-    - configmap: pto-config
   env:
+    - name: ISSO_JWKS_URL
+      value: https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri
+    - name: ISSO_ISSUER
+      value: https://isso-q.adeo.no:443/isso/oauth2
     - name: VEILARBFILTER_DB_URL
       value: jdbc:postgresql://b27dbvl008.preprod.local:5432/veilarbfilter
     - name: VAULT_MOUNT_PATH
       value: postgresql/preprod-fss
+    - name: VEILARBVEILEDERAPI_URL
+      value: https://veilarbveileder-{{namespace}}.nais.preprod.local/veilarbveileder/api
+    - name: ABAC_PDP_ENDPOINT_URL
+      value: https://wasapp-{{namespace}}.adeo.no/asm-pdp/authorize
+    - name: SECURITY_TOKEN_SERVICE_DISCOVERY_URL
+      value: https://security-token-service.nais.preprod.local/rest/v1/sts/.well-known/openid-configuration
