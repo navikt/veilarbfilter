@@ -41,8 +41,6 @@ spec:
   prometheus:
     enabled: true
     path: /veilarbfilter/internal/metrics
-  envFrom:
-    - configmap: pto-config
   env:
     - name: ISSO_JWKS_URL
       value: https://isso.adeo.no/isso/oauth2/connect/jwk_uri

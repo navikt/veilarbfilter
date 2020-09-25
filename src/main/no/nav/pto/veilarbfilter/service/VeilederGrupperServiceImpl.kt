@@ -100,7 +100,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
     suspend fun slettVeiledereSomIkkeErAktivePaEnheten(enhetId: String) {
         val veilederePaEnheten = veilarbveilederClient
             .hentVeilederePaEnheten(enhetId)
-                ?: throw IllegalStateException("Can not get veiledere for enhet " + enhetId);
+            ?: throw IllegalStateException("Can not get veiledere for enhet " + enhetId);
 
         val filterForBruker = finnFilterForFilterBruker(enhetId);
 

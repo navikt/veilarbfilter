@@ -32,20 +32,20 @@ class IntegrationTestsInternal {
         postgresqlContainer.start()
 
         val configuration = Configuration(
-                clustername = "",
-                serviceUser = Credentials("foo", "bar"),
-                abac = Configuration.Abac(""),
-                veilarbveilederConfig = Configuration.VeilarbveilederConfig(""),
-                database = Configuration.DB(
-                        url = postgresqlContainer.jdbcUrl,
-                        username = postgresqlContainer.username,
-                        password = postgresqlContainer.password
-                ),
-                httpServerWait = false,
-                useAuthentication = false
+            clustername = "",
+            serviceUser = Credentials("foo", "bar"),
+            abac = Configuration.Abac(""),
+            veilarbveilederConfig = Configuration.VeilarbveilederConfig(""),
+            database = Configuration.DB(
+                url = postgresqlContainer.jdbcUrl,
+                username = postgresqlContainer.username,
+                password = postgresqlContainer.password
+            ),
+            httpServerWait = false,
+            useAuthentication = false
         )
 
-        mainTest(configuration)
+        main(configuration)
     }
 
     @AfterAll
@@ -56,7 +56,7 @@ class IntegrationTestsInternal {
     @Test
     fun testDatabaseConnection() {
         val conn: Connection = DriverManager
-                .getConnection(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
+            .getConnection(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
         val resultSet: ResultSet = conn.createStatement().executeQuery("SELECT 1")
         resultSet.next()
         val result = resultSet.getInt(1)
