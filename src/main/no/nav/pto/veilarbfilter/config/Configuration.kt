@@ -24,36 +24,36 @@ private val defaultProperties = ConfigurationMap(
 
 
 data class Configuration(
-    val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
-    val stsDiscoveryUrl: String = config()[Key("SECURITY_TOKEN_SERVICE_DISCOVERY_URL", stringType)],
-    val database: DB = DB(),
-    val jwt: Jwt = Jwt(),
-    val abac: Abac = Abac(),
-    val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
-    val serviceUser: Credentials = getCredentials("service_user"),
-    val httpServerWait: Boolean = true,
-    val useAuthentication: Boolean = true
+        val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
+        val stsDiscoveryUrl: String = config()[Key("SECURITY_TOKEN_SERVICE_DISCOVERY_URL", stringType)],
+        val database: DB = DB(),
+        val jwt: Jwt = Jwt(),
+        val abac: Abac = Abac(),
+        val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
+        val serviceUser: Credentials = getCredentials("service_user"),
+        val httpServerWait: Boolean = true,
+        val useAuthentication: Boolean = true
 ) {
 
     data class Jwt(
-        val jwksUrl: JwkProvider = JwtUtil.makeJwkProvider(config()[Key("ISSO_JWKS_URL", stringType)]),
-        val jwtIssuer: String = config()[Key("ISSO_ISSUER", stringType)]
+            val jwksUrl: JwkProvider = JwtUtil.makeJwkProvider(config()[Key("ISSO_JWKS_URL", stringType)]),
+            val jwtIssuer: String = config()[Key("ISSO_ISSUER", stringType)]
     )
 
     data class DB(
-        val url: String = config()[Key("veilarbfilter_DB_URL", stringType)],
-        val name: String = config()[Key("veilarbfilter_DB_NAME", stringType)],
-        val username: String = config()[Key("veilarbfilter_DB_USERNAME", stringType)],
-        val password: String = config()[Key("veilarbfilter_DB_PASSWORD", stringType)],
-        val vaultMountPath: String = config()[Key("VAULT_MOUNT_PATH", stringType)]
+            val url: String = config()[Key("veilarbfilter_DB_URL", stringType)],
+            val name: String = config()[Key("veilarbfilter_DB_NAME", stringType)],
+            val username: String = config()[Key("veilarbfilter_DB_USERNAME", stringType)],
+            val password: String = config()[Key("veilarbfilter_DB_PASSWORD", stringType)],
+            val vaultMountPath: String = config()[Key("VAULT_MOUNT_PATH", stringType)]
     )
 
     data class Abac(
-        val url: String = config()[Key("ABAC_PDP_ENDPOINT_URL", stringType)]
+            val url: String = config()[Key("ABAC_PDP_ENDPOINT_URL", stringType)]
     )
 
     data class VeilarbveilederConfig(
-        val url: String = "http://veilarbveileder.${requireNamespace()}.svc.nais.local/veilarbveileder"
+            val url: String = "http://veilarbveileder.${requireNamespace()}.svc.nais.local/veilarbveileder"
     )
 }
 
