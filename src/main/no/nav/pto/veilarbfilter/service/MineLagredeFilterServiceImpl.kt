@@ -3,13 +3,12 @@ package no.nav.pto.veilarbfilter.service
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.db.MineLagredeFilter
-import no.nav.pto.veilarbfilter.model.FilterModel
-import no.nav.pto.veilarbfilter.model.MineLagredeFilterModel
-import no.nav.pto.veilarbfilter.model.NyttFilterModel
-import no.nav.pto.veilarbfilter.model.PortefoljeFilter
+import no.nav.pto.veilarbfilter.model.*
+import no.nav.pto.veilarbfilter.model.SortOrder
 import org.jetbrains.exposed.sql.*
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
+import kotlin.streams.toList
 
 class MineLagredeFilterServiceImpl() : FilterService {
     private val log = LoggerFactory.getLogger("MineLagredeFilterServiceImpl")
@@ -19,14 +18,15 @@ class MineLagredeFilterServiceImpl() : FilterService {
             return dbQuery {
 
                 (Filter innerJoin MineLagredeFilter).slice(
-                        Filter.filterId,
-                        Filter.filterNavn,
-                        Filter.valgteFilter,
-                        Filter.opprettetDato,
-                        MineLagredeFilter.veilederId
+                    Filter.filterId,
+                    Filter.filterNavn,
+                    Filter.valgteFilter,
+                    Filter.opprettetDato,
+                    MineLagredeFilter.veilederId,
+                    MineLagredeFilter.sortOrder
                 ).select { (Filter.filterId.eq(filterId)) }
-                        .mapNotNull { tilFilterModel(it) }
-                        .singleOrNull()
+                    .mapNotNull { tilFilterModel(it) }
+                    .singleOrNull()
             }
         } catch (e: Exception) {
             log.error("Hent filter error", e)
@@ -36,7 +36,7 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
     override suspend fun slettFilter(filterId: Int, veilederId: String): Int = dbQuery {
         val removedRows =
-                MineLagredeFilter.deleteWhere { (MineLagredeFilter.filterId eq filterId) and (MineLagredeFilter.veilederId eq veilederId) }
+            MineLagredeFilter.deleteWhere { (MineLagredeFilter.filterId eq filterId) and (MineLagredeFilter.veilederId eq veilederId) }
         if (removedRows > 0) {
             Filter.deleteWhere { (Filter.filterId eq filterId) }
         } else {
@@ -44,9 +44,34 @@ class MineLagredeFilterServiceImpl() : FilterService {
         }
     }
 
+    override suspend fun lagreSortering(veilederId: String, sortOrder: List<SortOrder>): List<FilterModel> {
+        val filterIdsList = sortOrder.stream().map { it.filterId }.toList()
+        var isValidUpdate = false
+        dbQuery {
+            isValidUpdate =
+                (Filter innerJoin MineLagredeFilter).select {
+                    (MineLagredeFilter.filterId inList filterIdsList) and
+                            (MineLagredeFilter.veilederId eq veilederId)
+                }
+                    .count() == filterIdsList.size
+
+            if (isValidUpdate) {
+                var sortOrderValue: Int;
+                sortOrder.forEach {
+                    sortOrderValue = it.sortOrder
+                    MineLagredeFilter
+                        .update({ (MineLagredeFilter.filterId eq it.filterId) }) {
+                            it[MineLagredeFilter.sortOrder] = sortOrderValue
+                        }
+                }
+            }
+        }
+        return finnFilterForFilterBruker(veilederId);
+    }
+
     override suspend fun lagreFilter(
-            veilederId: String,
-            nyttFilter: NyttFilterModel
+        veilederId: String,
+        nyttFilter: NyttFilterModel
     ): FilterModel? {
         var key = 0;
         var erUgyldigNavn = true;
@@ -57,9 +82,9 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
         dbQuery {
             erUgyldigNavn = (Filter innerJoin MineLagredeFilter).slice(
-                    Filter.filterNavn,
-                    Filter.filterId,
-                    MineLagredeFilter.veilederId
+                Filter.filterNavn,
+                Filter.filterId,
+                MineLagredeFilter.veilederId
             ).select {
                 (Filter.filterNavn eq nyttFilter.filterNavn) and
                         (MineLagredeFilter.veilederId eq veilederId)
@@ -68,9 +93,9 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
         dbQuery {
             erUgyldigFiltervalg = (Filter innerJoin MineLagredeFilter).slice(
-                    Filter.valgteFilter,
-                    Filter.filterId,
-                    MineLagredeFilter.veilederId
+                Filter.valgteFilter,
+                Filter.filterId,
+                MineLagredeFilter.veilederId
             ).select {
                 (Filter.valgteFilter eq nyttFilter.filterValg) and
                         (MineLagredeFilter.veilederId eq veilederId)
@@ -96,8 +121,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
     }
 
     override suspend fun oppdaterFilter(
-            veilederId: String,
-            filter: FilterModel
+        veilederId: String,
+        filter: FilterModel
     ): FilterModel {
         var erUgyldigNavn = true;
         var erUgyldigFiltervalg = true;
@@ -107,9 +132,9 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
         dbQuery {
             erUgyldigNavn = (Filter innerJoin MineLagredeFilter).slice(
-                    Filter.filterNavn,
-                    Filter.filterId,
-                    MineLagredeFilter.veilederId
+                Filter.filterNavn,
+                Filter.filterId,
+                MineLagredeFilter.veilederId
             ).select {
                 (Filter.filterNavn eq filter.filterNavn) and
                         (MineLagredeFilter.veilederId eq veilederId) and
@@ -119,9 +144,9 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
         dbQuery {
             erUgyldigFiltervalg = (Filter innerJoin MineLagredeFilter).slice(
-                    Filter.valgteFilter,
-                    Filter.filterId,
-                    MineLagredeFilter.veilederId
+                Filter.valgteFilter,
+                Filter.filterId,
+                MineLagredeFilter.veilederId
             ).select {
                 (Filter.valgteFilter eq filter.filterValg) and
                         (MineLagredeFilter.veilederId eq veilederId) and
@@ -133,17 +158,17 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
         dbQuery {
             val isValidUpdate =
-                    MineLagredeFilter.select {
-                        (MineLagredeFilter.filterId eq filter.filterId) and
-                                (MineLagredeFilter.veilederId eq veilederId)
-                    }
-                            .count() > 0
+                MineLagredeFilter.select {
+                    (MineLagredeFilter.filterId eq filter.filterId) and
+                            (MineLagredeFilter.veilederId eq veilederId)
+                }
+                    .count() > 0
             if (isValidUpdate) {
                 Filter
-                        .update({ (Filter.filterId eq filter.filterId) }) {
-                            it[filterNavn] = filter.filterNavn
-                            it[valgteFilter] = filter.filterValg
-                        }
+                    .update({ (Filter.filterId eq filter.filterId) }) {
+                        it[filterNavn] = filter.filterNavn
+                        it[valgteFilter] = filter.filterValg
+                    }
             }
         }
         return hentFilter(filter.filterId)!!
@@ -151,32 +176,35 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
     suspend fun hentAllLagredeFilter() = dbQuery {
         (Filter innerJoin MineLagredeFilter).slice(
-                Filter.filterId,
-                Filter.filterNavn,
-                Filter.valgteFilter,
-                Filter.opprettetDato,
-                MineLagredeFilter.veilederId
+            Filter.filterId,
+            Filter.filterNavn,
+            Filter.valgteFilter,
+            Filter.opprettetDato,
+            MineLagredeFilter.veilederId,
+            MineLagredeFilter.sortOrder
         ).selectAll()
-                .mapNotNull { tilMineLagredeFilterModel(it) }
+            .mapNotNull { tilMineLagredeFilterModel(it) }
     }
 
     private fun tilFilterModel(row: ResultRow): FilterModel =
-            MineLagredeFilterModel(
-                    filterId = row[Filter.filterId],
-                    filterNavn = row[Filter.filterNavn],
-                    filterValg = row[Filter.valgteFilter],
-                    veilederId = row[MineLagredeFilter.veilederId],
-                    opprettetDato = row[Filter.opprettetDato]
-            )
+        MineLagredeFilterModel(
+            filterId = row[Filter.filterId],
+            filterNavn = row[Filter.filterNavn],
+            filterValg = row[Filter.valgteFilter],
+            veilederId = row[MineLagredeFilter.veilederId],
+            opprettetDato = row[Filter.opprettetDato],
+            sortOrder = row[MineLagredeFilter.sortOrder]
+        )
 
     private fun tilMineLagredeFilterModel(row: ResultRow): MineLagredeFilterModel =
-            MineLagredeFilterModel(
-                    filterId = row[Filter.filterId],
-                    filterNavn = row[Filter.filterNavn],
-                    filterValg = row[Filter.valgteFilter],
-                    veilederId = row[MineLagredeFilter.veilederId],
-                    opprettetDato = row[Filter.opprettetDato]
-            )
+        MineLagredeFilterModel(
+            filterId = row[Filter.filterId],
+            filterNavn = row[Filter.filterNavn],
+            filterValg = row[Filter.valgteFilter],
+            veilederId = row[MineLagredeFilter.veilederId],
+            opprettetDato = row[Filter.opprettetDato],
+            sortOrder = row[MineLagredeFilter.sortOrder]
+        )
 
     private fun validerNavn(navn: String) {
         require(navn.length < 255) { LagredeFilterFeilmeldinger.NAVN_FOR_LANGT.message }
@@ -192,14 +220,22 @@ class MineLagredeFilterServiceImpl() : FilterService {
         require(valg) { LagredeFilterFeilmeldinger.FILTERVALG_EKSISTERER.message }
     }
 
-    override suspend fun finnFilterForFilterBruker(veilederId: String) = dbQuery {
-        (Filter innerJoin MineLagredeFilter).slice(
-                Filter.filterId,
-                Filter.filterNavn,
-                Filter.valgteFilter,
-                Filter.opprettetDato,
-                MineLagredeFilter.veilederId
-        ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
-                .mapNotNull { tilFilterModel(it) }
+    override suspend fun finnFilterForFilterBruker(veilederId: String): List<FilterModel> {
+        try {
+            return dbQuery {
+                (Filter innerJoin MineLagredeFilter).slice(
+                    Filter.filterId,
+                    Filter.filterNavn,
+                    Filter.valgteFilter,
+                    Filter.opprettetDato,
+                    MineLagredeFilter.veilederId,
+                    MineLagredeFilter.sortOrder
+                ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
+                    .mapNotNull { tilFilterModel(it) }
+            }
+        } catch (e: java.lang.Exception) {
+            log.error("Hent filter error", e)
+            return emptyList()
+        }
     }
 }

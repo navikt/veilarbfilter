@@ -6,6 +6,7 @@ import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.model.EnhetensLagredeFilterModel
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
+import no.nav.pto.veilarbfilter.model.SortOrder
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
 
@@ -16,7 +17,8 @@ class EnhetFilterServiceImpl() : FilterService {
             Filter.filterId,
             Filter.filterNavn,
             Filter.valgteFilter,
-            EnhetensLagredeFilter.enhetId
+            EnhetensLagredeFilter.enhetId,
+            EnhetensLagredeFilter.sortOrder
         ).select { (Filter.filterId.eq(filterId)) }
             .mapNotNull { tilEnhetFilterModel(it) }
             .singleOrNull()
@@ -27,7 +29,8 @@ class EnhetFilterServiceImpl() : FilterService {
             Filter.filterId,
             Filter.filterNavn,
             Filter.valgteFilter,
-            EnhetensLagredeFilter.enhetId
+            EnhetensLagredeFilter.enhetId,
+            EnhetensLagredeFilter.sortOrder
         ).select { (EnhetensLagredeFilter.enhetId.eq(enhetId)) }
             .mapNotNull { tilEnhetFilterModel(it) }
     }
@@ -40,6 +43,10 @@ class EnhetFilterServiceImpl() : FilterService {
         } else {
             0
         }
+    }
+
+    override suspend fun lagreSortering(filterBrukerId: String, sortOrder: List<SortOrder>): List<FilterModel> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun oppdaterFilter(enhetId: String, filter: FilterModel): FilterModel {
@@ -76,6 +83,7 @@ class EnhetFilterServiceImpl() : FilterService {
             filterNavn = row[Filter.filterNavn],
             filterValg = row[Filter.valgteFilter],
             enhetId = row[EnhetensLagredeFilter.enhetId],
-            opprettetDato = row[Filter.opprettetDato]
+            opprettetDato = row[Filter.opprettetDato],
+            sortOrder = row[EnhetensLagredeFilter.sortOrder]
         )
 }
