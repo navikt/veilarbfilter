@@ -14,13 +14,11 @@ object Filter : Table() {
 object EnhetensLagredeFilter : Table() {
     val filterId = integer("enhet_filter_id") references Filter.filterId;
     val enhetId = varchar("enhet_id", 32)
-    val sortOrder = integer("sort_order")
 }
 
 object MineLagredeFilter : Table() {
     val filterId = integer("mine_filter_id") references Filter.filterId;
     val veilederId = varchar("veileder_id", 32)
-    val sortOrder = integer("sort_order")
 }
 
 object VeilederGrupperFilter : Table() {
