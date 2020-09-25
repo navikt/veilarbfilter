@@ -8,6 +8,7 @@ import no.nav.pto.veilarbfilter.config.Database
 import no.nav.pto.veilarbfilter.jobs.CleanupVeilederGrupper
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
 
+
 fun mainTest(jdbcUrl: String, dbUsername: String, dbPass: String): ApplicationEngine {
     System.setProperty("NAIS_APP_NAME", "local")
 

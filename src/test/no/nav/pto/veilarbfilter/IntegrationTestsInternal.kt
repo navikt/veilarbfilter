@@ -42,7 +42,7 @@ class IntegrationTestsInternal {
     @Test
     fun testDatabaseConnection() {
         val conn: Connection = DriverManager
-            .getConnection(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
+                .getConnection(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
         val resultSet: ResultSet = conn.createStatement().executeQuery("SELECT 1")
         resultSet.next()
         val result = resultSet.getInt(1)

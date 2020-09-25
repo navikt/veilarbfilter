@@ -6,6 +6,7 @@ import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.db.VeilederGrupperFilter
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
+import no.nav.pto.veilarbfilter.model.SortOrder
 import no.nav.pto.veilarbfilter.model.VeilederGruppeFilterModel
 import org.jetbrains.exposed.sql.*
 import org.slf4j.LoggerFactory
@@ -90,6 +91,10 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
         } else {
             0
         }
+    }
+
+    override suspend fun lagreSortering(filterBrukerId: String, sortOrder: List<SortOrder>): Boolean {
+        TODO("Not yet implemented")
     }
 
     suspend fun slettVeiledereSomIkkeErAktivePaEnheten(enhetId: String) {
