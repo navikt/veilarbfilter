@@ -120,14 +120,6 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
         }
     }
 
-    private fun filtrerVeilederSomErIkkePaEnheten(
-        lagretFilter: FilterModel,
-        veilederePaEnheten: List<String>
-    ): List<String> =
-        lagretFilter.filterValg.veiledere.filter { veilederIdent ->
-            veilederePaEnheten.contains(veilederIdent)
-        }
-
     suspend fun hentAlleEnheter(): List<String> =
         dbQuery {
             VeilederGrupperFilter.slice(VeilederGrupperFilter.enhetId)

@@ -11,8 +11,8 @@ private const val notUsedLocally = ""
 private val defaultProperties = ConfigurationMap(
     mapOf(
         "NAIS_CLUSTER_NAME" to notUsedLocally,
-        "ISSO_JWKS_URL" to notUsedLocally,
-        "ISSO_ISSUER" to notUsedLocally,
+        "ISSO_JWKS_URL" to "https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri",
+        "ISSO_ISSUER" to "",
         "veilarbfilter_DB_URL" to "jdbc:postgresql://localhost:54321/veilarbfilter",
         "veilarbfilter_DB_NAME" to "veilarbfilter",
         "veilarbfilter_DB_USERNAME" to "user",
