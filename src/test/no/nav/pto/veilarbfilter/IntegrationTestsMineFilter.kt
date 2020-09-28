@@ -2,8 +2,7 @@ package no.nav.pto.veilarbfilter
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import no.nav.common.utils.Credentials
-import no.nav.pto.veilarbfilter.config.Configuration
+import io.ktor.server.engine.*
 import no.nav.pto.veilarbfilter.model.*
 import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger
 import org.apache.http.client.fluent.Request
@@ -15,6 +14,7 @@ import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
+import org.junit.Assert
 import org.junit.Assert.fail
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -28,8 +28,8 @@ import kotlin.random.Random
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IntegrationTestsMineFilter {
-    private
     lateinit var postgresqlContainer: PostgreSQLContainer<Nothing>;
+    lateinit var applicationEngine: ApplicationEngine;
 
     @BeforeAll
     internal fun setUp() {
@@ -39,26 +39,14 @@ class IntegrationTestsMineFilter {
             withPassword("password")
         }
         postgresqlContainer.start()
-
-        val configuration = Configuration(
-            clustername = "",
-            serviceUser = Credentials("foo", "bar"),
-            abac = Configuration.Abac(""),
-            veilarbveilederConfig = Configuration.VeilarbveilederConfig(""),
-            database = Configuration.DB(
-                url = postgresqlContainer.jdbcUrl,
-                username = postgresqlContainer.username,
-                password = postgresqlContainer.password
-            ),
-            httpServerWait = false,
-            useAuthentication = false
-        )
-        main(configuration)
+        applicationEngine =
+            mainTest(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
     }
 
     @AfterAll
     fun tearDown() {
         postgresqlContainer.stop()
+        applicationEngine.stop(0, 0)
     }
 
     /** TESTER RELATERT TIL GYLDIGHET FOR LAGRING AV NYTT FILTER **/
@@ -298,6 +286,34 @@ class IntegrationTestsMineFilter {
         assertTrue(endepunktRespons.responseValue?.filterNavn == spesialbokstaverFilterNavn)
     }
 
+    /** TESTER RELATERT TIL SORTING **/
+    @Test
+    fun `Sorting fungerer`() {
+        lagreNyttFilterVerdi(getRandomNyttFilter())
+        lagreNyttFilterVerdi(getRandomNyttFilter())
+        lagreNyttFilterVerdi(getRandomNyttFilter())
+
+        val mineLagredeFilter = getMineLagredeFilter()
+        if (mineLagredeFilter.responseValue === null) {
+            fail()
+        }
+        Assert.assertTrue(mineLagredeFilter.responseValue?.size!! >= 3)
+
+        val sortOrder = ArrayList<SortOrder>()
+        mineLagredeFilter.responseValue.forEach {
+            sortOrder.add(SortOrder(filterId = it.filterId, sortOrder = Random.nextInt(1, 100)))
+        }
+
+        val oppdaterSortingMineLagredeFilter = oppdaterSortingMineLagredeFilter(sortOrder)
+        Assert.assertTrue(oppdaterSortingMineLagredeFilter.size >= 3)
+
+        val mineLagredeFilterMedSortOrder = getMineLagredeFilter()
+        val sortOrderHash = sortOrder.map { it.filterId to it.sortOrder }.toMap()
+        mineLagredeFilterMedSortOrder.responseValue?.forEach {
+            Assert.assertTrue(it.sortOrder === sortOrderHash.get(it.filterId))
+        }
+    }
+
     /** HJELPEFUNKSJONER  **/
     private fun getMineLagredeFilter(): ApiResponse<List<MineLagredeFilterModel>> {
         val request: HttpUriRequest = HttpGet("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
@@ -343,6 +359,21 @@ class IntegrationTestsMineFilter {
                 responseContent
             )
         ) else return ApiResponse(responseCode = statusCode, errorMessage = responseContent)
+    }
+
+    private fun oppdaterSortingMineLagredeFilter(
+        sortOrder: List<SortOrder>
+    ): List<MineLagredeFilterModel> {
+        val response =
+            Request.Post("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/lagresortering")
+                .bodyString(Gson().toJson(sortOrder), ContentType.APPLICATION_JSON)
+                .connectTimeout(1000)
+                .execute()
+                .returnResponse()
+
+        val responseContent = EntityUtils.toString(response.entity)
+
+        return deserializeLagredeFilterModels(responseContent)
     }
 
     private fun deleteMineLagredeFilter(filterId: Int, veilederId: String): Int {

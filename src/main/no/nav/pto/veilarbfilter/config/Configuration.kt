@@ -17,7 +17,8 @@ private val defaultProperties = ConfigurationMap(
         "veilarbfilter_DB_NAME" to "veilarbfilter",
         "veilarbfilter_DB_USERNAME" to "user",
         "veilarbfilter_DB_PASSWORD" to "password",
-        "VAULT_MOUNT_PATH" to notUsedLocally
+        "VAULT_MOUNT_PATH" to notUsedLocally,
+        "SECURITY_TOKEN_SERVICE_DISCOVERY_URL" to notUsedLocally
     )
 )
 
