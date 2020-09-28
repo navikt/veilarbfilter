@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter
 
 import no.nav.common.sts.NaisSystemUserTokenProvider
+import no.nav.common.utils.SslUtils
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit
 data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
 
 
-private val INITIAL_DELAY_CLEANUP = TimeUnit.MINUTES.toMillis(5);
+private val INITIAL_DELAY_CLEANUP = TimeUnit.MINUTES.toMillis(1);
 private val INTERVAL_CLEANUP = TimeUnit.MINUTES.toMillis(15);
 
 private val INITIAL_DELAY_METRICS = TimeUnit.MINUTES.toMillis(2);
@@ -24,29 +25,39 @@ fun main() {
 }
 
 fun main(configuration: Configuration) {
+    SslUtils.setupTruststore();
     Database(configuration)
     val applicationState = ApplicationState()
-    val systemUserTokenProvider = NaisSystemUserTokenProvider(configuration.stsDiscoveryUrl, configuration.serviceUser.username, configuration.serviceUser.password)
-    val veilederGrupperService = VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration, systemUserTokenProvider = systemUserTokenProvider));
+    val systemUserTokenProvider = NaisSystemUserTokenProvider(
+        configuration.stsDiscoveryUrl,
+        configuration.serviceUser.username,
+        configuration.serviceUser.password
+    )
+    val veilederGrupperService = VeilederGrupperServiceImpl(
+        VeilarbveilederClient(
+            config = configuration,
+            systemUserTokenProvider = systemUserTokenProvider
+        )
+    );
     val mineLagredeFilterService = MineLagredeFilterServiceImpl();
 
     val cleanUpVeilederGrupper = CleanupVeilederGrupper(
-            veilederGrupperService = veilederGrupperService,
-            initialDelay = INITIAL_DELAY_CLEANUP,
-            interval = INTERVAL_CLEANUP
+        veilederGrupperService = veilederGrupperService,
+        initialDelay = INITIAL_DELAY_CLEANUP,
+        interval = INTERVAL_CLEANUP
     )
 
     val metrikker = MetricsReporter(
-            mineLagredeFilterServiceImpl = mineLagredeFilterService,
-            initialDelay = INITIAL_DELAY_METRICS,
-            interval = INTERVAL_METRICS_REPORT
+        mineLagredeFilterServiceImpl = mineLagredeFilterService,
+        initialDelay = INITIAL_DELAY_METRICS,
+        interval = INTERVAL_METRICS_REPORT
     )
 
     val applicationServer = createHttpServer(
-            applicationState = applicationState,
-            configuration = configuration,
-            veilederGrupperService = veilederGrupperService,
-            useAuthentication = configuration.useAuthentication
+        applicationState = applicationState,
+        configuration = configuration,
+        veilederGrupperService = veilederGrupperService,
+        useAuthentication = configuration.useAuthentication
     );
 
     Runtime.getRuntime().addShutdownHook(Thread {
@@ -54,6 +65,7 @@ fun main(configuration: Configuration) {
         applicationServer.stop(5, 5)
         cleanUpVeilederGrupper.stop()
         metrikker.stop()
+        
     })
 
     cleanUpVeilederGrupper.start()

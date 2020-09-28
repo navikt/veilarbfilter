@@ -1,13 +1,10 @@
 package no.nav.pto.veilarbfilter
 
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.features.StatusPages
-import io.ktor.features.origin
-import io.ktor.http.HttpStatusCode
-import io.ktor.request.ApplicationRequest
-import io.ktor.response.respond
-import io.ktor.response.respondText
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.http.*
+import io.ktor.request.*
+import io.ktor.response.*
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("Exceptionhandler")
@@ -56,7 +53,7 @@ private suspend inline fun ApplicationCall.logErrorAndRespond(
     lazyMessage: () -> String
 ) {
     val message = lazyMessage()
-    log.error(message, cause)
+    log.error(message)
 
     val response = HttpErrorResponse(
         url = this.request.url(),

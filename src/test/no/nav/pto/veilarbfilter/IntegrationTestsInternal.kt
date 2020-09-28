@@ -1,7 +1,6 @@
 package no.nav.pto.veilarbfilter
 
-import no.nav.common.utils.Credentials
-import no.nav.pto.veilarbfilter.config.Configuration
+import io.ktor.server.engine.*
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.impl.client.BasicResponseHandler
@@ -19,8 +18,8 @@ import java.sql.ResultSet
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IntegrationTestsInternal {
-    private
     lateinit var postgresqlContainer: PostgreSQLContainer<Nothing>;
+    lateinit var applicationEngine: ApplicationEngine;
 
     @BeforeAll
     internal fun setUp() {
@@ -30,33 +29,20 @@ class IntegrationTestsInternal {
             withPassword("password")
         }
         postgresqlContainer.start()
-
-        val configuration = Configuration(
-            clustername = "",
-            serviceUser = Credentials("foo", "bar"),
-            abac = Configuration.Abac(""),
-            veilarbveilederConfig = Configuration.VeilarbveilederConfig(""),
-            database = Configuration.DB(
-                url = postgresqlContainer.jdbcUrl,
-                username = postgresqlContainer.username,
-                password = postgresqlContainer.password
-            ),
-            httpServerWait = false,
-            useAuthentication = false
-        )
-
-        main(configuration)
+        applicationEngine =
+            mainTest(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
     }
 
     @AfterAll
     fun tearDown() {
         postgresqlContainer.stop()
+        applicationEngine.stop(0, 0)
     }
 
     @Test
     fun testDatabaseConnection() {
         val conn: Connection = DriverManager
-            .getConnection(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
+                .getConnection(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
         val resultSet: ResultSet = conn.createStatement().executeQuery("SELECT 1")
         resultSet.next()
         val result = resultSet.getInt(1)

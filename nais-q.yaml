@@ -41,6 +41,8 @@ spec:
     requests:
       cpu: 500m
       memory: 2Gi
+  envFrom:
+    - configmap: pto-config
   env:
     - name: ISSO_JWKS_URL
       value: https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri
