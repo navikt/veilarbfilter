@@ -6,6 +6,7 @@ import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.db.VeilederGrupperFilter
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
+import no.nav.pto.veilarbfilter.model.SortOrder
 import no.nav.pto.veilarbfilter.model.VeilederGruppeFilterModel
 import org.jetbrains.exposed.sql.*
 import org.slf4j.LoggerFactory
@@ -92,19 +93,30 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
         }
     }
 
+    override suspend fun lagreSortering(filterBrukerId: String, sortOrder: List<SortOrder>): List<FilterModel> {
+        TODO("Not yet implemented")
+    }
+
     suspend fun slettVeiledereSomIkkeErAktivePaEnheten(enhetId: String) {
         val veilederePaEnheten = veilarbveilederClient
             .hentVeilederePaEnheten(enhetId)
-            ?: throw IllegalStateException();
+            ?: throw IllegalStateException("Can not get veiledere for enhet " + enhetId);
 
         val filterForBruker = finnFilterForFilterBruker(enhetId);
 
         filterForBruker.forEach {
-            log.info("Veiledergruppe fore filter: {}", it.filterValg.veiledere)
-            val filtrerVeileder = filtrerVeilederSomErIkkePaEnheten(it, veilederePaEnheten)
-            val nyttFilter = it.filterValg.copy(veiledere = filtrerVeileder)
-            log.info("Veiledergruppe etter filter: {}", nyttFilter.veiledere)
-            oppdaterFilter(enhetId, FilterModel(it.filterId, it.filterNavn, nyttFilter, it.opprettetDato))
+            val alleVeiledere = it.filterValg.veiledere;
+            val aktiveVeileder = alleVeiledere.filter { veilederIdent ->
+                veilederePaEnheten.contains(veilederIdent)
+            }
+
+            if (aktiveVeileder.size < alleVeiledere.size) {
+                val removedVeileder =
+                    it.filterValg.veiledere.filter { veilederIdent -> !aktiveVeileder.contains(veilederIdent) }
+                log.warn("Removed veileder: $removedVeileder")
+                val nyttFilter = it.filterValg.copy(veiledere = aktiveVeileder)
+                oppdaterFilter(enhetId, FilterModel(it.filterId, it.filterNavn, nyttFilter, it.opprettetDato))
+            }
         }
     }
 
