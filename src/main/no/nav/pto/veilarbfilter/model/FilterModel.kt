@@ -2,6 +2,7 @@ package no.nav.pto.veilarbfilter.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDateTime
+import kotlin.reflect.typeOf
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class FilterModel(
@@ -9,7 +10,14 @@ open class FilterModel(
         var filterNavn: String,
         var filterValg: PortefoljeFilter,
         val opprettetDato: LocalDateTime?
-)
+){
+        override fun equals(other: Any?): Boolean {
+                if(other != null && other is FilterModel){
+                        return filterId == other.filterId && filterNavn == other.filterNavn && filterValg == other.filterValg && opprettetDato == other.opprettetDato
+                }
+                return false
+        }
+}
 
 class EnhetensLagredeFilterModel(
         filterId: Int,
