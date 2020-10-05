@@ -4,28 +4,24 @@ package no.nav.pto.veilarbfilter;
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.ktor.server.engine.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import no.nav.pto.veilarbfilter.model.*
-import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger
 import org.apache.http.client.fluent.Request
-import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.entity.ContentType
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
-import org.junit.Assert
 import org.junit.Assert.fail
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
 import java.time.LocalDateTime
-import java.util.Arrays.asList
 import kotlin.random.Random
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -35,7 +31,7 @@ class IntegrationTestsVeilederGrupper {
     var randomGenerator = Random
 
     @BeforeAll
-    internal fun setUp() {
+    internal fun setUp() = runBlocking {
         postgresqlContainer = PostgreSQLContainer<Nothing>("postgres:12-alpine").apply {
             withDatabaseName("veilarbfilter")
             withUsername("user")
@@ -43,7 +39,7 @@ class IntegrationTestsVeilederGrupper {
         }
         postgresqlContainer.start()
         applicationEngine =
-                mainTest(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
+                mainTestWithMock(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
     }
 
     @AfterAll
@@ -53,23 +49,46 @@ class IntegrationTestsVeilederGrupper {
     }
 
     @Test
-    fun `Lagring av nytt filter`() {
+    fun `Lagring av ny veileder filter`() = runBlocking<Unit> {
         val mineLagredeFilterResponse = getFilterGrupper("1")
 
         if (mineLagredeFilterResponse.responseValue == null) {
             fail()
-            return
+        }else {
+            lagreNyttFilterRespons("1", getRandomFilter(listOf("1")))
+            val mineLagredeFilterNyResponsEtterLagring = getFilterGrupper("1")
+
+            if (mineLagredeFilterNyResponsEtterLagring.responseValue == null || mineLagredeFilterNyResponsEtterLagring.responseValue.isEmpty()) {
+                fail()
+            } else {
+                assertTrue(mineLagredeFilterResponse.responseValue.size < mineLagredeFilterNyResponsEtterLagring.responseValue.size)
+            }
         }
+    }
 
-        lagreNyttFilterRespons("1",getRandomFilter(asList("1","2")))
-        val mineLagredeFilterNyResponsEtterLagring = getFilterGrupper("1")
+    @Test
+    fun `CleanupVeilederGrupper fjerner ugyldige veildere`() = runBlocking<Unit> {
+        val mineLagredeFilterResponse = getFilterGrupper("1")
 
-        if (mineLagredeFilterNyResponsEtterLagring.responseValue == null) {
+        if (mineLagredeFilterResponse.responseValue == null) {
             fail()
-            return
-        }
+        }else {
+            val responsLagring = lagreNyttFilterRespons("1", getRandomFilter(listOf("1", "2", "23546576"))).responseValue
+            if (responsLagring == null) {
+                fail()
+            }else{
+                delay(  1000)   // Wait for clean up
+                val mineLagredeFilterNyResponsEtterLagring = getFilterGrupper("1")
 
-        assertTrue(mineLagredeFilterResponse.responseValue.size < mineLagredeFilterNyResponsEtterLagring.responseValue.size)
+                if (mineLagredeFilterNyResponsEtterLagring.responseValue == null || mineLagredeFilterNyResponsEtterLagring.responseValue.isEmpty()) {
+                    fail()
+                } else {
+                    val filterePaEnhet = mineLagredeFilterNyResponsEtterLagring.responseValue;
+
+                    assertTrue(filterePaEnhet.find { it.filterId == responsLagring.filterId }?.let{it.filterValg.veiledere == listOf("1", "2")} ?: false)
+                }
+            }
+        }
     }
 
     /** HJELPEFUNKSJONER  **/
@@ -115,8 +134,8 @@ class IntegrationTestsVeilederGrupper {
     private fun getRandomFilter(veiledereList: List<String>): NyttFilterModel {
         val filterId = randomGenerator.nextInt(1, 1000)
         return NyttFilterModel(
-            "Filter $filterId",
-            PortefoljeFilter(veiledere = veiledereList)
+                "Filter $filterId",
+                PortefoljeFilter(veiledere = veiledereList)
         )
     }
 }
