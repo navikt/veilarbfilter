@@ -1,6 +1,6 @@
 package no.nav.pto.veilarbfilter
 
-import junit.framework.Assert.assertEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import no.nav.pto.veilarbfilter.abac.AbacCache
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
@@ -17,7 +17,6 @@ object AbacCacheSpec: Spek({
             on("legg til veileder og besluttning") {
                 val ident = "Z007";
                 val enhetId = "NAV 001"
-                val harTilgang = false
                 it("should return the result of adding the first number to the second number") {
                     assertEquals(false, abacCache.harTilgangTilEnheten(ident, enhetId))
                 }

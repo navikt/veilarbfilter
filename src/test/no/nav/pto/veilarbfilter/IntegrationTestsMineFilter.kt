@@ -199,10 +199,7 @@ class IntegrationTestsMineFilter {
             return
         }
 
-        val responseCode = deleteMineLagredeFilter(
-            lagretMineLagredeFilterResponse.filterId,
-            lagretMineLagredeFilterResponse.veilederId
-        )
+        val responseCode = deleteMineLagredeFilter(lagretMineLagredeFilterResponse.filterId)
         assertTrue(responseCode == 200 || responseCode == 204)
 
         val mineLagredeFilterResponse = getMineLagredeFilter()
@@ -310,7 +307,11 @@ class IntegrationTestsMineFilter {
         val mineLagredeFilterMedSortOrder = getMineLagredeFilter()
         val sortOrderHash = sortOrder.map { it.filterId to it.sortOrder }.toMap()
         mineLagredeFilterMedSortOrder.responseValue?.forEach {
-            Assert.assertTrue(it.sortOrder === sortOrderHash.get(it.filterId))
+            if(sortOrderHash.get(it.filterId) == null){
+                fail()
+            } else{
+                Assert.assertTrue(it.sortOrder == sortOrderHash.get(it.filterId))
+            }
         }
     }
 
@@ -376,7 +377,7 @@ class IntegrationTestsMineFilter {
         return deserializeLagredeFilterModels(responseContent)
     }
 
-    private fun deleteMineLagredeFilter(filterId: Int, veilederId: String): Int {
+    private fun deleteMineLagredeFilter(filterId: Int): Int {
         val httpclient = HttpClients.createDefault()
         val httpDelete =
             HttpDelete("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$filterId")
