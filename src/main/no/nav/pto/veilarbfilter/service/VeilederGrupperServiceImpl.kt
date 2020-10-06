@@ -23,6 +23,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
                 it[filterNavn] = nyttFilter.filterNavn
                 it[valgteFilter] = nyttFilter.filterValg
                 it[opprettetDato] = LocalDateTime.now()
+                it[cleanedUp] = 0
             } get Filter.filterId)
 
             VeilederGrupperFilter.insert {
@@ -43,6 +44,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
                     .update({ (Filter.filterId eq filter.filterId) }) {
                         it[filterNavn] = filter.filterNavn
                         it[valgteFilter] = filter.filterValg
+                        it[cleanedUp] = filter.cleanedUp
                     }
             }
         }
@@ -56,7 +58,8 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
             Filter.filterNavn,
             Filter.valgteFilter,
             VeilederGrupperFilter.enhetId,
-            Filter.opprettetDato
+            Filter.opprettetDato,
+            Filter.cleanedUp
         ).select { (Filter.filterId eq filterId) }
             .mapNotNull { tilVeilederGruppeFilterModel(it) }
             .singleOrNull()
@@ -78,7 +81,8 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
             Filter.filterNavn,
             Filter.valgteFilter,
             VeilederGrupperFilter.enhetId,
-            Filter.opprettetDato
+            Filter.opprettetDato,
+            Filter.cleanedUp
         ).select { (VeilederGrupperFilter.enhetId eq enhetId) }
             .mapNotNull { tilVeilederGruppeFilterModel(it) }
     }

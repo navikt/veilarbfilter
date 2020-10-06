@@ -9,7 +9,7 @@ open class FilterModel(
         var filterNavn: String,
         var filterValg: PortefoljeFilter,
         val opprettetDato: LocalDateTime?,
-        val cleanedUp: Int
+        val cleanedUp: Int = 0
 )
 
 class EnhetensLagredeFilterModel(
