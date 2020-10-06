@@ -17,21 +17,22 @@ private val defaultProperties = ConfigurationMap(
         "veilarbfilter_DB_NAME" to "veilarbfilter",
         "veilarbfilter_DB_USERNAME" to "user",
         "veilarbfilter_DB_PASSWORD" to "password",
-        "VAULT_MOUNT_PATH" to notUsedLocally
+        "VAULT_MOUNT_PATH" to notUsedLocally,
+        "SECURITYTOKENSERVICE_URL" to notUsedLocally
     )
 )
 
 
 data class Configuration(
-        val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
-        val stsDiscoveryUrl: String = config()[Key("SECURITYTOKENSERVICE_URL", stringType)],
-        val database: DB = DB(),
-        val jwt: Jwt = Jwt(),
-        val abac: Abac = Abac(),
-        val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
-        val serviceUser: Credentials = getCredentials("service_user"),
-        val httpServerWait: Boolean = true,
-        val useAuthentication: Boolean = true
+    val clustername: String = config()[Key("NAIS_CLUSTER_NAME", stringType)],
+    val stsDiscoveryUrl: String = config()[Key("SECURITYTOKENSERVICE_URL", stringType)],
+    val database: DB = DB(),
+    val jwt: Jwt = Jwt(),
+    val abac: Abac = Abac(),
+    val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
+    val serviceUser: Credentials = getCredentials("service_user"),
+    val httpServerWait: Boolean = true,
+    val useAuthentication: Boolean = true
 ) {
 
     data class Jwt(
