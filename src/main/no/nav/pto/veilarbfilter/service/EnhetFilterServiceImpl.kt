@@ -84,6 +84,7 @@ class EnhetFilterServiceImpl() : FilterService {
             filterValg = row[Filter.valgteFilter],
             enhetId = row[EnhetensLagredeFilter.enhetId],
             opprettetDato = row[Filter.opprettetDato],
-            sortOrder = row[EnhetensLagredeFilter.sortOrder]
+            sortOrder = row[EnhetensLagredeFilter.sortOrder],
+            cleanedUp = row[Filter.cleanedUp]
         )
 }

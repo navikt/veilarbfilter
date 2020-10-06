@@ -68,7 +68,8 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
             filterNavn = row[Filter.filterNavn],
             filterValg = row[Filter.valgteFilter],
             enhetId = row[VeilederGrupperFilter.enhetId],
-            opprettetDato = row[Filter.opprettetDato]
+            opprettetDato = row[Filter.opprettetDato],
+            cleanedUp = row[Filter.cleanedUp]
         )
 
     override suspend fun finnFilterForFilterBruker(enhetId: String): List<FilterModel> = dbQuery {
@@ -117,7 +118,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
                     it.filterValg.veiledere.filter { veilederIdent -> !aktiveVeileder.contains(veilederIdent) }
                 log.warn("Removed veileder: $removedVeileder")
                 val nyttFilter = it.filterValg.copy(veiledere = aktiveVeileder)
-                oppdaterFilter(enhetId, FilterModel(it.filterId, it.filterNavn, nyttFilter, it.opprettetDato))
+                oppdaterFilter(enhetId, FilterModel(it.filterId, it.filterNavn, nyttFilter, it.opprettetDato, 1))
             }
         }
     }
