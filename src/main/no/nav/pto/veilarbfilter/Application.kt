@@ -58,7 +58,7 @@ fun main(configuration: Configuration) {
         configuration = configuration,
         veilederGrupperService = veilederGrupperService,
         useAuthentication = configuration.useAuthentication
-    );
+    )
 
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false
