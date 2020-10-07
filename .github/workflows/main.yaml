@@ -67,7 +67,7 @@ jobs:
           VAR: version=${{ env.IMAGE_TAG }},namespace=q0
   deploy-q1:
     name: Deploy application to Q1
-    if: github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/azureConfig'
     needs: test-build-and-push
     runs-on: ubuntu-latest
     steps:
