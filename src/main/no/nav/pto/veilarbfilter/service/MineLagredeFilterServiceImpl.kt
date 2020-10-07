@@ -23,7 +23,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
                     Filter.valgteFilter,
                     Filter.opprettetDato,
                     MineLagredeFilter.veilederId,
-                    MineLagredeFilter.sortOrder
+                    MineLagredeFilter.sortOrder,
+                    Filter.cleanedUp
                 ).select { (Filter.filterId.eq(filterId)) }
                     .mapNotNull { tilFilterModel(it) }
                     .singleOrNull()
@@ -231,7 +232,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
                     Filter.valgteFilter,
                     Filter.opprettetDato,
                     MineLagredeFilter.veilederId,
-                    MineLagredeFilter.sortOrder
+                    MineLagredeFilter.sortOrder,
+                    Filter.cleanedUp
                 ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
                     .mapNotNull { tilFilterModel(it) }
             }
