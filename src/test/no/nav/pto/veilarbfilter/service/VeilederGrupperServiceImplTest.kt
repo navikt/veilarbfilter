@@ -62,9 +62,9 @@ class VeilederGrupperServiceImplTest {
         Assert.assertTrue(filterList.get(1).filterValg.veiledere.containsAll(listOf("1", "2")))
         Assert.assertTrue(filterList.get(2).filterValg.veiledere.containsAll(listOf("3")))
 
-        Assert.assertTrue(filterList.get(0).cleanedUp === 0)
-        Assert.assertTrue(filterList.get(1).cleanedUp === 1)
-        Assert.assertTrue(filterList.get(2).cleanedUp === 1)
+        Assert.assertTrue(filterList.get(0).filterCleanup === 0)
+        Assert.assertTrue(filterList.get(1).filterCleanup === 1)
+        Assert.assertTrue(filterList.get(2).filterCleanup === 1)
     }
 
     @Test
