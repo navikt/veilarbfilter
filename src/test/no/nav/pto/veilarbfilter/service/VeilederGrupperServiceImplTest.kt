@@ -51,7 +51,7 @@ class VeilederGrupperServiceImplTest {
     fun testSlettInaktiveVeiledere() = runBlocking<Unit> {
         veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1", "2", "3")))
         veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1", "2", "6")))
-        veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("10", "12", "13")))
+        veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("10", "12", "13", "3")))
 
         veilederGrupperServiceImpl.slettVeiledereSomIkkeErAktivePaEnheten("1")
 
@@ -60,7 +60,22 @@ class VeilederGrupperServiceImplTest {
         Assert.assertTrue(filterList.size === 3)
         Assert.assertTrue(filterList.get(0).filterValg.veiledere.containsAll(listOf("1", "2", "3")))
         Assert.assertTrue(filterList.get(1).filterValg.veiledere.containsAll(listOf("1", "2")))
-        Assert.assertTrue(filterList.get(2).filterValg.veiledere.isEmpty())
+        Assert.assertTrue(filterList.get(2).filterValg.veiledere.containsAll(listOf("3")))
+
+        Assert.assertTrue(filterList.get(0).filterCleanup === 0)
+        Assert.assertTrue(filterList.get(1).filterCleanup === 1)
+        Assert.assertTrue(filterList.get(2).filterCleanup === 1)
+    }
+
+    @Test
+    fun testSlettTomtVeiledereGruppeEtterCleanup() = runBlocking<Unit> {
+        veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("10", "12", "13")))
+
+        veilederGrupperServiceImpl.slettVeiledereSomIkkeErAktivePaEnheten("1")
+
+        val filterList = veilederGrupperServiceImpl.finnFilterForFilterBruker("1")
+
+        Assert.assertTrue(filterList.size === 0)
     }
 
 

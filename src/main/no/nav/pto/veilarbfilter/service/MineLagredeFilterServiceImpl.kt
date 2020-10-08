@@ -23,7 +23,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
                     Filter.valgteFilter,
                     Filter.opprettetDato,
                     MineLagredeFilter.veilederId,
-                    MineLagredeFilter.sortOrder
+                    MineLagredeFilter.sortOrder,
+                    Filter.filterCleanup
                 ).select { (Filter.filterId.eq(filterId)) }
                     .mapNotNull { tilFilterModel(it) }
                     .singleOrNull()
@@ -193,7 +194,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
             filterValg = row[Filter.valgteFilter],
             veilederId = row[MineLagredeFilter.veilederId],
             opprettetDato = row[Filter.opprettetDato],
-            sortOrder = row[MineLagredeFilter.sortOrder]
+            sortOrder = row[MineLagredeFilter.sortOrder],
+            filterCleanup = row[Filter.filterCleanup]
         )
 
     private fun tilMineLagredeFilterModel(row: ResultRow): MineLagredeFilterModel =
@@ -203,7 +205,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
             filterValg = row[Filter.valgteFilter],
             veilederId = row[MineLagredeFilter.veilederId],
             opprettetDato = row[Filter.opprettetDato],
-            sortOrder = row[MineLagredeFilter.sortOrder]
+            sortOrder = row[MineLagredeFilter.sortOrder],
+            filterCleanup = row[Filter.filterCleanup]
         )
 
     private fun validerNavn(navn: String) {
@@ -229,7 +232,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
                     Filter.valgteFilter,
                     Filter.opprettetDato,
                     MineLagredeFilter.veilederId,
-                    MineLagredeFilter.sortOrder
+                    MineLagredeFilter.sortOrder,
+                    Filter.filterCleanup
                 ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
                     .mapNotNull { tilFilterModel(it) }
             }
