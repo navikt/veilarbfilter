@@ -182,7 +182,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
             Filter.valgteFilter,
             Filter.opprettetDato,
             MineLagredeFilter.veilederId,
-            MineLagredeFilter.sortOrder
+            MineLagredeFilter.sortOrder,
+            Filter.filterCleanup
         ).selectAll()
             .mapNotNull { tilMineLagredeFilterModel(it) }
     }
