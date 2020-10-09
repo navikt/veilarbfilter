@@ -1,20 +1,18 @@
 package no.nav.pto.veilarbfilter.client
 
-import no.nav.pto.veilarbfilter.abac.AbacCache
-
 
 //DETTA ÄR GODTYCKLIGT VALGT.
 // VILL INTE GÅ MOT ABAC FÖR OFTA DÅ VEILARBFILTER KOMMER KALLAS VARJE GÅNG VI RENDRAR OVERSIKTEN
-private const val TEN_MIN_CACHE_EXPIRATION_TIME = 1000 * 60 * 10
+private const val TEN_MIN_CACHE_EXPIRATION_TIME = 1000 * 60 * 5
 
-data class VeilederCacheValue (val veiledere: List<String>, val timestamp: Long)
+data class VeilederCacheValue(val veiledere: List<String>, val timestamp: Long)
 
 class VeilederCache(private val cacheExpiration: Int = TEN_MIN_CACHE_EXPIRATION_TIME) {
     private val cache = HashMap<String, VeilederCacheValue>()
     fun veilederePaEnheten(enhetId: String): List<String>? =
         cache[enhetId]
             ?.let {
-                if(cacheHasExpired(it.timestamp)) {
+                if (cacheHasExpired(it.timestamp)) {
                     cache.remove(enhetId)
                     return null;
                 }
@@ -22,7 +20,7 @@ class VeilederCache(private val cacheExpiration: Int = TEN_MIN_CACHE_EXPIRATION_
             }
 
 
-    fun leggTilEnhetICachen (enhetId: String, veiledere: List<String>) {
+    fun leggTilEnhetICachen(enhetId: String, veiledere: List<String>) {
         cache[enhetId] = VeilederCacheValue(veiledere, System.currentTimeMillis())
     }
 
