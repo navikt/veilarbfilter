@@ -24,6 +24,9 @@ import no.nav.pto.veilarbfilter.routes.mineLagredeFilterRoutes
 import no.nav.pto.veilarbfilter.routes.veilederGruppeRoutes
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterServiceImpl
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
+import org.slf4j.LoggerFactory
+
+private val log = LoggerFactory.getLogger("HttpHandler")
 
 fun createHttpServer(
     applicationState: ApplicationState,
@@ -66,6 +69,7 @@ fun createHttpServer(
     }
 
     routing {
+        log.info("HTTP called in routing")
         route("veilarbfilter") {
             internalRoutes(
                 readinessCheck = { applicationState.initialized },
