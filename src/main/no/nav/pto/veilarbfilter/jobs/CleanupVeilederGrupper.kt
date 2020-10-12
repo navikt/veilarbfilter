@@ -33,8 +33,12 @@ class CleanupVeilederGrupper(
         }
         while (isActive) {
             log.info("Fjern veileder som er ikke aktive...")
-            fjernVeilederSomErIkkeAktive()
-            log.info("Fjern veileder som er ikke aktive er ferdig")
+            try {
+                fjernVeilederSomErIkkeAktive()
+                log.info("Fjern veileder som er ikke aktive er ferdig")
+            } catch (e: Exception) {
+                log.warn("Exception during clanup $e", e)
+            }
             delay(interval)
         }
     }
