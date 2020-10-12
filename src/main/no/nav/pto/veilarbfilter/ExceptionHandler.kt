@@ -1,12 +1,10 @@
 package no.nav.pto.veilarbfilter
 
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.features.StatusPages
-import io.ktor.features.origin
-import io.ktor.http.HttpStatusCode
-import io.ktor.request.ApplicationRequest
-import io.ktor.response.respond
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.http.*
+import io.ktor.request.*
+import io.ktor.response.*
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("Exceptionhandler")
@@ -64,8 +62,7 @@ private suspend inline fun ApplicationCall.logErrorAndRespond(
         code = status
     )
 
-    log.error("Status Page Response: $response")
-    this.respond(status, response)
+    this.respondText(status = status) { message }
 }
 
 internal data class HttpErrorResponse(
