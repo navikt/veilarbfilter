@@ -7,7 +7,6 @@ import io.ktor.features.origin
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.ApplicationRequest
 import io.ktor.response.respond
-import io.ktor.response.respondText
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("Exceptionhandler")
@@ -65,7 +64,8 @@ private suspend inline fun ApplicationCall.logErrorAndRespond(
         code = status
     )
 
-    this.respondText(status = status) { message }
+    log.error("Status Page Response: $response")
+    this.respond(status, response)
 }
 
 internal data class HttpErrorResponse(
