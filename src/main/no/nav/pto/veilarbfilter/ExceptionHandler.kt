@@ -53,7 +53,7 @@ private suspend inline fun ApplicationCall.logErrorAndRespond(
     lazyMessage: () -> String
 ) {
     val message = lazyMessage()
-    log.error(message, cause)
+    log.error(message)
 
     val response = HttpErrorResponse(
         url = this.request.url(),
