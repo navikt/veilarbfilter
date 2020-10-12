@@ -15,7 +15,7 @@ data class ApplicationState(var running: Boolean = true, var initialized: Boolea
 
 
 private val INITIAL_DELAY_CLEANUP = TimeUnit.MINUTES.toMillis(1);
-private val INTERVAL_CLEANUP = TimeUnit.MINUTES.toMillis(15);
+private val INTERVAL_CLEANUP = TimeUnit.MINUTES.toMillis(5);
 
 private val INITIAL_DELAY_METRICS = TimeUnit.MINUTES.toMillis(2);
 private val INTERVAL_METRICS_REPORT = TimeUnit.MINUTES.toMillis(5);
@@ -62,13 +62,12 @@ fun main(configuration: Configuration) {
 
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false
-        applicationServer.stop(5, 5)
-        //cleanUpVeilederGrupper.stop()
+        cleanUpVeilederGrupper.stop()
         metrikker.stop()
-        
+
     })
 
-    //cleanUpVeilederGrupper.start()
+    cleanUpVeilederGrupper.start()
     metrikker.start()
     applicationServer.start(wait = configuration.httpServerWait)
 

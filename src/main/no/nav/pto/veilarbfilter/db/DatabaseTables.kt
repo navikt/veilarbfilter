@@ -9,6 +9,7 @@ object Filter : Table() {
     val filterNavn = varchar("filter_navn", 255)
     val valgteFilter = jsonb("valgte_filter", PortefoljeFilter::class.java)
     val opprettetDato = datetime("opprettet")
+    val filterCleanup = integer("filter_cleanup")
 }
 
 object EnhetensLagredeFilter : Table() {
