@@ -24,9 +24,11 @@ class JwtUtil {
         fun useJwtFromCookie(call: ApplicationCall): HttpAuthHeader? {
             try {
                 val azureValidation = call.request.cookies["isso-idtoken"]
-                val header = io.ktor.http.auth.parseAuthorizationHeader("Bearer $azureValidation")
-                if(header != null){
-                    return  header
+                if(azureValidation != null) {
+                    val header = io.ktor.http.auth.parseAuthorizationHeader("Bearer $azureValidation")
+                    if (header != null) {
+                        return header
+                    }
                 }
             } catch (ex: Throwable) {
                 log.error("Illegal HTTP azure auth header", ex)
