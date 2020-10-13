@@ -22,6 +22,16 @@ private val log = LoggerFactory.getLogger("veilarbfilter.JwtConfig")
 class JwtUtil {
     companion object {
         fun useJwtFromCookie(call: ApplicationCall): HttpAuthHeader? {
+            try {
+                val azureValidation = call.request.cookies["isso-idtoken"]
+                val header = io.ktor.http.auth.parseAuthorizationHeader("Bearer $azureValidation")
+                if(header != null){
+                    return  header
+                }
+            } catch (ex: Throwable) {
+                log.error("Illegal HTTP azure auth header", ex)
+            }
+
             return try {
                 val token = call.request.cookies["ID_token"]
                 io.ktor.http.auth.parseAuthorizationHeader("Bearer $token")
