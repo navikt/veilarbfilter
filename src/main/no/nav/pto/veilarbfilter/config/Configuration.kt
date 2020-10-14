@@ -32,12 +32,18 @@ data class Configuration(
     val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
     val serviceUser: Credentials = getCredentials("service_user"),
     val httpServerWait: Boolean = true,
-    val useAuthentication: Boolean = true
+    val useAuthentication: Boolean = true,
+    val azureConfig: Azure = Azure()
 ) {
 
     data class Jwt(
         val jwksUrl: JwkProvider = JwtUtil.makeJwkProvider(config()[Key("ISSO_JWKS_URL", stringType)]),
         val jwtIssuer: String = config()[Key("ISSO_ISSUER", stringType)]
+    )
+
+    data class Azure(
+        val adDiscoveryUrl: JwkProvider = JwtUtil.makeJwkProvider( config()[Key("AAD_DISCOVERY_URL", stringType)]),
+        val adClientId: String =  config()[Key("VEILARBLOGIN_AAD_CLIENT_ID", stringType)]
     )
 
     data class DB(

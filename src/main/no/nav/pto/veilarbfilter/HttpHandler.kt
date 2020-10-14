@@ -40,12 +40,23 @@ fun createHttpServer(
 
     install(Authentication) {
         jwt {
+            authHeader(JwtUtilAzure.Companion::useJwtFromCookie)
+            realm = "veilarbfilter"
+            verifier(configuration.azureConfig.adDiscoveryUrl, configuration.azureConfig.adClientId)
+            validate { JwtUtil.validateJWT(it) }
+        }
+    }
+
+    /*
+    install(Authentication) {
+        jwt {
             authHeader(JwtUtil.Companion::useJwtFromCookie)
             realm = "veilarbfilter"
             verifier(configuration.jwt.jwksUrl, configuration.jwt.jwtIssuer)
             validate { JwtUtil.validateJWT(it) }
         }
     }
+     */
 
 
     install(CORS) {
