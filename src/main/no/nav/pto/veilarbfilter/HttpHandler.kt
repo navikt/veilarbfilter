@@ -18,6 +18,7 @@ import io.ktor.server.netty.Netty
 import no.nav.common.log.LogFilter
 import no.nav.common.utils.EnvironmentUtils
 import no.nav.pto.veilarbfilter.abac.PepClient
+import no.nav.pto.veilarbfilter.config.AzureAuth
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.routes.internalRoutes
 import no.nav.pto.veilarbfilter.routes.mineLagredeFilterRoutes
@@ -37,17 +38,6 @@ fun createHttpServer(
         notFoundHandler()
     }
 
-
-    install(Authentication) {
-        jwt {
-            authHeader(JwtUtilAzure.Companion::useJwtFromCookie)
-            realm = "veilarbfilter"
-            verifier(configuration.azureConfig.adDiscoveryUrl, configuration.azureConfig.adClientId)
-            validate { JwtUtilAzure.validateJWT(it) }
-        }
-    }
-
-    /*
     install(Authentication) {
         jwt {
             authHeader(JwtUtil.Companion::useJwtFromCookie)
@@ -56,8 +46,6 @@ fun createHttpServer(
             validate { JwtUtil.validateJWT(it) }
         }
     }
-     */
-
 
     install(CORS) {
         anyHost()
@@ -76,13 +64,15 @@ fun createHttpServer(
         register(ContentType.Application.Json, JacksonConverter(ObjectMapperProvider.objectMapper))
     }
 
+    val adAuth = AzureAuth(configuration)
+
     routing {
         route("veilarbfilter") {
             internalRoutes(
                 readinessCheck = { applicationState.initialized },
                 livenessCheck = { applicationState.running })
             route("/api/") {
-                veilederGruppeRoutes(veilederGrupperService, PepClient(config = configuration))
+                veilederGruppeRoutes(veilederGrupperService, PepClient(config = configuration), adAuth)
                 mineLagredeFilterRoutes(MineLagredeFilterServiceImpl(), useAuthentication)
             }
         }
