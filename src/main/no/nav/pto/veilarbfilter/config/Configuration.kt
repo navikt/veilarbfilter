@@ -28,12 +28,12 @@ data class Configuration(
     val stsDiscoveryUrl: String = config()[Key("SECURITY_TOKEN_SERVICE_DISCOVERY_URL", stringType)],
     val database: DB = DB(),
     val jwt: Jwt = Jwt(),
+    val azureConfig: Azure = Azure(),
     val abac: Abac = Abac(),
     val veilarbveilederConfig: VeilarbveilederConfig = VeilarbveilederConfig(),
     val serviceUser: Credentials = getCredentials("service_user"),
     val httpServerWait: Boolean = true,
-    val useAuthentication: Boolean = true,
-    val azureConfig: Azure = Azure()
+    val useAuthentication: Boolean = true
 ) {
 
     data class Jwt(
@@ -42,7 +42,7 @@ data class Configuration(
     )
 
     data class Azure(
-        val adDiscoveryUrl: JwkProvider = JwtUtil.makeJwkProvider( config()[Key("AAD_DISCOVERY_URL", stringType)]),
+        val adDiscoveryUrl: JwkProvider = JwtUtil.makeJwkProvider(config()[Key("AAD_DISCOVERY_URL", stringType)]),
         val adClientId: String =  config()[Key("VEILARBLOGIN_AAD_CLIENT_ID", stringType)]
     )
 

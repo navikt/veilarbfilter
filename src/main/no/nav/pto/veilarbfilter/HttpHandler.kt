@@ -43,7 +43,7 @@ fun createHttpServer(
             authHeader(JwtUtilAzure.Companion::useJwtFromCookie)
             realm = "veilarbfilter"
             verifier(configuration.azureConfig.adDiscoveryUrl, configuration.azureConfig.adClientId)
-            validate { JwtUtil.validateJWT(it) }
+            validate { JwtUtilAzure.validateJWT(it) }
         }
     }
 

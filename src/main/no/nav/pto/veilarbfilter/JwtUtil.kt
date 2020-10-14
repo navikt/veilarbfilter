@@ -76,29 +76,11 @@ class JwtUtilAzure {
         fun useJwtFromCookie(call: ApplicationCall): HttpAuthHeader? {
             return try {
                 val azureValidation = call.request.cookies["isso-idtoken"]
-                val header = io.ktor.http.auth.parseAuthorizationHeader("Bearer $azureValidation")
-                return header
+                return io.ktor.http.auth.parseAuthorizationHeader("Bearer $azureValidation")
             } catch (ex: Throwable) {
                 null
             }
         }
-
-        fun getSubject(call: ApplicationCall): String {
-            return try {
-                useJwtFromCookie(call)
-                    ?.getBlob()
-                    ?.let { blob -> JWT.decode(blob).parsePayload().subject }
-                    ?: "Unauthenticated"
-            } catch (e: Throwable) {
-                "JWT not found"
-            }
-        }
-
-        fun makeJwkProvider(jwksUrl: String): JwkProvider =
-            JwkProviderBuilder(URL(jwksUrl))
-                .cached(10, 24, TimeUnit.HOURS)
-                .rateLimited(10, 1, TimeUnit.MINUTES)
-                .build()
 
         fun validateJWT(credentials: JWTCredential): Principal? {
             return try {
@@ -108,16 +90,6 @@ class JwtUtilAzure {
                 log.error("Failed to validateJWT token", e)
                 null
             }
-        }
-
-        private fun HttpAuthHeader.getBlob() = when {
-            this is HttpAuthHeader.Single -> blob
-            else -> null
-        }
-
-        private fun DecodedJWT.parsePayload(): Payload {
-            val payloadString = String(Base64.getUrlDecoder().decode(payload))
-            return JWTParser().parsePayload(payloadString)
         }
     }
 }
