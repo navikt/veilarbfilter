@@ -61,10 +61,13 @@ class VeilederGrupperServiceImplTest {
         val filterListSize = veilederGrupperServiceImpl.finnFilterForFilterBruker("1").size
         val filterList = veilederGrupperServiceImpl.finnFilterForFilterBruker("1")
 
-        assertTrue(filterListSize == 3) // TODO: burde ikke resultatet være 2? Da en av de burde ha blitt slettet
+        assertEquals(filterListSize, 2)
         assertTrue(finnVeilederDB(veildederGruppeId1,filterList) {it.filterValg.veiledere.containsAll(listOf("1", "2","3"))})
         assertTrue(finnVeilederDB(veildederGruppeId2,filterList) {it.filterValg.veiledere.containsAll(listOf("1", "2"))})
-        assertTrue(finnVeilederDB(veildederGruppeId3,filterList) {it.filterValg.veiledere.isEmpty()}) // TODO: burde ikke denne bli helt slettet?
+        assertNull(filterList.find { gruppe -> gruppe.filterId == veildederGruppeId3 })
+
+        assertTrue(finnVeilederDB(veildederGruppeId1,filterList) {it.filterCleanup == 0})
+        assertTrue(finnVeilederDB(veildederGruppeId2,filterList) {it.filterCleanup == 1})
     }
 
     @Test
@@ -82,7 +85,13 @@ class VeilederGrupperServiceImplTest {
         assertNotNull(veildederGruppe)
         if(veildederGruppe != null) {
             val filterFromService = veilederGrupperServiceImpl.hentFilter(veildederGruppe.filterId)
-            assertEquals(filterFromService, veildederGruppe)
+            if(filterFromService != null){
+                assertEquals(filterFromService.filterId, veildederGruppe.filterId)
+                assertEquals(filterFromService.filterNavn, veildederGruppe.filterNavn)
+                assertEquals(filterFromService.filterValg, veildederGruppe.filterValg)
+            }else{
+                fail("Filter was not in DB")
+            }
         }
     }
 
@@ -127,6 +136,17 @@ class VeilederGrupperServiceImplTest {
 
             assertTrue(finnVeilederDB(veildederGruppe2.filterId, filterList) {it.filterValg.veiledere.containsAll(listOf("1"))})
         }
+    }
+
+    @Test
+    fun testSlettTomtVeiledereGruppeEtterCleanup() = runBlocking<Unit> {
+        veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("10", "12", "13")))
+
+        veilederGrupperServiceImpl.slettVeiledereSomIkkeErAktivePaEnheten("1")
+
+        val filterList = veilederGrupperServiceImpl.finnFilterForFilterBruker("1")
+
+        assertTrue(filterList.isEmpty())
     }
 
     private fun finnVeilederDB(gruppeID: Int, filterList: List<FilterModel>, func: (FilterModel) -> Boolean): Boolean {

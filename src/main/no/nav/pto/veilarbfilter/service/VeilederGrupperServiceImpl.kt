@@ -23,6 +23,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
                 it[filterNavn] = nyttFilter.filterNavn
                 it[valgteFilter] = nyttFilter.filterValg
                 it[opprettetDato] = LocalDateTime.now()
+                it[filterCleanup] = 0
             } get Filter.filterId)
 
             VeilederGrupperFilter.insert {
@@ -43,6 +44,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
                     .update({ (Filter.filterId eq filter.filterId) }) {
                         it[filterNavn] = filter.filterNavn
                         it[valgteFilter] = filter.filterValg
+                        it[filterCleanup] = filter.filterCleanup
                     }
             }
         }
@@ -56,7 +58,8 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
             Filter.filterNavn,
             Filter.valgteFilter,
             VeilederGrupperFilter.enhetId,
-            Filter.opprettetDato
+            Filter.opprettetDato,
+            Filter.filterCleanup
         ).select { (Filter.filterId eq filterId) }
             .mapNotNull { tilVeilederGruppeFilterModel(it) }
             .singleOrNull()
@@ -68,7 +71,8 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
             filterNavn = row[Filter.filterNavn],
             filterValg = row[Filter.valgteFilter],
             enhetId = row[VeilederGrupperFilter.enhetId],
-            opprettetDato = row[Filter.opprettetDato]
+            opprettetDato = row[Filter.opprettetDato],
+            filterCleanup = row[Filter.filterCleanup]
         )
 
     override suspend fun finnFilterForFilterBruker(enhetId: String): List<FilterModel> = dbQuery {
@@ -77,7 +81,8 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
             Filter.filterNavn,
             Filter.valgteFilter,
             VeilederGrupperFilter.enhetId,
-            Filter.opprettetDato
+            Filter.opprettetDato,
+            Filter.filterCleanup
         ).select { (VeilederGrupperFilter.enhetId eq enhetId) }
             .mapNotNull { tilVeilederGruppeFilterModel(it) }
     }
@@ -109,15 +114,23 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
             val aktiveVeileder = alleVeiledere.filter { veilederIdent ->
                 veilederePaEnheten.contains(veilederIdent)
             }
+            val removedVeileder = getRemovedVeiledere(alleVeiledere, aktiveVeileder)
 
-            if (aktiveVeileder.size < alleVeiledere.size) {
-                val removedVeileder =
-                    it.filterValg.veiledere.filter { veilederIdent -> !aktiveVeileder.contains(veilederIdent) }
-                log.warn("Removed veileder: $removedVeileder")
+            if (aktiveVeileder.isEmpty()) {
+                log.warn("Removed veiledere: $removedVeileder")
+                slettFilter(filterId = it.filterId, enhetId = enhetId)
+                log.warn("Removed veiledergruppe: ${it.filterNavn} from enhet: ${enhetId}")
+            } else if (aktiveVeileder.size < alleVeiledere.size) {
+                log.warn("Removed veiledere: $removedVeileder")
                 val nyttFilter = it.filterValg.copy(veiledere = aktiveVeileder)
-                oppdaterFilter(enhetId, FilterModel(it.filterId, it.filterNavn, nyttFilter, it.opprettetDato))
+                oppdaterFilter(enhetId, FilterModel(it.filterId, it.filterNavn, nyttFilter, it.opprettetDato, 1))
+                log.warn("Updated veiledergruppe: ${it.filterNavn} from enhet: ${enhetId}")
             }
         }
+    }
+
+    private fun getRemovedVeiledere(alleVeiledere: List<String>, aktiveVeileder: List<String>): List<String> {
+        return alleVeiledere.filter { veilederIdent -> !aktiveVeileder.contains(veilederIdent) }
     }
 
     suspend fun hentAlleEnheter(): List<String> =
