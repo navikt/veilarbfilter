@@ -2,7 +2,6 @@ package no.nav.pto.veilarbfilter.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDateTime
-import kotlin.reflect.typeOf
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class FilterModel(
