@@ -71,7 +71,7 @@ fun createHttpServer(
                 readinessCheck = { applicationState.initialized },
                 livenessCheck = { applicationState.running })
             route("/api/") {
-                veilederGruppeRoutes(veilederGrupperService, PepClient(config = configuration))
+                veilederGruppeRoutes(veilederGrupperService, PepClient(config = configuration),useAuthentication)
                 mineLagredeFilterRoutes(MineLagredeFilterServiceImpl(), useAuthentication)
             }
         }
