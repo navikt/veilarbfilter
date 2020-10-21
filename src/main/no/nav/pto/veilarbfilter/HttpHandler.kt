@@ -1,20 +1,14 @@
 package no.nav.pto.veilarbfilter
 
-import io.ktor.application.install
-import io.ktor.auth.Authentication
-import io.ktor.auth.jwt.jwt
-import io.ktor.features.CORS
-import io.ktor.features.CallLogging
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.StatusPages
-import io.ktor.http.ContentType
-import io.ktor.http.HttpMethod
-import io.ktor.jackson.JacksonConverter
-import io.ktor.routing.route
-import io.ktor.routing.routing
-import io.ktor.server.engine.ApplicationEngine
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.application.*
+import io.ktor.auth.*
+import io.ktor.auth.jwt.*
+import io.ktor.features.*
+import io.ktor.http.*
+import io.ktor.jackson.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import no.nav.common.log.LogFilter
 import no.nav.common.utils.EnvironmentUtils
 import no.nav.pto.veilarbfilter.abac.PepClient
@@ -30,6 +24,7 @@ fun createHttpServer(
     port: Int = 8080,
     configuration: Configuration,
     veilederGrupperService: VeilederGrupperServiceImpl,
+    mineLagredeFilterService: MineLagredeFilterServiceImpl,
     useAuthentication: Boolean = true
 ): ApplicationEngine = embeddedServer(Netty, port) {
     install(StatusPages) {
@@ -71,8 +66,8 @@ fun createHttpServer(
                 readinessCheck = { applicationState.initialized },
                 livenessCheck = { applicationState.running })
             route("/api/") {
-                veilederGruppeRoutes(veilederGrupperService, PepClient(config = configuration),useAuthentication)
-                mineLagredeFilterRoutes(MineLagredeFilterServiceImpl(), useAuthentication)
+                veilederGruppeRoutes(veilederGrupperService, PepClient(config = configuration), useAuthentication)
+                mineLagredeFilterRoutes(mineLagredeFilterService, useAuthentication)
             }
         }
     }

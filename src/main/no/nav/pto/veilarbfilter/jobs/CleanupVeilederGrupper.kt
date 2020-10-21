@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.jobs
 
 import kotlinx.coroutines.*
+import no.nav.pto.veilarbfilter.service.MineLagredeFilterServiceImpl
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
@@ -8,6 +9,7 @@ import kotlin.coroutines.CoroutineContext
 
 class CleanupVeilederGrupper(
     val veilederGrupperService: VeilederGrupperServiceImpl,
+    val mineLagredeFilterService: MineLagredeFilterServiceImpl,
     val interval: Long,
     val initialDelay: Long?
 ) :
@@ -32,16 +34,31 @@ class CleanupVeilederGrupper(
             delay(it)
         }
         while (isActive) {
-            log.info("Fjern veileder som er ikke aktive...")
             fjernVeilederSomErIkkeAktive()
-            log.info("Fjern veileder som er ikke aktive er ferdig")
+            leggeTilEnhetIdTilMineFilter()
             delay(interval)
         }
     }
 
     private suspend fun fjernVeilederSomErIkkeAktive() {
-        veilederGrupperService.hentAlleEnheter().forEach {
-            veilederGrupperService.slettVeiledereSomIkkeErAktivePaEnheten(it)
+        try {
+            log.info("Fjern veileder som er ikke aktive...")
+            veilederGrupperService.hentAlleEnheter().forEach {
+                veilederGrupperService.slettVeiledereSomIkkeErAktivePaEnheten(it)
+            }
+            log.info("Fjern veileder som er ikke aktive er ferdig")
+        } catch (e: Exception) {
+            log.warn("Exception during cleanup $e", e)
+        }
+    }
+
+    private suspend fun leggeTilEnhetIdTilMineFilter() {
+        try {
+            log.info("Legg til enhet id til mine filter...")
+            mineLagredeFilterService.leggTilEnhetIdTilMineFilter()
+            log.info("Legg til enhet id til mine filter er ferdig")
+        } catch (e: Exception) {
+            log.warn("Exception during adding enheter id to mine filter $e", e)
         }
     }
 }

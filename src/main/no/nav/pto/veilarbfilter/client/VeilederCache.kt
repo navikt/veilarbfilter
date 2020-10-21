@@ -3,11 +3,11 @@ package no.nav.pto.veilarbfilter.client
 
 //DETTA ÄR GODTYCKLIGT VALGT.
 // VILL INTE GÅ MOT ABAC FÖR OFTA DÅ VEILARBFILTER KOMMER KALLAS VARJE GÅNG VI RENDRAR OVERSIKTEN
-private const val TEN_MIN_CACHE_EXPIRATION_TIME = 1000 * 60 * 5
+private const val CACHE_EXPIRATION_TIME = 1000 * 60 * 5
 
 data class VeilederCacheValue(val veiledere: List<String>, val timestamp: Long)
 
-class VeilederCache(private val cacheExpiration: Int = TEN_MIN_CACHE_EXPIRATION_TIME) {
+class VeilederCache(private val cacheExpiration: Int = CACHE_EXPIRATION_TIME) {
     private val cache = HashMap<String, VeilederCacheValue>()
     fun veilederePaEnheten(enhetId: String): List<String>? =
         cache[enhetId]
