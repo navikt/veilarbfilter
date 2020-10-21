@@ -33,16 +33,17 @@ fun main(configuration: Configuration) {
         configuration.serviceUser.username,
         configuration.serviceUser.password
     )
-    val veilederGrupperService = VeilederGrupperServiceImpl(
-        VeilarbveilederClient(
-            config = configuration,
-            systemUserTokenProvider = systemUserTokenProvider
-        )
-    );
-    val mineLagredeFilterService = MineLagredeFilterServiceImpl();
+    val veilarbveilederClient = VeilarbveilederClient(
+        config = configuration,
+        systemUserTokenProvider = systemUserTokenProvider
+    )
+
+    val veilederGrupperService = VeilederGrupperServiceImpl(veilarbveilederClient);
+    val mineLagredeFilterService = MineLagredeFilterServiceImpl(veilarbveilederClient);
 
     val cleanUpVeilederGrupper = CleanupVeilederGrupper(
         veilederGrupperService = veilederGrupperService,
+        mineLagredeFilterService = mineLagredeFilterService,
         initialDelay = INITIAL_DELAY_CLEANUP,
         interval = INTERVAL_CLEANUP
     )
@@ -57,6 +58,7 @@ fun main(configuration: Configuration) {
         applicationState = applicationState,
         configuration = configuration,
         veilederGrupperService = veilederGrupperService,
+        mineLagredeFilterService = mineLagredeFilterService,
         useAuthentication = configuration.useAuthentication
     );
 

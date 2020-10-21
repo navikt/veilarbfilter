@@ -52,7 +52,7 @@ jobs:
           docker push ${IMAGE}:${IMAGE_TAG}
   deploy-q0:
     name: Deploy application to Q0
-    if: github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/CleanupMineFilter'
     needs: test-build-and-push
     runs-on: ubuntu-latest
     steps:
