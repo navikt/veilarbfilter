@@ -27,7 +27,7 @@
         <prometheus.version>0.4.0</prometheus.version>
         <logstash.version>5.1</logstash.version>
         <jacksonkotlin.version>2.9.7</jacksonkotlin.version>
-        <common.version>2.2020.08.06_11.28-05c901c817c2</common.version>
+        <common.version>2.2020.10.13_14.48-80e4c2dc5856</common.version>
         <abacattribute.version>3.3.13</abacattribute.version>
         <spek.version>1.1.5</spek.version>
         <kluent.version>1.34</kluent.version>
@@ -207,6 +207,12 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>log</artifactId>
+            <version>${common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>types</artifactId>
             <version>${common.version}</version>
         </dependency>
 

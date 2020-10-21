@@ -7,12 +7,16 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
 import no.nav.common.sts.NaisSystemUserTokenProvider
+import no.nav.common.types.identer.EnhetId
 import no.nav.common.utils.IdUtils
 import no.nav.pto.veilarbfilter.ObjectMapperProvider
+import no.nav.pto.veilarbfilter.client.dto.IdentOgEnhetliste
 import no.nav.pto.veilarbfilter.config.Configuration
+import kotlin.streams.toList
 
 
 private val veilederPaEnhetenCache = VeilederCache()
+private val enheterForVeilederCache = EnheterForVeilederCache()
 
 
 class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: NaisSystemUserTokenProvider?) {
@@ -28,16 +32,34 @@ class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: Nais
 
         return runBlocking {
             HttpClient(Apache).use { httpClient ->
-                val response = get(httpClient, enhetId)
+                val response = hentVeilederePaEnhetenFraAPI(httpClient, enhetId)
                 when (response.status.value) {
-                    200 -> readResponse(response, enhetId)
+                    200 -> readVeiledereResponse(response, enhetId)
                     else -> throw IllegalStateException("Feilet mot veilarbveileder " + response.status.value)
                 }
             }
         }
     }
 
-    private suspend fun readResponse(
+    fun hentEnheterForVeileder(veilederId: String): List<EnhetId>? {
+        val enheterForVeileder = enheterForVeilederCache.enheterForVeileder(veilederId)
+
+        if (enheterForVeileder !== null) {
+            return enheterForVeileder
+        }
+
+        return runBlocking {
+            HttpClient(Apache).use { httpClient ->
+                val response = hentEnhetenForVeilederFraAPI(httpClient, veilederId)
+                when (response.status.value) {
+                    200 -> readEnheterForVeileder(response, veilederId)
+                    else -> throw IllegalStateException("Feilet mot henting enheter for veileder " + response.status.value)
+                }
+            }
+        }
+    }
+
+    private suspend fun readVeiledereResponse(
         response: HttpResponse,
         enhetId: String
     ): List<String>? {
@@ -48,11 +70,37 @@ class VeilarbveilederClient(config: Configuration, systemUserTokenProvider: Nais
         return veiledereResponse
     }
 
-    private suspend fun get(
+    private suspend fun readEnheterForVeileder(
+        response: HttpResponse,
+        veilederIdent: String
+    ): List<EnhetId> {
+        val res = response.readText()
+        val identOgEnhetliste: IdentOgEnhetliste =
+            ObjectMapperProvider.objectMapper.readValue(res, object : TypeReference<IdentOgEnhetliste>() {});
+        val enheterIdsList = identOgEnhetliste.enhetliste.stream().map { it.enhetId }.toList()
+        enheterForVeilederCache.leggTilEnheterICachen(veilederIdent, enheterIdsList)
+        return enheterIdsList
+    }
+
+    private suspend fun hentVeilederePaEnhetenFraAPI(
         httpClient: HttpClient,
         enhetId: String
     ): HttpResponse {
         return httpClient.get<HttpStatement>("$veilarbveilederClientUrl/api/enhet/$enhetId/identer") {
+            header("Nav-Call-Id", IdUtils.generateId())
+            header("Nav-Consumer-Id", "veilarbfilter")
+            if (systemUserTokenProvider != null) {
+                header("Authorization", "Bearer " + systemUserTokenProvider.systemUserToken)
+            }
+        }
+            .execute()
+    }
+
+    private suspend fun hentEnhetenForVeilederFraAPI(
+        httpClient: HttpClient,
+        veilederIdent: String
+    ): HttpResponse {
+        return httpClient.get<HttpStatement>("$veilarbveilederClientUrl/api/veileder/enheter/$veilederIdent") {
             header("Nav-Call-Id", IdUtils.generateId())
             header("Nav-Consumer-Id", "veilarbfilter")
             if (systemUserTokenProvider != null) {
