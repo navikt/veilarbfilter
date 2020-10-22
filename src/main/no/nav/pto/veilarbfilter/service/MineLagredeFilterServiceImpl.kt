@@ -281,7 +281,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
         val alleMineFilter = hentAlleMineFilter()
         alleMineFilter.stream().forEach {
             val enheterForVeileder = veilarbveilederClient.hentEnheterForVeileder(it.veilederId)
-            log.info("Veileder ${it.veilederId} enheter size: " + enheterForVeileder?.size)
+            //log.info("Veileder ${it.veilederId} enheter size: " + enheterForVeileder?.size)
         }
     }
 }
