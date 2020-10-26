@@ -321,4 +321,8 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
 
         }
     }
+
+    suspend fun resetMineFilter() {
+        
+    }
 }
