@@ -267,7 +267,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                     MineLagredeFilter.veilederId,
                     MineLagredeFilter.sortOrder,
                     Filter.filterCleanup
-                ).selectAll().mapNotNull { tilMineLagredeFilterModel(it) }
+                ).select({ MineLagredeFilter.enhetId.isNull() }).map { tilMineLagredeFilterModel(it) }
             }
         } catch (e: java.lang.Exception) {
             log.error("Hent mine filter error", e)
@@ -281,6 +281,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                 .update({ (Filter.filterId eq filterId) }) {
                     it[MineLagredeFilter.enhetId] = enhetId
                 }
+            log.info("Added enhetId to MineFilter")
         } catch (e: java.lang.Exception) {
             log.error("Legg til enhet id til mine filter error", e)
         }
@@ -300,6 +301,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                 it[veilederId] = mineFilter.veilederId
                 it[MineLagredeFilter.enhetId] = enhetId
             }
+            log.info("Duplicated MineFilter to other enhets")
         }
     }
 
