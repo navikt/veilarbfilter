@@ -30,6 +30,7 @@ import kotlin.random.Random
 class IntegrationTestsMineFilter {
     lateinit var postgresqlContainer: PostgreSQLContainer<Nothing>;
     lateinit var applicationEngine: ApplicationEngine;
+    var enhetId: String = "enhet1"
 
     @BeforeAll
     internal fun setUp() {
@@ -307,24 +308,26 @@ class IntegrationTestsMineFilter {
         val mineLagredeFilterMedSortOrder = getMineLagredeFilter()
         val sortOrderHash = sortOrder.map { it.filterId to it.sortOrder }.toMap()
         mineLagredeFilterMedSortOrder.responseValue?.forEach {
-            if(sortOrderHash.get(it.filterId) == null){
+            if (sortOrderHash.get(it.filterId) == null) {
                 fail()
-            } else{
+            } else {
                 Assert.assertTrue(it.sortOrder == sortOrderHash.get(it.filterId))
             }
         }
     }
 
+    /** @TODO: TESTER RELATERT TIL FLERE ENHETER **/
+
     /** HJELPEFUNKSJONER  **/
     private fun getMineLagredeFilter(): ApiResponse<List<MineLagredeFilterModel>> {
-        val request: HttpUriRequest = HttpGet("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
+        val request: HttpUriRequest = HttpGet("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$enhetId/")
         val httpResponse = HttpClientBuilder.create().build().execute(request)
         val responseString = BasicResponseHandler().handleResponse(httpResponse)
         return ApiResponse(httpResponse.statusLine.statusCode, deserializeLagredeFilterModels(responseString))
     }
 
     private fun lagreNyttFilterRespons(valgteFilter: NyttFilterModel): ApiResponse<MineLagredeFilterModel> {
-        val response = Request.Post("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
+        val response = Request.Post("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$enhetId/")
             .bodyString(Gson().toJson(valgteFilter), ContentType.APPLICATION_JSON)
             .connectTimeout(1000)
             .execute()
@@ -345,7 +348,7 @@ class IntegrationTestsMineFilter {
         filterModel: FilterModel
     ): ApiResponse<MineLagredeFilterModel?> {
         val response =
-            Request.Put("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/")
+            Request.Put("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$enhetId/")
                 .bodyString(serializeLagredeFilterModel(filterModel), ContentType.APPLICATION_JSON)
                 .connectTimeout(1000)
                 .execute()
@@ -366,7 +369,7 @@ class IntegrationTestsMineFilter {
         sortOrder: List<SortOrder>
     ): List<MineLagredeFilterModel> {
         val response =
-            Request.Post("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/lagresortering")
+            Request.Post("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$enhetId/lagresortering")
                 .bodyString(Gson().toJson(sortOrder), ContentType.APPLICATION_JSON)
                 .connectTimeout(1000)
                 .execute()
@@ -380,7 +383,7 @@ class IntegrationTestsMineFilter {
     private fun deleteMineLagredeFilter(filterId: Int): Int {
         val httpclient = HttpClients.createDefault()
         val httpDelete =
-            HttpDelete("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$filterId")
+            HttpDelete("http://0.0.0.0:8080/veilarbfilter/api/minelagredefilter/$enhetId/$filterId")
         val httpResponse = httpclient.execute(httpDelete)
         return httpResponse.statusLine.statusCode
     }

@@ -1,6 +1,6 @@
 package no.nav.pto.veilarbfilter.service
 
-import no.nav.common.types.identer.EnhetId
+import kotlinx.coroutines.runBlocking
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.Filter
@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import kotlin.streams.toList
 
-class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient) : FilterService {
+class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient) {
     private val log = LoggerFactory.getLogger("MineLagredeFilterServiceImpl")
     private val veilarbveilederClient: VeilarbveilederClient = veilarbveilederClient;
 
-    override suspend fun hentFilter(filterId: Int): FilterModel? {
+    suspend fun hentFilter(filterId: Int): FilterModel? {
         try {
             return dbQuery {
 
@@ -38,7 +38,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
         }
     }
 
-    override suspend fun slettFilter(filterId: Int, veilederId: String): Int = dbQuery {
+    suspend fun slettFilter(filterId: Int, veilederId: String): Int = dbQuery {
         val removedRows =
             MineLagredeFilter.deleteWhere { (MineLagredeFilter.filterId eq filterId) and (MineLagredeFilter.veilederId eq veilederId) }
         if (removedRows > 0) {
@@ -48,14 +48,15 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
         }
     }
 
-    override suspend fun lagreSortering(veilederId: String, sortOrder: List<SortOrder>): List<FilterModel> {
+    suspend fun lagreSortering(veilederId: String, sortOrder: List<SortOrder>, enhetId: String): List<FilterModel> {
         val filterIdsList = sortOrder.stream().map { it.filterId }.toList()
         var isValidUpdate = false
         dbQuery {
             isValidUpdate =
                 (Filter innerJoin MineLagredeFilter).select {
                     (MineLagredeFilter.filterId inList filterIdsList) and
-                            (MineLagredeFilter.veilederId eq veilederId)
+                            (MineLagredeFilter.veilederId eq veilederId) and
+                            (MineLagredeFilter.enhetId eq enhetId)
                 }
                     .count() == filterIdsList.size
 
@@ -70,12 +71,13 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                 }
             }
         }
-        return finnFilterForFilterBruker(veilederId);
+        return finnFilterForFilterBruker(veilederId, enhetId);
     }
 
-    override suspend fun lagreFilter(
+    suspend fun lagreFilter(
         veilederId: String,
-        nyttFilter: NyttFilterModel
+        nyttFilter: NyttFilterModel,
+        enhetId: String
     ): FilterModel? {
         var key = 0;
         var erUgyldigNavn = true;
@@ -91,7 +93,8 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                 MineLagredeFilter.veilederId
             ).select {
                 (Filter.filterNavn eq nyttFilter.filterNavn) and
-                        (MineLagredeFilter.veilederId eq veilederId)
+                        (MineLagredeFilter.veilederId eq veilederId) and
+                        (MineLagredeFilter.enhetId eq enhetId)
             }.count() > 0
         }
 
@@ -102,7 +105,8 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                 MineLagredeFilter.veilederId
             ).select {
                 (Filter.valgteFilter eq nyttFilter.filterValg) and
-                        (MineLagredeFilter.veilederId eq veilederId)
+                        (MineLagredeFilter.veilederId eq veilederId) and
+                        (MineLagredeFilter.enhetId eq enhetId)
             }.count() > 0
         }
 
@@ -118,15 +122,18 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
             MineLagredeFilter.insert {
                 it[filterId] = key
                 it[MineLagredeFilter.veilederId] = veilederId
+                it[MineLagredeFilter.enhetId] = enhetId
             }
 
         }
+
         return hentFilter(key)
     }
 
-    override suspend fun oppdaterFilter(
+    suspend fun oppdaterFilter(
         veilederId: String,
-        filter: FilterModel
+        filter: FilterModel,
+        enhetId: String
     ): FilterModel {
         var erUgyldigNavn = true;
         var erUgyldigFiltervalg = true;
@@ -142,7 +149,8 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
             ).select {
                 (Filter.filterNavn eq filter.filterNavn) and
                         (MineLagredeFilter.veilederId eq veilederId) and
-                        (Filter.filterId neq filter.filterId)
+                        (Filter.filterId neq filter.filterId) and
+                        (MineLagredeFilter.enhetId eq enhetId)
             }.count() > 0
         }
 
@@ -154,7 +162,8 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
             ).select {
                 (Filter.valgteFilter eq filter.filterValg) and
                         (MineLagredeFilter.veilederId eq veilederId) and
-                        (Filter.filterId neq filter.filterId)
+                        (Filter.filterId neq filter.filterId) and
+                        (MineLagredeFilter.enhetId eq enhetId)
             }.count() > 0
         }
 
@@ -227,7 +236,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
         require(valg) { LagredeFilterFeilmeldinger.FILTERVALG_EKSISTERER.message }
     }
 
-    override suspend fun finnFilterForFilterBruker(veilederId: String): List<FilterModel> {
+    suspend fun finnFilterForFilterBruker(veilederId: String, enhetId: String): List<FilterModel> {
         try {
             return dbQuery {
                 (Filter innerJoin MineLagredeFilter).slice(
@@ -238,7 +247,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                     MineLagredeFilter.veilederId,
                     MineLagredeFilter.sortOrder,
                     Filter.filterCleanup
-                ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
+                ).select { (MineLagredeFilter.veilederId.eq(veilederId)) and (MineLagredeFilter.enhetId.eq(enhetId)) }
                     .mapNotNull { tilFilterModel(it) }
             }
         } catch (e: java.lang.Exception) {
@@ -266,22 +275,48 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
         }
     }
 
-    suspend fun oppdatertEnhetIdIMineFilter(filterId: Int, enhetId: EnhetId) {
+    fun leggTilEnhetIdTilMineFilter(filterId: Int, enhetId: String) {
         try {
             MineLagredeFilter
                 .update({ (Filter.filterId eq filterId) }) {
-                    it[MineLagredeFilter.enhetId] = enhetId.get()
+                    it[MineLagredeFilter.enhetId] = enhetId
                 }
         } catch (e: java.lang.Exception) {
             log.error("Legg til enhet id til mine filter error", e)
         }
     }
 
+    suspend fun copyMineFilterOgLeggTilEnhetIdTilMineFilter(mineFilter: MineLagredeFilterModel, enhetId: String) {
+        var key: Int;
+        dbQuery {
+            key = (Filter.insert {
+                it[filterNavn] = mineFilter.filterNavn
+                it[valgteFilter] = mineFilter.filterValg
+                it[opprettetDato] = LocalDateTime.now()
+            } get Filter.filterId)
+
+            MineLagredeFilter.insert {
+                it[filterId] = key
+                it[veilederId] = mineFilter.veilederId
+                it[MineLagredeFilter.enhetId] = enhetId
+            }
+        }
+    }
+
     suspend fun leggTilEnhetIdTilMineFilter() {
         val alleMineFilter = hentAlleMineFilter()
-        alleMineFilter.stream().forEach {
-            val enheterForVeileder = veilarbveilederClient.hentEnheterForVeileder(it.veilederId)
-            //log.info("Veileder ${it.veilederId} enheter size: " + enheterForVeileder?.size)
+        alleMineFilter.stream().forEach { mineFilter ->
+            val enheterForVeileder = veilarbveilederClient.hentEnheterForVeileder(mineFilter.veilederId)
+            if (enheterForVeileder != null && enheterForVeileder.size > 0) {
+                leggTilEnhetIdTilMineFilter(mineFilter.filterId, enheterForVeileder[0].get())
+                var i = 1;
+                while (i < enheterForVeileder.size) {
+                    runBlocking {
+                        copyMineFilterOgLeggTilEnhetIdTilMineFilter(mineFilter, enheterForVeileder[i].get())
+                    }
+                }
+            }
+
         }
     }
 }

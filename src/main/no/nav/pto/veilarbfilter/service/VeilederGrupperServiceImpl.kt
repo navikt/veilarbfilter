@@ -6,17 +6,16 @@ import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.db.VeilederGrupperFilter
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
-import no.nav.pto.veilarbfilter.model.SortOrder
 import no.nav.pto.veilarbfilter.model.VeilederGruppeFilterModel
 import org.jetbrains.exposed.sql.*
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
-class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) : FilterService {
+class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) {
     private val veilarbveilederClient: VeilarbveilederClient = veilarbveilederClient;
     private val log = LoggerFactory.getLogger("VeilederGrupperServiceImpl")
 
-    override suspend fun lagreFilter(enhetId: String, nyttFilter: NyttFilterModel): FilterModel? {
+    suspend fun lagreFilter(enhetId: String, nyttFilter: NyttFilterModel): FilterModel? {
         var key = 0;
         dbQuery {
             key = (Filter.insert {
@@ -34,7 +33,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
         return hentFilter(key)
     }
 
-    override suspend fun oppdaterFilter(enhetId: String, filter: FilterModel): FilterModel {
+    suspend fun oppdaterFilter(enhetId: String, filter: FilterModel): FilterModel {
         dbQuery {
             val isValidUpdate =
                 (VeilederGrupperFilter).select { (VeilederGrupperFilter.filterId eq filter.filterId) and (VeilederGrupperFilter.enhetId eq enhetId) }
@@ -52,7 +51,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
     }
 
 
-    override suspend fun hentFilter(filterId: Int): FilterModel? = dbQuery {
+    suspend fun hentFilter(filterId: Int): FilterModel? = dbQuery {
         (Filter innerJoin VeilederGrupperFilter).slice(
             Filter.filterId,
             Filter.filterNavn,
@@ -75,7 +74,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
             filterCleanup = row[Filter.filterCleanup]
         )
 
-    override suspend fun finnFilterForFilterBruker(enhetId: String): List<FilterModel> = dbQuery {
+    suspend fun finnFilterForFilterBruker(enhetId: String): List<FilterModel> = dbQuery {
         (Filter innerJoin VeilederGrupperFilter).slice(
             Filter.filterId,
             Filter.filterNavn,
@@ -88,7 +87,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
     }
 
 
-    override suspend fun slettFilter(filterId: Int, enhetId: String): Int = dbQuery {
+    suspend fun slettFilter(filterId: Int, enhetId: String): Int = dbQuery {
         val removedRows =
             VeilederGrupperFilter.deleteWhere { (VeilederGrupperFilter.filterId eq filterId) and (VeilederGrupperFilter.enhetId eq enhetId) }
         if (removedRows > 0) {
@@ -96,10 +95,6 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
         } else {
             0
         }
-    }
-
-    override suspend fun lagreSortering(filterBrukerId: String, sortOrder: List<SortOrder>): List<FilterModel> {
-        TODO("Not yet implemented")
     }
 
     suspend fun slettVeiledereSomIkkeErAktivePaEnheten(enhetId: String) {

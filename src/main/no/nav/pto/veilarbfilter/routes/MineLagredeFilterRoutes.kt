@@ -13,7 +13,7 @@ import no.nav.pto.veilarbfilter.MockPayload
 import no.nav.pto.veilarbfilter.model.FilterModel
 import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import no.nav.pto.veilarbfilter.model.SortOrder
-import no.nav.pto.veilarbfilter.service.FilterService
+import no.nav.pto.veilarbfilter.service.MineLagredeFilterServiceImpl
 import org.slf4j.LoggerFactory
 
 
@@ -32,27 +32,36 @@ fun Route.conditionalAuthenticate(useAuthentication: Boolean, build: Route.() ->
     return route
 }
 
-fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: FilterService, useAuthentication: Boolean) {
+fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: MineLagredeFilterServiceImpl, useAuthentication: Boolean) {
     conditionalAuthenticate(useAuthentication) {
-        route("/minelagredefilter") {
+        route("/minelagredefilter/{enhetId}/") {
             post {
                 call.getNavident()?.let { veilederId ->
-                    val nyttFilter = call.receive<NyttFilterModel>()
-                    val savedFilter = mineLagredeFilterService.lagreFilter(veilederId, nyttFilter)
-                    savedFilter?.let { call.respond(it) } ?: throw IllegalArgumentException()
+                    val enhetId = call.parameters["enhetId"]
+                    enhetId?.let {
+                        val nyttFilter = call.receive<NyttFilterModel>()
+                        val savedFilter = mineLagredeFilterService.lagreFilter(veilederId, nyttFilter, enhetId)
+                        savedFilter?.let { call.respond(it) } ?: throw IllegalArgumentException()
+                    }
                 }
             }
             put {
                 call.getNavident()?.let { veilederId ->
-                    val filterModel: FilterModel = call.receive()
-                    val oppdatertFilter = mineLagredeFilterService.oppdaterFilter(veilederId, filterModel)
-                    call.respond(oppdatertFilter)
+                    val enhetId = call.parameters["enhetId"]
+                    enhetId?.let {
+                        val filterModel: FilterModel = call.receive()
+                        val oppdatertFilter = mineLagredeFilterService.oppdaterFilter(veilederId, filterModel, enhetId)
+                        call.respond(oppdatertFilter)
+                    }
                 }
             }
             get {
                 call.getNavident()?.let { veilederId ->
-                    val filterListe = mineLagredeFilterService.finnFilterForFilterBruker(veilederId)
-                    call.respond(filterListe)
+                    val enhetId = call.parameters["enhetId"]
+                    enhetId?.let {
+                        val filterListe = mineLagredeFilterService.finnFilterForFilterBruker(veilederId, enhetId)
+                        call.respond(filterListe)
+                    }
                 }
             }
             delete("/{filterId}") {
@@ -69,9 +78,12 @@ fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: FilterService, useAu
             post("/lagresortering") {
                 call.getNavident()?.let { veilederId ->
                     try {
-                        val sortOrder = jacksonObjectMapper().readValue<List<SortOrder>>(call.receiveText())
-                        val lagreSortering = mineLagredeFilterService.lagreSortering(veilederId, sortOrder)
-                        lagreSortering?.let { call.respond(it) }
+                        val enhetId = call.parameters["enhetId"]
+                        enhetId?.let {
+                            val sortOrder = jacksonObjectMapper().readValue<List<SortOrder>>(call.receiveText())
+                            val lagreSortering = mineLagredeFilterService.lagreSortering(veilederId, sortOrder, enhetId)
+                            lagreSortering?.let { call.respond(it) }
+                        }
                     } catch (e: Exception) {
                         log.error("Lagre sortering fail:$e", e)
                     }
@@ -83,6 +95,6 @@ fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: FilterService, useAu
 
 private fun ApplicationCall.getNavident(): String? {
     return this.principal<JWTPrincipal>()
-            ?.payload
-            ?.subject
+        ?.payload
+        ?.subject
 }
