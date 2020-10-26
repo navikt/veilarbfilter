@@ -281,7 +281,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                 .update({ (Filter.filterId eq filterId) }) {
                     it[MineLagredeFilter.enhetId] = enhetId
                 }
-            log.info("Added enhetId to MineFilter")
+            log.info("Added enhetId ${enhetId} to MineFilter ${filterId}")
         } catch (e: java.lang.Exception) {
             log.error("Legg til enhet id til mine filter error", e)
         }
@@ -301,7 +301,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                 it[veilederId] = mineFilter.veilederId
                 it[MineLagredeFilter.enhetId] = enhetId
             }
-            log.info("Duplicated MineFilter to other enhets")
+            log.info("Replicated MineFilter ${mineFilter.filterId} to Enhet ${enhetId}")
         }
     }
 
@@ -322,7 +322,4 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
         }
     }
 
-    suspend fun resetMineFilter() {
-        
-    }
 }
