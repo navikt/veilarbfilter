@@ -55,7 +55,7 @@ class CleanupVeilederGrupper(
     private suspend fun leggeTilEnhetIdTilMineFilter() {
         try {
             log.info("Legg til enhet id til mine filter...")
-            //mineLagredeFilterService.leggTilEnhetIdTilMineFilter()
+            mineLagredeFilterService.leggTilEnhetIdTilMineFilter()
             log.info("Legg til enhet id til mine filter er ferdig")
         } catch (e: Exception) {
             log.warn("Exception during adding enheter id to mine filter $e", e)

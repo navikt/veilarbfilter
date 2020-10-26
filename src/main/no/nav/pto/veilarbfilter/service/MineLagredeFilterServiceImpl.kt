@@ -316,6 +316,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                     runBlocking {
                         copyMineFilterOgLeggTilEnhetIdTilMineFilter(mineFilter, enheterForVeileder[i].get())
                     }
+                    i++
                 }
             }
 
