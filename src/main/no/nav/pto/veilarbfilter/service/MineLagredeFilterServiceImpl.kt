@@ -275,19 +275,30 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
         }
     }
 
-    fun leggTilEnhetIdTilMineFilter(filterId: Int, enhetId: String) {
+    suspend fun leggTilEnhetIdTilMineFilter(mineFilter: MineLagredeFilterModel, enhetId: String) {
         try {
-            MineLagredeFilter
-                .update({ (Filter.filterId eq filterId) }) {
-                    it[MineLagredeFilter.enhetId] = enhetId
-                }
-            log.info("Added enhetId ${enhetId} to MineFilter ${filterId}")
+            if (existsDuplicateFilter(mineFilter, enhetId)) {
+                log.info("Filter already exists with name: ${mineFilter.filterNavn} and id: ${mineFilter.filterId}")
+                return
+            }
+            dbQuery {
+                MineLagredeFilter
+                    .update({ (Filter.filterId eq mineFilter.filterId) }) {
+                        it[MineLagredeFilter.enhetId] = enhetId
+                    }
+                log.info("Added enhetId ${enhetId} to MineFilter ${mineFilter.filterId}")
+            }
         } catch (e: java.lang.Exception) {
             log.error("Legg til enhet id til mine filter error", e)
         }
     }
 
     suspend fun copyMineFilterOgLeggTilEnhetIdTilMineFilter(mineFilter: MineLagredeFilterModel, enhetId: String) {
+        if (existsDuplicateFilter(mineFilter, enhetId)) {
+            log.info("Filter already exists with name: ${mineFilter.filterNavn} and id: ${mineFilter.filterId}")
+            return
+        }
+
         var key: Int;
         dbQuery {
             key = (Filter.insert {
@@ -305,12 +316,30 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
         }
     }
 
+    private suspend fun existsDuplicateFilter(mineFilter: MineLagredeFilterModel, enhetId: String): Boolean {
+        try {
+            return dbQuery {
+                (Filter innerJoin MineLagredeFilter).select {
+                    (MineLagredeFilter.enhetId.eq(enhetId)) and (Filter.filterNavn.eq(mineFilter.filterNavn)) and
+                            MineLagredeFilter.veilederId.eq(
+                                mineFilter.veilederId
+                            )
+                }.count() > 0
+            }
+        } catch (e: java.lang.Exception) {
+            log.error("Hent mine filter error", e)
+            return true
+        }
+    }
+
     suspend fun leggTilEnhetIdTilMineFilter() {
         val alleMineFilter = hentAlleMineFilter()
         alleMineFilter.stream().forEach { mineFilter ->
             val enheterForVeileder = veilarbveilederClient.hentEnheterForVeileder(mineFilter.veilederId)
             if (enheterForVeileder != null && enheterForVeileder.size > 0) {
-                leggTilEnhetIdTilMineFilter(mineFilter.filterId, enheterForVeileder[0].get())
+                runBlocking {
+                    leggTilEnhetIdTilMineFilter(mineFilter, enheterForVeileder[0].get())
+                }
                 var i = 1;
                 while (i < enheterForVeileder.size) {
                     runBlocking {
