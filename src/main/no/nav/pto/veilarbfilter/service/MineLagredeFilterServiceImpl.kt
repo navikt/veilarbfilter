@@ -283,11 +283,11 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
             }
             dbQuery {
                 MineLagredeFilter
-                    .update({ (Filter.filterId eq mineFilter.filterId) }) {
+                    .update({ (MineLagredeFilter.filterId eq mineFilter.filterId) }) {
                         it[MineLagredeFilter.enhetId] = enhetId
                     }
-                log.info("Added enhetId ${enhetId} to MineFilter ${mineFilter.filterId}")
             }
+            log.info("Added enhetId ${enhetId} to MineFilter ${mineFilter.filterId}")
         } catch (e: java.lang.Exception) {
             log.error("Legg til enhet id til mine filter error", e)
         }
