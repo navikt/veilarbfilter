@@ -27,7 +27,7 @@ jobs:
   test-build-and-push:
     name: Test, build and push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/master' || || github.ref == 'refs/heads/ConnectMineFilterToVeilederGruppeId'
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -52,7 +52,7 @@ jobs:
           docker push ${IMAGE}:${IMAGE_TAG}
   deploy-q0:
     name: Deploy application to Q0
-    if: github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/ConnectMineFilterToVeilederGruppeId'
     needs: test-build-and-push
     runs-on: ubuntu-latest
     steps:

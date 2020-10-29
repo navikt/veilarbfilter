@@ -6,6 +6,7 @@ import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.config.Database
 import no.nav.pto.veilarbfilter.jobs.CleanupVeilederGrupper
+import no.nav.pto.veilarbfilter.service.MineLagredeFilterServiceImpl
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
 
 
@@ -30,9 +31,11 @@ fun mainTest(jdbcUrl: String, dbUsername: String, dbPass: String): ApplicationEn
 
     val veilederGrupperService =
         VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration, systemUserTokenProvider = null));
+    val mineLagredeFilterService: MineLagredeFilterServiceImpl = MineLagredeFilterServiceImpl()
     val cleanupVeilederGrupper =
         CleanupVeilederGrupper(
             veilederGrupperService = veilederGrupperService,
+            mineLagredeFilterService = mineLagredeFilterService,
             initialDelay = null,
             interval = 100000L
         );

@@ -267,7 +267,6 @@ class MineLagredeFilterServiceImpl() : FilterService {
                     log.warn("Matching veiledergruppe for mine filter: " + mineFilter.filterId)
                 }
             }
-
         }
     }
 
