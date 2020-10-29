@@ -36,6 +36,7 @@ class CleanupVeilederGrupper(
         while (isActive) {
             fjernVeilederSomErIkkeAktive()
             leggeTilEnhetIdTilMineFilter()
+            cleanupMineFilter()
             delay(interval)
         }
     }
@@ -57,6 +58,16 @@ class CleanupVeilederGrupper(
             log.info("Legg til enhet id til mine filter...")
             mineLagredeFilterService.leggTilEnhetIdTilMineFilter()
             log.info("Legg til enhet id til mine filter er ferdig")
+        } catch (e: Exception) {
+            log.warn("Exception during adding enheter id to mine filter $e", e)
+        }
+    }
+
+    private suspend fun cleanupMineFilter() {
+        try {
+            log.info("Cleanup mine filter...")
+            mineLagredeFilterService.cleanupMineFilter()
+            log.info("Cleanup mine filter er ferdig")
         } catch (e: Exception) {
             log.warn("Exception during adding enheter id to mine filter $e", e)
         }

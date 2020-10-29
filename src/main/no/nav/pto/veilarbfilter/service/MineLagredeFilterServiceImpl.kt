@@ -27,7 +27,9 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                     Filter.opprettetDato,
                     MineLagredeFilter.veilederId,
                     MineLagredeFilter.sortOrder,
-                    Filter.filterCleanup
+                    Filter.filterCleanup,
+                    MineLagredeFilter.aktiv,
+                    MineLagredeFilter.note
                 ).select { (Filter.filterId.eq(filterId)) }
                     .mapNotNull { tilFilterModel(it) }
                     .singleOrNull()
@@ -195,7 +197,9 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
             Filter.opprettetDato,
             MineLagredeFilter.veilederId,
             MineLagredeFilter.sortOrder,
-            Filter.filterCleanup
+            Filter.filterCleanup,
+            MineLagredeFilter.aktiv,
+            MineLagredeFilter.note
         ).selectAll()
             .mapNotNull { tilMineLagredeFilterModel(it) }
     }
@@ -208,7 +212,10 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
             veilederId = row[MineLagredeFilter.veilederId],
             opprettetDato = row[Filter.opprettetDato],
             sortOrder = row[MineLagredeFilter.sortOrder],
-            filterCleanup = row[Filter.filterCleanup]
+            filterCleanup = row[Filter.filterCleanup],
+            enhetId = row[MineLagredeFilter.enhetId],
+            aktiv = row[MineLagredeFilter.aktiv] === 1,
+            note = row[MineLagredeFilter.note]
         )
 
     private fun tilMineLagredeFilterModel(row: ResultRow): MineLagredeFilterModel =
@@ -219,7 +226,10 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
             veilederId = row[MineLagredeFilter.veilederId],
             opprettetDato = row[Filter.opprettetDato],
             sortOrder = row[MineLagredeFilter.sortOrder],
-            filterCleanup = row[Filter.filterCleanup]
+            filterCleanup = row[Filter.filterCleanup],
+            enhetId = row[MineLagredeFilter.enhetId],
+            aktiv = row[MineLagredeFilter.aktiv] === 1,
+            note = row[MineLagredeFilter.note]
         )
 
     private fun validerNavn(navn: String) {
@@ -246,7 +256,9 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                     Filter.opprettetDato,
                     MineLagredeFilter.veilederId,
                     MineLagredeFilter.sortOrder,
-                    Filter.filterCleanup
+                    Filter.filterCleanup,
+                    MineLagredeFilter.aktiv,
+                    MineLagredeFilter.note
                 ).select { (MineLagredeFilter.veilederId.eq(veilederId)) and (MineLagredeFilter.enhetId.eq(enhetId)) }
                     .mapNotNull { tilFilterModel(it) }
             }
@@ -256,7 +268,20 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
         }
     }
 
-    suspend fun hentAlleMineFilter(): List<MineLagredeFilterModel> {
+    suspend fun deaktivateFilter(filterId: Int, note: String) {
+        try {
+            MineLagredeFilter
+                .update({ (MineLagredeFilter.filterId eq filterId) }) {
+                    it[MineLagredeFilter.aktiv] = 0;
+                    it[MineLagredeFilter.note] = note;
+                }
+        } catch (e: Exception) {
+            log.error("Filter deactivation error " + e, e)
+        }
+
+    }
+
+    suspend fun hentAlleMineFilterUtenEnhetId(): List<MineLagredeFilterModel> {
         try {
             return dbQuery {
                 (Filter innerJoin MineLagredeFilter).slice(
@@ -266,8 +291,31 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                     Filter.opprettetDato,
                     MineLagredeFilter.veilederId,
                     MineLagredeFilter.sortOrder,
-                    Filter.filterCleanup
+                    Filter.filterCleanup,
+                    MineLagredeFilter.aktiv,
+                    MineLagredeFilter.note
                 ).select({ MineLagredeFilter.enhetId.isNull() }).map { tilMineLagredeFilterModel(it) }
+            }
+        } catch (e: java.lang.Exception) {
+            log.error("Hent mine filter error", e)
+            return emptyList()
+        }
+    }
+
+    suspend fun hentAlleMineFilterMedEnhetId(): List<MineLagredeFilterModel> {
+        try {
+            return dbQuery {
+                (Filter innerJoin MineLagredeFilter).slice(
+                    Filter.filterId,
+                    Filter.filterNavn,
+                    Filter.valgteFilter,
+                    Filter.opprettetDato,
+                    MineLagredeFilter.veilederId,
+                    MineLagredeFilter.sortOrder,
+                    Filter.filterCleanup,
+                    MineLagredeFilter.aktiv,
+                    MineLagredeFilter.note
+                ).select({ MineLagredeFilter.enhetId.isNotNull() }).map { tilMineLagredeFilterModel(it) }
             }
         } catch (e: java.lang.Exception) {
             log.error("Hent mine filter error", e)
@@ -333,7 +381,7 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
     }
 
     suspend fun leggTilEnhetIdTilMineFilter() {
-        val alleMineFilter = hentAlleMineFilter()
+        val alleMineFilter = hentAlleMineFilterUtenEnhetId()
         alleMineFilter.stream().forEach { mineFilter ->
             val enheterForVeileder = veilarbveilederClient.hentEnheterForVeileder(mineFilter.veilederId)
             if (enheterForVeileder != null && enheterForVeileder.size > 0) {
@@ -350,6 +398,46 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
             }
 
         }
+    }
+
+    suspend fun cleanupMineFilter() {
+        val alleMineFilterMedEnhetId = hentAlleMineFilterMedEnhetId()
+        alleMineFilterMedEnhetId.stream().forEach { mineFilter ->
+            if (mineFilter.filterValg.veiledere.isNotEmpty()) {
+                runBlocking {
+                    cleanupInaktivVeiledere(mineFilter)
+                }
+            }
+            val permitterteFilter = listOf("PERMITTERTE_ETTER_NIENDE_MARS", "IKKE_PERMITTERTE_ETTER_NIENDE_MARS")
+            if (mineFilter.filterValg.ferdigfilterListe.stream().anyMatch { permitterteFilter.contains(it) }) {
+                runBlocking {
+                    cleanupPermittertFilter(mineFilter)
+                }
+            }
+        }
+    }
+
+    suspend private fun cleanupInaktivVeiledere(mineFilter: MineLagredeFilterModel) {
+        val veilederePaEnheten = veilarbveilederClient.hentVeilederePaEnheten(mineFilter.enhetId)
+        if (veilederePaEnheten != null && mineFilter.filterValg.veiledere.stream()
+                .anyMatch { !veilederePaEnheten.contains(it) }
+        ) {
+            log.info("Deactive filter ${mineFilter.filterId} since it contains invalid veileder")
+            deaktivateFilter(
+                mineFilter.filterId,
+                "${mineFilter.filterNavn} er slettet fordi veiledere er fjernet."
+            )
+
+        }
+    }
+
+    suspend private fun cleanupPermittertFilter(mineFilter: MineLagredeFilterModel) {
+        log.info("Deactive filter ${mineFilter.filterId} since it contains permittert filter")
+        deaktivateFilter(
+            mineFilter.filterId,
+            "${mineFilter.filterNavn} er slettet fordi filteret 'Permittert etter 09.03.2020' er fjernet."
+        )
+
     }
 
 }
