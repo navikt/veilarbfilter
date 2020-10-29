@@ -39,7 +39,7 @@ fun main(configuration: Configuration) {
     )
 
     val veilederGrupperService = VeilederGrupperServiceImpl(veilarbveilederClient);
-    val mineLagredeFilterService = MineLagredeFilterServiceImpl(veilarbveilederClient);
+    val mineLagredeFilterService = MineLagredeFilterServiceImpl();
 
     val cleanUpVeilederGrupper = CleanupVeilederGrupper(
         veilederGrupperService = veilederGrupperService,
@@ -58,7 +58,6 @@ fun main(configuration: Configuration) {
         applicationState = applicationState,
         configuration = configuration,
         veilederGrupperService = veilederGrupperService,
-        mineLagredeFilterService = mineLagredeFilterService,
         useAuthentication = configuration.useAuthentication
     );
 
