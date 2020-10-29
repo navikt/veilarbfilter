@@ -33,16 +33,17 @@ fun main(configuration: Configuration) {
         configuration.serviceUser.username,
         configuration.serviceUser.password
     )
-    val veilederGrupperService = VeilederGrupperServiceImpl(
-        VeilarbveilederClient(
-            config = configuration,
-            systemUserTokenProvider = systemUserTokenProvider
-        )
-    );
+    val veilarbveilederClient = VeilarbveilederClient(
+        config = configuration,
+        systemUserTokenProvider = systemUserTokenProvider
+    )
+
+    val veilederGrupperService = VeilederGrupperServiceImpl(veilarbveilederClient);
     val mineLagredeFilterService = MineLagredeFilterServiceImpl();
 
     val cleanUpVeilederGrupper = CleanupVeilederGrupper(
         veilederGrupperService = veilederGrupperService,
+        mineLagredeFilterService = mineLagredeFilterService,
         initialDelay = INITIAL_DELAY_CLEANUP,
         interval = INTERVAL_CLEANUP
     )

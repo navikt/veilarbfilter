@@ -3,11 +3,13 @@ package no.nav.pto.veilarbfilter.service
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.db.MineLagredeFilter
+import no.nav.pto.veilarbfilter.db.VeilederGrupperFilter
 import no.nav.pto.veilarbfilter.model.*
 import no.nav.pto.veilarbfilter.model.SortOrder
 import org.jetbrains.exposed.sql.*
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
+import java.util.*
 import kotlin.streams.toList
 
 class MineLagredeFilterServiceImpl() : FilterService {
@@ -238,7 +240,7 @@ class MineLagredeFilterServiceImpl() : FilterService {
                 ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
                     .mapNotNull { tilFilterModel(it) }
             }
-        } catch (e: java.lang.Exception) {
+        } catch (e: Exception) {
             log.error("Hent filter error", e)
             return emptyList()
         }
@@ -246,11 +248,56 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
 
     suspend fun findVeilederGruppeIdForMineFilter() {
+        val alleVeiledereGruppe = fetchAllVeiledereGruppe()
+        log.info("Total " + alleVeiledereGruppe.size + " veiledergrupper")
+
+        if (alleVeiledereGruppe.isEmpty()) {
+            return;
+        }
+
         hentAllLagredeFilter().forEach { mineFilter ->
             if (!mineFilter.filterValg.veiledere.isEmpty()) {
-                //find veileder gruppe id with the same veiledere
+                val matchingVeilederGrupper =
+                    findMatchingVeilederGrupper(mineFilter.filterValg.veiledere, alleVeiledereGruppe)
+                if (matchingVeilederGrupper.isEmpty()) {
+                    log.warn("No matching veiledergruppe for mine filter: " + mineFilter.filterId)
+                } else if (matchingVeilederGrupper.size > 1) {
+                    log.warn("More then one matching veiledergruppe for mine filter: " + mineFilter.filterId)
+                } else {
+                    log.warn("Matching veiledergruppe for mine filter: " + mineFilter.filterId)
+                }
             }
 
         }
+    }
+
+    suspend fun fetchAllVeiledereGruppe(): List<VeilederGrupper> {
+        return dbQuery {
+            (Filter innerJoin VeilederGrupperFilter).slice(
+                Filter.filterId,
+                Filter.valgteFilter
+            ).selectAll()
+                .mapNotNull { tilVeilederGrupper(it) }
+        }
+    }
+
+    fun tilVeilederGrupper(row: ResultRow): VeilederGrupper {
+        return VeilederGrupper(row[Filter.filterId], row[Filter.valgteFilter].veiledere)
+    }
+
+    fun findMatchingVeilederGrupper(
+        mineFilterVeiledere: List<String>,
+        veilederGrupper: List<VeilederGrupper>
+    ): List<VeilederGrupper> {
+        return veilederGrupper.stream()
+            .filter { veilederGrupper -> erVeiledereListeErLik(veilederGrupper.veilederListe, mineFilterVeiledere) }
+            .toList()
+    }
+
+    fun erVeiledereListeErLik(veiledereList1: List<String>, veiledereList2: List<String>): Boolean {
+        if (veiledereList1.size != veiledereList2.size) return false;
+        Collections.sort(veiledereList1)
+        Collections.sort(veiledereList2)
+        return veiledereList1.equals(veiledereList2)
     }
 }
