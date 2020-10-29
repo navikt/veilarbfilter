@@ -249,14 +249,16 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
     suspend fun findVeilederGruppeIdForMineFilter() {
         val alleVeiledereGruppe = fetchAllVeiledereGruppe()
+        val alleMineFilter = hentAllLagredeFilter();
         log.info("Total " + alleVeiledereGruppe.size + " veiledergrupper")
-
+        log.info("Total " + alleMineFilter.size + " mine filter")
         if (alleVeiledereGruppe.isEmpty()) {
             return;
         }
 
-        hentAllLagredeFilter().forEach { mineFilter ->
+        alleMineFilter.forEach { mineFilter ->
             if (!mineFilter.filterValg.veiledere.isEmpty()) {
+                log.info("Checking mine filter " + mineFilter.filterId)
                 val matchingVeilederGrupper =
                     findMatchingVeilederGrupper(mineFilter.filterValg.veiledere, alleVeiledereGruppe)
                 if (matchingVeilederGrupper.isEmpty()) {
