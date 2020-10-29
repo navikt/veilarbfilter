@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.jobs
 
 import kotlinx.coroutines.*
+import no.nav.pto.veilarbfilter.service.MineLagredeFilterServiceImpl
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
@@ -8,6 +9,7 @@ import kotlin.coroutines.CoroutineContext
 
 class CleanupVeilederGrupper(
     val veilederGrupperService: VeilederGrupperServiceImpl,
+    val mineLagredeFilterService: MineLagredeFilterServiceImpl,
     val interval: Long,
     val initialDelay: Long?
 ) :
@@ -32,20 +34,29 @@ class CleanupVeilederGrupper(
             delay(it)
         }
         while (isActive) {
-            log.info("Fjern veileder som er ikke aktive...")
-            try {
-                fjernVeilederSomErIkkeAktive()
-                log.info("Fjern veileder som er ikke aktive er ferdig")
-            } catch (e: Exception) {
-                log.warn("Exception during clanup $e", e)
-            }
+            findVeilederGruppeIdForMineFilter()
+            fjernVeilederSomErIkkeAktive()
             delay(interval)
         }
     }
 
+    private suspend fun findVeilederGruppeIdForMineFilter() {
+        try {
+            mineLagredeFilterService.findVeilederGruppeIdForMineFilter()
+        } catch (e: Exception) {
+            log.warn("Exception during finding veileder gruppe id for mine filter $e", e)
+        }
+    }
+
     private suspend fun fjernVeilederSomErIkkeAktive() {
-        veilederGrupperService.hentAlleEnheter().forEach {
-            veilederGrupperService.slettVeiledereSomIkkeErAktivePaEnheten(it)
+        try {
+            log.info("Fjern veileder som er ikke aktive...")
+            veilederGrupperService.hentAlleEnheter().forEach {
+                veilederGrupperService.slettVeiledereSomIkkeErAktivePaEnheten(it)
+            }
+            log.info("Fjern veileder som er ikke aktive er ferdig")
+        } catch (e: Exception) {
+            log.warn("Exception during clanup $e", e)
         }
     }
 }

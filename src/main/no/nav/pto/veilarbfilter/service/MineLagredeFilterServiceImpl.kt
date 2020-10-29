@@ -243,4 +243,14 @@ class MineLagredeFilterServiceImpl() : FilterService {
             return emptyList()
         }
     }
+
+
+    suspend fun findVeilederGruppeIdForMineFilter() {
+        hentAllLagredeFilter().forEach { mineFilter ->
+            if (!mineFilter.filterValg.veiledere.isEmpty()) {
+                //find veileder gruppe id with the same veiledere
+            }
+
+        }
+    }
 }
