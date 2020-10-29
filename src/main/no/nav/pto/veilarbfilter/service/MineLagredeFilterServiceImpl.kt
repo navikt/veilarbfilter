@@ -1,7 +1,5 @@
 package no.nav.pto.veilarbfilter.service
 
-import no.nav.common.types.identer.EnhetId
-import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.db.MineLagredeFilter
@@ -12,9 +10,8 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import kotlin.streams.toList
 
-class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient) : FilterService {
+class MineLagredeFilterServiceImpl() : FilterService {
     private val log = LoggerFactory.getLogger("MineLagredeFilterServiceImpl")
-    private val veilarbveilederClient: VeilarbveilederClient = veilarbveilederClient;
 
     override suspend fun hentFilter(filterId: Int): FilterModel? {
         try {
@@ -247,41 +244,13 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
         }
     }
 
-    suspend fun hentAlleMineFilter(): List<MineLagredeFilterModel> {
-        try {
-            return dbQuery {
-                (Filter innerJoin MineLagredeFilter).slice(
-                    Filter.filterId,
-                    Filter.filterNavn,
-                    Filter.valgteFilter,
-                    Filter.opprettetDato,
-                    MineLagredeFilter.veilederId,
-                    MineLagredeFilter.sortOrder,
-                    Filter.filterCleanup
-                ).selectAll().mapNotNull { tilMineLagredeFilterModel(it) }
+
+    suspend fun findVeilederGruppeIdForMineFilter() {
+        hentAllLagredeFilter().forEach { mineFilter ->
+            if (!mineFilter.filterValg.veiledere.isEmpty()) {
+                //find veileder gruppe id with the same veiledere
             }
-        } catch (e: java.lang.Exception) {
-            log.error("Hent mine filter error", e)
-            return emptyList()
-        }
-    }
 
-    suspend fun oppdatertEnhetIdIMineFilter(filterId: Int, enhetId: EnhetId) {
-        try {
-            MineLagredeFilter
-                .update({ (Filter.filterId eq filterId) }) {
-                    it[MineLagredeFilter.enhetId] = enhetId.get()
-                }
-        } catch (e: java.lang.Exception) {
-            log.error("Legg til enhet id til mine filter error", e)
-        }
-    }
-
-    suspend fun leggTilEnhetIdTilMineFilter() {
-        val alleMineFilter = hentAlleMineFilter()
-        alleMineFilter.stream().forEach {
-            val enheterForVeileder = veilarbveilederClient.hentEnheterForVeileder(it.veilederId)
-            log.info("Veileder enheter size: " + enheterForVeileder?.size)
         }
     }
 }
