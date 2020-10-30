@@ -24,7 +24,6 @@ fun createHttpServer(
     port: Int = 8080,
     configuration: Configuration,
     veilederGrupperService: VeilederGrupperServiceImpl,
-    mineLagredeFilterService: MineLagredeFilterServiceImpl,
     useAuthentication: Boolean = true
 ): ApplicationEngine = embeddedServer(Netty, port) {
     install(StatusPages) {
@@ -67,7 +66,7 @@ fun createHttpServer(
                 livenessCheck = { applicationState.running })
             route("/api/") {
                 veilederGruppeRoutes(veilederGrupperService, PepClient(config = configuration), useAuthentication)
-                mineLagredeFilterRoutes(mineLagredeFilterService, useAuthentication)
+                mineLagredeFilterRoutes(MineLagredeFilterServiceImpl(), useAuthentication)
             }
         }
     }
