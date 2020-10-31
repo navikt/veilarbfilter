@@ -1,20 +1,19 @@
 package no.nav.pto.veilarbfilter.service
 
-import no.nav.common.types.identer.EnhetId
-import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.db.MineLagredeFilter
+import no.nav.pto.veilarbfilter.db.VeilederGrupperFilter
 import no.nav.pto.veilarbfilter.model.*
 import no.nav.pto.veilarbfilter.model.SortOrder
 import org.jetbrains.exposed.sql.*
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
+import java.util.*
 import kotlin.streams.toList
 
-class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient) : FilterService {
+class MineLagredeFilterServiceImpl() : FilterService {
     private val log = LoggerFactory.getLogger("MineLagredeFilterServiceImpl")
-    private val veilarbveilederClient: VeilarbveilederClient = veilarbveilederClient;
 
     override suspend fun hentFilter(filterId: Int): FilterModel? {
         try {
@@ -241,47 +240,65 @@ class MineLagredeFilterServiceImpl(veilarbveilederClient: VeilarbveilederClient)
                 ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
                     .mapNotNull { tilFilterModel(it) }
             }
-        } catch (e: java.lang.Exception) {
+        } catch (e: Exception) {
             log.error("Hent filter error", e)
             return emptyList()
         }
     }
 
-    suspend fun hentAlleMineFilter(): List<MineLagredeFilterModel> {
-        try {
-            return dbQuery {
-                (Filter innerJoin MineLagredeFilter).slice(
-                    Filter.filterId,
-                    Filter.filterNavn,
-                    Filter.valgteFilter,
-                    Filter.opprettetDato,
-                    MineLagredeFilter.veilederId,
-                    MineLagredeFilter.sortOrder,
-                    Filter.filterCleanup
-                ).selectAll().mapNotNull { tilMineLagredeFilterModel(it) }
-            }
-        } catch (e: java.lang.Exception) {
-            log.error("Hent mine filter error", e)
-            return emptyList()
-        }
-    }
 
-    suspend fun oppdatertEnhetIdIMineFilter(filterId: Int, enhetId: EnhetId) {
-        try {
-            MineLagredeFilter
-                .update({ (Filter.filterId eq filterId) }) {
-                    it[MineLagredeFilter.enhetId] = enhetId.get()
+    suspend fun findVeilederGruppeIdForMineFilter() {
+        val alleVeiledereGruppe = fetchAllVeiledereGruppe()
+        val alleMineFilter = hentAllLagredeFilter();
+        log.info("Total " + alleVeiledereGruppe.size + " veiledergrupper")
+        log.info("Total " + alleMineFilter.size + " mine filter")
+        if (alleVeiledereGruppe.isEmpty()) {
+            return;
+        }
+
+        alleMineFilter.forEach { mineFilter ->
+            if (!mineFilter.filterValg.veiledere.isEmpty()) {
+                log.info("Checking mine filter " + mineFilter.filterId)
+                val matchingVeilederGrupper =
+                    findMatchingVeilederGrupper(mineFilter.filterValg.veiledere, alleVeiledereGruppe)
+                if (matchingVeilederGrupper.isEmpty()) {
+                    log.warn("No matching veiledergruppe for mine filter: " + mineFilter.filterId)
+                } else if (matchingVeilederGrupper.size > 1) {
+                    log.warn("More then one matching veiledergruppe for mine filter: " + mineFilter.filterId)
+                } else {
+                    log.warn("Matching veiledergruppe for mine filter: " + mineFilter.filterId)
                 }
-        } catch (e: java.lang.Exception) {
-            log.error("Legg til enhet id til mine filter error", e)
+            }
         }
     }
 
-    suspend fun leggTilEnhetIdTilMineFilter() {
-        val alleMineFilter = hentAlleMineFilter()
-        alleMineFilter.stream().forEach {
-            val enheterForVeileder = veilarbveilederClient.hentEnheterForVeileder(it.veilederId)
-            log.info("Veileder enheter size: " + enheterForVeileder?.size)
+    suspend fun fetchAllVeiledereGruppe(): List<VeilederGrupper> {
+        return dbQuery {
+            (Filter innerJoin VeilederGrupperFilter).slice(
+                Filter.filterId,
+                Filter.valgteFilter
+            ).selectAll()
+                .mapNotNull { tilVeilederGrupper(it) }
         }
+    }
+
+    fun tilVeilederGrupper(row: ResultRow): VeilederGrupper {
+        return VeilederGrupper(row[Filter.filterId], row[Filter.valgteFilter].veiledere)
+    }
+
+    fun findMatchingVeilederGrupper(
+        mineFilterVeiledere: List<String>,
+        veilederGrupper: List<VeilederGrupper>
+    ): List<VeilederGrupper> {
+        return veilederGrupper.stream()
+            .filter { veilederGrupper -> erVeiledereListeErLik(veilederGrupper.veilederListe, mineFilterVeiledere) }
+            .toList()
+    }
+
+    fun erVeiledereListeErLik(veiledereList1: List<String>, veiledereList2: List<String>): Boolean {
+        if (veiledereList1.size != veiledereList2.size) return false;
+        Collections.sort(veiledereList1)
+        Collections.sort(veiledereList2)
+        return veiledereList1.equals(veiledereList2)
     }
 }

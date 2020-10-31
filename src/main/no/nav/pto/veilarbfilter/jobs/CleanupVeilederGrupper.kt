@@ -34,9 +34,17 @@ class CleanupVeilederGrupper(
             delay(it)
         }
         while (isActive) {
+            findVeilederGruppeIdForMineFilter()
             fjernVeilederSomErIkkeAktive()
-            leggeTilEnhetIdTilMineFilter()
             delay(interval)
+        }
+    }
+
+    private suspend fun findVeilederGruppeIdForMineFilter() {
+        try {
+            mineLagredeFilterService.findVeilederGruppeIdForMineFilter()
+        } catch (e: Exception) {
+            log.warn("Exception during finding veileder gruppe id for mine filter $e", e)
         }
     }
 
@@ -48,17 +56,7 @@ class CleanupVeilederGrupper(
             }
             log.info("Fjern veileder som er ikke aktive er ferdig")
         } catch (e: Exception) {
-            log.warn("Exception during cleanup $e", e)
-        }
-    }
-
-    private suspend fun leggeTilEnhetIdTilMineFilter() {
-        try {
-            log.info("Legg til enhet id til mine filter...")
-            mineLagredeFilterService.leggTilEnhetIdTilMineFilter()
-            log.info("Legg til enhet id til mine filter er ferdig")
-        } catch (e: Exception) {
-            log.warn("Exception during adding enheter id to mine filter $e", e)
+            log.warn("Exception during clanup $e", e)
         }
     }
 }

@@ -44,3 +44,5 @@ class VeilederGruppeFilterModel(
 data class NyttFilterModel(val filterNavn: String, val filterValg: PortefoljeFilter)
 
 data class SortOrder(val filterId: Int, val sortOrder: Int)
+
+data class VeilederGrupper(val filterId: Int, val veilederListe: List<String>)
