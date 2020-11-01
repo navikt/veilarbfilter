@@ -318,6 +318,7 @@ class MineLagredeFilterServiceImpl() : FilterService {
                         filterValg.veiledereGruppeId = veilederGruppeId
                         it[Filter.valgteFilter] = filterValg
                     }
+                log.info("Updated veiledereGruppeId for filter: " + mineFilterId)
             } catch (e: Exception) {
                 log.warn("Can't update veiledereGruppeId for filter: " + mineFilterId)
             }
