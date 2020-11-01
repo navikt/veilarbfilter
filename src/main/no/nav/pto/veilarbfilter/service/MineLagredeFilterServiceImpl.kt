@@ -313,8 +313,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
     ) {
         dbQuery {
             try {
-                MineLagredeFilter
-                    .update({ (MineLagredeFilter.filterId eq mineFilterId) }) {
+                Filter
+                    .update({ (Filter.filterId eq mineFilterId) }) {
                         filterValg.veiledereGruppeId = veilederGruppeId
                         it[Filter.valgteFilter] = filterValg
                     }
