@@ -36,7 +36,6 @@ class Database(configuration: Configuration) {
         config.connectionTimeout = 10000
         Database.connect(HikariDataSource(config))
         val flyway = Flyway.configure().dataSource(dbUrl, config.username, config.password).load()
-        flyway.repair();
         flyway.migrate()
     }
 
