@@ -34,17 +34,17 @@ class CleanupVeilederGrupper(
             delay(it)
         }
         while (isActive) {
-            findVeilederGruppeIdForMineFilter()
+            fjernMineFilterMedInaktiveFilter()
             fjernVeilederSomErIkkeAktive()
             delay(interval)
         }
     }
 
-    private suspend fun findVeilederGruppeIdForMineFilter() {
+    private suspend fun fjernMineFilterMedInaktiveFilter() {
         try {
-            mineLagredeFilterService.findVeilederGruppeIdForMineFilter()
+            mineLagredeFilterService.fjernMineFilterMedInaktiveFilter()
         } catch (e: Exception) {
-            log.warn("Exception during finding veileder gruppe id for mine filter $e", e)
+            log.warn("Exception during cleaning up mine filter $e", e)
         }
     }
 

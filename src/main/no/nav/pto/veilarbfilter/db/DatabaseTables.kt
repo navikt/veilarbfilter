@@ -16,6 +16,8 @@ object MineLagredeFilter : Table() {
     val filterId = integer("mine_filter_id") references Filter.filterId;
     val veilederId = varchar("veileder_id", 32)
     val sortOrder = integer("sort_order")
+    val note = varchar("note", 255)
+    val aktiv = integer("aktiv")
 }
 
 object VeilederGrupperFilter : Table() {

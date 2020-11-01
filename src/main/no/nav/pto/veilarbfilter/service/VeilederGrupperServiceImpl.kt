@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.service
 
+import kotlinx.coroutines.runBlocking
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.Filter
@@ -12,8 +13,12 @@ import org.jetbrains.exposed.sql.*
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
-class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) : FilterService {
+class VeilederGrupperServiceImpl(
+    veilarbveilederClient: VeilarbveilederClient,
+    mineLagredeFilterService: MineLagredeFilterServiceImpl
+) : FilterService {
     private val veilarbveilederClient: VeilarbveilederClient = veilarbveilederClient;
+    private val mineLagredeFilterService: MineLagredeFilterServiceImpl = mineLagredeFilterService
     private val log = LoggerFactory.getLogger("VeilederGrupperServiceImpl")
 
     override suspend fun lagreFilter(enhetId: String, nyttFilter: NyttFilterModel): FilterModel? {
@@ -88,14 +93,28 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
     }
 
 
-    override suspend fun slettFilter(filterId: Int, enhetId: String): Int = dbQuery {
-        val removedRows =
-            VeilederGrupperFilter.deleteWhere { (VeilederGrupperFilter.filterId eq filterId) and (VeilederGrupperFilter.enhetId eq enhetId) }
-        if (removedRows > 0) {
-            Filter.deleteWhere { (Filter.filterId eq filterId) }
-        } else {
-            0
+    override suspend fun slettFilter(filterId: Int, enhetId: String): Int {
+        val veilederGruppe = hentFilter(filterId)
+        if (veilederGruppe === null) {
+            return 0
         }
+        var erSlettet = 0
+
+        dbQuery {
+            val removedRows =
+                VeilederGrupperFilter.deleteWhere { (VeilederGrupperFilter.filterId eq filterId) and (VeilederGrupperFilter.enhetId eq enhetId) }
+            if (removedRows > 0) {
+                Filter.deleteWhere { (Filter.filterId eq filterId) }
+                runBlocking {
+                    mineLagredeFilterService.deactivateMineFilterWithDeletedVeilederGroup(
+                        veilederGruppe.filterNavn,
+                        veilederGruppe.filterValg.veiledere
+                    )
+                }
+                erSlettet = 1
+            }
+        }
+        return erSlettet
     }
 
     override suspend fun lagreSortering(filterBrukerId: String, sortOrder: List<SortOrder>): List<FilterModel> {

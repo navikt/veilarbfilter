@@ -33,9 +33,10 @@ suspend fun mainTestWithMock(jdbcUrl: String, dbUsername: String, dbPass: String
     val applicationState = ApplicationState()
     val veilarbveilederClient: VeilarbveilederClient =
         mock(VeilarbveilederClient::class.java, withSettings().useConstructor(configuration, null))
-    val veilederGrupperServiceReal = VeilederGrupperServiceImpl(veilarbveilederClient)
-    val veilederGrupperService: VeilederGrupperServiceImpl = spy(veilederGrupperServiceReal)
     val mineFilterServiceReal = MineLagredeFilterServiceImpl()
+    val veilederGrupperServiceReal = VeilederGrupperServiceImpl(veilarbveilederClient, mineFilterServiceReal)
+    val veilederGrupperService: VeilederGrupperServiceImpl = spy(veilederGrupperServiceReal)
+
     val mineFilterService: MineLagredeFilterServiceImpl = spy(mineFilterServiceReal)
 
 
