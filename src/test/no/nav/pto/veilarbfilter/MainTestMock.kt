@@ -1,5 +1,7 @@
-package no.nav.pto.veilarbfilter
+package no.nav.pto.veilarbfilter;
 
+
+import com.nhaarman.mockito_kotlin.withSettings
 import io.ktor.server.engine.*
 import no.nav.common.utils.Credentials
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
@@ -8,11 +10,13 @@ import no.nav.pto.veilarbfilter.config.Database
 import no.nav.pto.veilarbfilter.jobs.CleanupVeilederGrupper
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterServiceImpl
 import no.nav.pto.veilarbfilter.service.VeilederGrupperServiceImpl
+import org.mockito.Mockito
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.spy
 
 
-fun mainTest(jdbcUrl: String, dbUsername: String, dbPass: String): ApplicationEngine {
+suspend fun mainTestWithMock(jdbcUrl: String, dbUsername: String, dbPass: String): ApplicationEngine {
     System.setProperty("NAIS_APP_NAME", "local")
-
     val configuration = Configuration(
         clustername = "",
         stsDiscoveryUrl = "",
@@ -25,20 +29,26 @@ fun mainTest(jdbcUrl: String, dbUsername: String, dbPass: String): ApplicationEn
             password = dbPass
         )
     )
-
     Database(configuration)
     val applicationState = ApplicationState()
+    val veilarbveilederClient: VeilarbveilederClient =
+        mock(VeilarbveilederClient::class.java, withSettings().useConstructor(configuration, null))
+    val veilederGrupperServiceReal = VeilederGrupperServiceImpl(veilarbveilederClient)
+    val veilederGrupperService: VeilederGrupperServiceImpl = spy(veilederGrupperServiceReal)
+    val mineFilterServiceReal = MineLagredeFilterServiceImpl()
+    val mineFilterService: MineLagredeFilterServiceImpl = spy(mineFilterServiceReal)
 
-    val veilederGrupperService =
-        VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration, systemUserTokenProvider = null));
-    val mineLagredeFilterService: MineLagredeFilterServiceImpl = MineLagredeFilterServiceImpl()
+
+    Mockito.`when`(veilarbveilederClient.hentVeilederePaEnheten("1")).thenReturn(listOf("1", "2", "3"))
+    Mockito.`when`(veilederGrupperService.hentAlleEnheter()).thenReturn(listOf("1", "2", "3"))
+
     val cleanupVeilederGrupper =
         CleanupVeilederGrupper(
             veilederGrupperService = veilederGrupperService,
-            mineLagredeFilterService = mineLagredeFilterService,
+            mineLagredeFilterService = mineFilterService,
             initialDelay = null,
-            interval = 100000L
-        );
+            interval = 500L
+        );  // Low interval cleanup to be able to test the function
 
     val applicationServer = createHttpServer(
         applicationState = applicationState,
@@ -56,3 +66,4 @@ fun mainTest(jdbcUrl: String, dbUsername: String, dbPass: String): ApplicationEn
     applicationServer.start(wait = false)
     return applicationServer
 }
+

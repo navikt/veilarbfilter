@@ -42,7 +42,7 @@ class DateSerializerTest {
     fun whenDateIsValidTestSerialization() {
         var date = LocalDateTime.now()
         val serializedDate = DateSerializer().serialize(date, null, null)
-        Assert.assertTrue(serializedDate != null)
+        Assert.assertNotNull(serializedDate)
         Assert.assertTrue(serializedDate.asString.length > 10)
     }
 

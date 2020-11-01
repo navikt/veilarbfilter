@@ -116,7 +116,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
             }
             val removedVeileder = getRemovedVeiledere(alleVeiledere, aktiveVeileder)
 
-            if (aktiveVeileder.size === 0) {
+            if (aktiveVeileder.isEmpty()) {
                 log.warn("Removed veiledere: $removedVeileder")
                 slettFilter(filterId = it.filterId, enhetId = enhetId)
                 log.warn("Removed veiledergruppe: ${it.filterNavn} from enhet: ${enhetId}")
@@ -129,7 +129,7 @@ class VeilederGrupperServiceImpl(veilarbveilederClient: VeilarbveilederClient) :
         }
     }
 
-    private suspend fun getRemovedVeiledere(alleVeiledere: List<String>, aktiveVeileder: List<String>): List<String> {
+    private fun getRemovedVeiledere(alleVeiledere: List<String>, aktiveVeileder: List<String>): List<String> {
         return alleVeiledere.filter { veilederIdent -> !aktiveVeileder.contains(veilederIdent) }
     }
 
