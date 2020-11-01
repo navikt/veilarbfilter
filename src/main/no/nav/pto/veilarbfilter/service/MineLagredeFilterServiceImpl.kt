@@ -320,7 +320,7 @@ class MineLagredeFilterServiceImpl() : FilterService {
                     }
                 log.info("Updated veiledereGruppeId for filter: " + mineFilterId)
             } catch (e: Exception) {
-                log.warn("Can't update veiledereGruppeId for filter: " + mineFilterId)
+                log.warn("Can't update veiledereGruppeId for filter: ${mineFilterId}" + e, e)
             }
 
         }
