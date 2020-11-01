@@ -266,7 +266,11 @@ class MineLagredeFilterServiceImpl() : FilterService {
                 } else if (matchingVeilederGrupper.size > 1) {
                     log.warn("More then one matching veiledergruppe for mine filter: " + mineFilter.filterId)
                 } else {
-                    log.warn("Matching veiledergruppe for mine filter: " + mineFilter.filterId)
+                    updateVeiledereGruppeIdForMineFilter(
+                        mineFilter.filterId,
+                        mineFilter.filterValg,
+                        matchingVeilederGrupper.get(0).filterId
+                    )
                 }
             }
         }
@@ -300,5 +304,25 @@ class MineLagredeFilterServiceImpl() : FilterService {
         Collections.sort(veiledereList1)
         Collections.sort(veiledereList2)
         return veiledereList1.equals(veiledereList2)
+    }
+
+    suspend fun updateVeiledereGruppeIdForMineFilter(
+        mineFilterId: Int,
+        filterValg: PortefoljeFilter,
+        veilederGruppeId: Int
+    ) {
+        dbQuery {
+            try {
+                MineLagredeFilter
+                    .update({ (MineLagredeFilter.filterId eq mineFilterId) }) {
+                        filterValg.veiledereGruppeId = veilederGruppeId
+                        it[Filter.valgteFilter] = filterValg
+                    }
+                log.info("Updated veiledereGruppeId for filter: " + mineFilterId)
+            } catch (e: Exception) {
+                log.warn("Can't update veiledereGruppeId for filter: " + mineFilterId)
+            }
+
+        }
     }
 }

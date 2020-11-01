@@ -21,6 +21,7 @@ data class PortefoljeFilter(
     val tiltakstyper: List<String> = emptyList(),
     val veilederNavnQuery: String = "",
     val veiledere: List<String> = emptyList(),
+    var veiledereGruppeId: Int? = -1,
     val ytelse: String? = "",
     val registreringstype: List<String>? = emptyList(),
     val cvJobbprofil: String? = "",
