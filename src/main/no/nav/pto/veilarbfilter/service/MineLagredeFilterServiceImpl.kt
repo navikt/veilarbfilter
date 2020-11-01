@@ -3,7 +3,6 @@ package no.nav.pto.veilarbfilter.service
 import no.nav.pto.veilarbfilter.config.dbQuery
 import no.nav.pto.veilarbfilter.db.Filter
 import no.nav.pto.veilarbfilter.db.MineLagredeFilter
-import no.nav.pto.veilarbfilter.db.VeilederGrupperFilter
 import no.nav.pto.veilarbfilter.model.*
 import no.nav.pto.veilarbfilter.model.SortOrder
 import org.jetbrains.exposed.sql.*
@@ -26,7 +25,9 @@ class MineLagredeFilterServiceImpl() : FilterService {
                     Filter.opprettetDato,
                     MineLagredeFilter.veilederId,
                     MineLagredeFilter.sortOrder,
-                    Filter.filterCleanup
+                    Filter.filterCleanup,
+                    MineLagredeFilter.aktiv,
+                    MineLagredeFilter.note
                 ).select { (Filter.filterId.eq(filterId)) }
                     .mapNotNull { tilFilterModel(it) }
                     .singleOrNull()
@@ -185,7 +186,9 @@ class MineLagredeFilterServiceImpl() : FilterService {
             Filter.opprettetDato,
             MineLagredeFilter.veilederId,
             MineLagredeFilter.sortOrder,
-            Filter.filterCleanup
+            Filter.filterCleanup,
+            MineLagredeFilter.aktiv,
+            MineLagredeFilter.note
         ).selectAll()
             .mapNotNull { tilMineLagredeFilterModel(it) }
     }
@@ -198,7 +201,9 @@ class MineLagredeFilterServiceImpl() : FilterService {
             veilederId = row[MineLagredeFilter.veilederId],
             opprettetDato = row[Filter.opprettetDato],
             sortOrder = row[MineLagredeFilter.sortOrder],
-            filterCleanup = row[Filter.filterCleanup]
+            filterCleanup = row[Filter.filterCleanup],
+            aktiv = row[MineLagredeFilter.aktiv] === 1,
+            note = row[MineLagredeFilter.note]
         )
 
     private fun tilMineLagredeFilterModel(row: ResultRow): MineLagredeFilterModel =
@@ -209,7 +214,9 @@ class MineLagredeFilterServiceImpl() : FilterService {
             veilederId = row[MineLagredeFilter.veilederId],
             opprettetDato = row[Filter.opprettetDato],
             sortOrder = row[MineLagredeFilter.sortOrder],
-            filterCleanup = row[Filter.filterCleanup]
+            filterCleanup = row[Filter.filterCleanup],
+            aktiv = row[MineLagredeFilter.aktiv] === 1,
+            note = row[MineLagredeFilter.note]
         )
 
     private fun validerNavn(navn: String) {
@@ -236,7 +243,9 @@ class MineLagredeFilterServiceImpl() : FilterService {
                     Filter.opprettetDato,
                     MineLagredeFilter.veilederId,
                     MineLagredeFilter.sortOrder,
-                    Filter.filterCleanup
+                    Filter.filterCleanup,
+                    MineLagredeFilter.aktiv,
+                    MineLagredeFilter.note
                 ).select { (MineLagredeFilter.veilederId.eq(veilederId)) }
                     .mapNotNull { tilFilterModel(it) }
             }
@@ -247,56 +256,40 @@ class MineLagredeFilterServiceImpl() : FilterService {
     }
 
 
-    suspend fun findVeilederGruppeIdForMineFilter() {
-        val alleVeiledereGruppe = fetchAllVeiledereGruppe()
+    suspend fun deactivateMineFilterWithDeletedVeilederGroup(
+        veilederGroupName: String,
+        veiledereInDeletedGroup: List<String>
+    ) {
         val alleMineFilter = hentAllLagredeFilter();
-        log.info("Total " + alleVeiledereGruppe.size + " veiledergrupper")
-        log.info("Total " + alleMineFilter.size + " mine filter")
-        if (alleVeiledereGruppe.isEmpty()) {
-            return;
-        }
 
         alleMineFilter.forEach { mineFilter ->
-            if (!mineFilter.filterValg.veiledere.isEmpty()) {
-                log.info("Checking mine filter " + mineFilter.filterId)
-                val matchingVeilederGrupper =
-                    findMatchingVeilederGrupper(mineFilter.filterValg.veiledere, alleVeiledereGruppe)
-                if (matchingVeilederGrupper.isEmpty()) {
-                    log.warn("No matching veiledergruppe for mine filter: " + mineFilter.filterId)
-                } else if (matchingVeilederGrupper.size > 1) {
-                    log.warn("More then one matching veiledergruppe for mine filter: " + mineFilter.filterId)
-                } else {
-                    updateVeiledereGruppeIdForMineFilter(
-                        mineFilter.filterId,
-                        mineFilter.filterValg,
-                        matchingVeilederGrupper.get(0).filterId
-                    )
-                }
+            if (!mineFilter.filterValg.veiledere.isEmpty() && erVeiledereListeErLik(
+                    mineFilter.filterValg.veiledere,
+                    veiledereInDeletedGroup
+                )
+            ) {
+                deactiveMineFilter(
+                    mineFilter.filterId,
+                    "'${mineFilter.filterNavn}' er slettet fordi filteret '${veilederGroupName}' er fjernet."
+                )
             }
+
         }
     }
 
-    suspend fun fetchAllVeiledereGruppe(): List<VeilederGrupper> {
-        return dbQuery {
-            (Filter innerJoin VeilederGrupperFilter).slice(
-                Filter.filterId,
-                Filter.valgteFilter
-            ).selectAll()
-                .mapNotNull { tilVeilederGrupper(it) }
+    suspend fun deactiveMineFilter(filterId: Int, note: String) {
+        dbQuery {
+            try {
+                MineLagredeFilter
+                    .update({ (MineLagredeFilter.filterId eq filterId) }) {
+                        it[aktiv] = 0
+                        it[MineLagredeFilter.note] = note
+                    }
+            } catch (e: Exception) {
+                log.error("Error while deactivating mine filter", e)
+            }
+
         }
-    }
-
-    fun tilVeilederGrupper(row: ResultRow): VeilederGrupper {
-        return VeilederGrupper(row[Filter.filterId], row[Filter.valgteFilter].veiledere)
-    }
-
-    fun findMatchingVeilederGrupper(
-        mineFilterVeiledere: List<String>,
-        veilederGrupper: List<VeilederGrupper>
-    ): List<VeilederGrupper> {
-        return veilederGrupper.stream()
-            .filter { veilederGrupper -> erVeiledereListeErLik(veilederGrupper.veilederListe, mineFilterVeiledere) }
-            .toList()
     }
 
     fun erVeiledereListeErLik(veiledereList1: List<String>, veiledereList2: List<String>): Boolean {
@@ -306,23 +299,17 @@ class MineLagredeFilterServiceImpl() : FilterService {
         return veiledereList1.equals(veiledereList2)
     }
 
-    suspend fun updateVeiledereGruppeIdForMineFilter(
-        mineFilterId: Int,
-        filterValg: PortefoljeFilter,
-        veilederGruppeId: Int
-    ) {
-        dbQuery {
-            try {
-                Filter
-                    .update({ (Filter.filterId eq mineFilterId) }) {
-                        filterValg.veiledereGruppeId = veilederGruppeId
-                        it[Filter.valgteFilter] = filterValg
-                    }
-                log.info("Updated veiledereGruppeId for filter: " + mineFilterId)
-            } catch (e: Exception) {
-                log.warn("Can't update veiledereGruppeId for filter: ${mineFilterId}" + e, e)
+    suspend fun fjernMineFilterMedInaktiveFilter() {
+        val alleMineFilter = hentAllLagredeFilter();
+        val permitterteFilter = listOf<String>("PERMITTERTE_ETTER_NIENDE_MARS", "IKKE_PERMITTERTE_ETTER_NIENDE_MARS")
+        alleMineFilter.forEach { mineFilter ->
+            if (mineFilter.filterValg.ferdigfilterListe.stream().anyMatch { permitterteFilter.contains(it) }) {
+                deactiveMineFilter(
+                    mineFilter.filterId,
+                    "'${mineFilter.filterNavn}' er slettet fordi filteret 'Permitterte etter 09.03.2020' er fjernet."
+                )
             }
-
         }
+
     }
 }

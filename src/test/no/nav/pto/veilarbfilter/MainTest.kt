@@ -29,9 +29,13 @@ fun mainTest(jdbcUrl: String, dbUsername: String, dbPass: String): ApplicationEn
     Database(configuration)
     val applicationState = ApplicationState()
 
+    val mineLagredeFilterService = MineLagredeFilterServiceImpl()
     val veilederGrupperService =
-        VeilederGrupperServiceImpl(VeilarbveilederClient(config = configuration, systemUserTokenProvider = null));
-    val mineLagredeFilterService: MineLagredeFilterServiceImpl = MineLagredeFilterServiceImpl()
+        VeilederGrupperServiceImpl(
+            VeilarbveilederClient(config = configuration, systemUserTokenProvider = null),
+            mineLagredeFilterService
+        );
+
     val cleanupVeilederGrupper =
         CleanupVeilederGrupper(
             veilederGrupperService = veilederGrupperService,

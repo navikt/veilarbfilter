@@ -22,7 +22,11 @@ class VeilederGrupperServiceImplTest {
 
     @Mock
     val veilarbveilederClient: VeilarbveilederClient = Mockito.mock(VeilarbveilederClient::class.java)
-    var veilederGrupperServiceImpl: VeilederGrupperServiceImpl = VeilederGrupperServiceImpl(veilarbveilederClient)
+
+    @Mock
+    val mineLagredeFilterService: MineLagredeFilterServiceImpl = Mockito.mock(MineLagredeFilterServiceImpl::class.java)
+    var veilederGrupperServiceImpl: VeilederGrupperServiceImpl =
+        VeilederGrupperServiceImpl(veilarbveilederClient, mineLagredeFilterService)
 
     @BeforeAll
     internal fun setUp() {
@@ -45,16 +49,20 @@ class VeilederGrupperServiceImplTest {
     }
 
     @BeforeEach
-    fun wipeAllGroups () = runBlocking<Unit> {
-        veilederGrupperServiceImpl.finnFilterForFilterBruker("1").forEach{ veilederGrupperServiceImpl.slettFilter(it.filterId,"1")}
+    fun wipeAllGroups() = runBlocking<Unit> {
+        veilederGrupperServiceImpl.finnFilterForFilterBruker("1")
+            .forEach { veilederGrupperServiceImpl.slettFilter(it.filterId, "1") }
     }
 
 
     @Test
     fun testSlettInaktiveVeiledere() = runBlocking<Unit> {
-        val veildederGruppeId1 = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1", "2", "3")))?.filterId ?: -1
-        val veildederGruppeId2 = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1", "2", "6")))?.filterId ?: -1
-        val veildederGruppeId3 = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("10", "12", "13")))?.filterId ?: -1
+        val veildederGruppeId1 =
+            veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1", "2", "3")))?.filterId ?: -1
+        val veildederGruppeId2 =
+            veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1", "2", "6")))?.filterId ?: -1
+        val veildederGruppeId3 =
+            veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("10", "12", "13")))?.filterId ?: -1
 
         veilederGrupperServiceImpl.slettVeiledereSomIkkeErAktivePaEnheten("1")
 
@@ -62,20 +70,36 @@ class VeilederGrupperServiceImplTest {
         val filterList = veilederGrupperServiceImpl.finnFilterForFilterBruker("1")
 
         assertEquals(filterListSize, 2)
-        assertTrue(finnVeilederDB(veildederGruppeId1,filterList) {it.filterValg.veiledere.containsAll(listOf("1", "2","3"))})
-        assertTrue(finnVeilederDB(veildederGruppeId2,filterList) {it.filterValg.veiledere.containsAll(listOf("1", "2"))})
+        assertTrue(finnVeilederDB(veildederGruppeId1, filterList) {
+            it.filterValg.veiledere.containsAll(
+                listOf(
+                    "1",
+                    "2",
+                    "3"
+                )
+            )
+        })
+        assertTrue(finnVeilederDB(veildederGruppeId2, filterList) {
+            it.filterValg.veiledere.containsAll(
+                listOf(
+                    "1",
+                    "2"
+                )
+            )
+        })
         assertNull(filterList.find { gruppe -> gruppe.filterId == veildederGruppeId3 })
 
-        assertTrue(finnVeilederDB(veildederGruppeId1,filterList) {it.filterCleanup == 0})
-        assertTrue(finnVeilederDB(veildederGruppeId2,filterList) {it.filterCleanup == 1})
+        assertTrue(finnVeilederDB(veildederGruppeId1, filterList) { it.filterCleanup == 0 })
+        assertTrue(finnVeilederDB(veildederGruppeId2, filterList) { it.filterCleanup == 1 })
     }
 
     @Test
     fun `Single veileder in a group`() = runBlocking<Unit> {
-        val veildederGruppeId = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1")))?.filterId ?: -1
+        val veildederGruppeId =
+            veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1")))?.filterId ?: -1
         val filterList = veilederGrupperServiceImpl.finnFilterForFilterBruker("1")
 
-        assertTrue(finnVeilederDB(veildederGruppeId, filterList) {it.filterValg.veiledere.containsAll(listOf("1"))})
+        assertTrue(finnVeilederDB(veildederGruppeId, filterList) { it.filterValg.veiledere.containsAll(listOf("1")) })
     }
 
     @Test
@@ -83,13 +107,13 @@ class VeilederGrupperServiceImplTest {
         val veildederGruppe = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1")))
 
         assertNotNull(veildederGruppe)
-        if(veildederGruppe != null) {
+        if (veildederGruppe != null) {
             val filterFromService = veilederGrupperServiceImpl.hentFilter(veildederGruppe.filterId)
-            if(filterFromService != null){
+            if (filterFromService != null) {
                 assertEquals(filterFromService.filterId, veildederGruppe.filterId)
                 assertEquals(filterFromService.filterNavn, veildederGruppe.filterNavn)
                 assertEquals(filterFromService.filterValg, veildederGruppe.filterValg)
-            }else{
+            } else {
                 fail("Filter was not in DB")
             }
         }
@@ -97,9 +121,9 @@ class VeilederGrupperServiceImplTest {
 
     @Test
     fun `Slett veiledergruppe`() = runBlocking<Unit> {
-        val veildederGruppe = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1","2")))
+        val veildederGruppe = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1", "2")))
         assertNotNull(veildederGruppe)
-        if(veildederGruppe != null) {
+        if (veildederGruppe != null) {
             veilederGrupperServiceImpl.slettFilter(veildederGruppe.filterId, "1");
             val filterFromService = veilederGrupperServiceImpl.hentFilter(veildederGruppe.filterId)
             assertNull(filterFromService)
@@ -108,33 +132,42 @@ class VeilederGrupperServiceImplTest {
 
     @Test
     fun `Inactive veileder removed from active group`() = runBlocking<Unit> {
-        val veildederGruppeId = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1","5")))?.filterId ?: -1
+        val veildederGruppeId =
+            veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1", "5")))?.filterId ?: -1
         val filterList = veilederGrupperServiceImpl.finnFilterForFilterBruker("1")
 
-        assertTrue(finnVeilederDB(veildederGruppeId, filterList) {it.filterValg.veiledere.containsAll(listOf("1"))})
+        assertTrue(finnVeilederDB(veildederGruppeId, filterList) { it.filterValg.veiledere.containsAll(listOf("1")) })
     }
 
     @Test
     fun `Update filter`() = runBlocking<Unit> {
         val veildederGruppe1 = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1")))
-        val veildederGruppe2 = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1","2","3")))
+        val veildederGruppe2 = veilederGrupperServiceImpl.lagreFilter("1", getRandomFilter(listOf("1", "2", "3")))
 
         assertNotNull(veildederGruppe1)
-        if(veildederGruppe1 != null) {
-            veildederGruppe1.filterValg =  PortefoljeFilter(veiledere = listOf("1","2"))
+        if (veildederGruppe1 != null) {
+            veildederGruppe1.filterValg = PortefoljeFilter(veiledere = listOf("1", "2"))
             veilederGrupperServiceImpl.oppdaterFilter("1", veildederGruppe1)
             val filterList = veilederGrupperServiceImpl.finnFilterForFilterBruker("1")
 
-            assertTrue(finnVeilederDB(veildederGruppe1.filterId, filterList) {it.filterValg.veiledere.containsAll(listOf("1","2"))})
+            assertTrue(finnVeilederDB(veildederGruppe1.filterId, filterList) {
+                it.filterValg.veiledere.containsAll(
+                    listOf("1", "2")
+                )
+            })
         }
 
         assertNotNull(veildederGruppe2)
-        if(veildederGruppe2 != null) {
-            veildederGruppe2.filterValg =  PortefoljeFilter(veiledere = listOf("1"))
+        if (veildederGruppe2 != null) {
+            veildederGruppe2.filterValg = PortefoljeFilter(veiledere = listOf("1"))
             veilederGrupperServiceImpl.oppdaterFilter("1", veildederGruppe2)
             val filterList = veilederGrupperServiceImpl.finnFilterForFilterBruker("1")
 
-            assertTrue(finnVeilederDB(veildederGruppe2.filterId, filterList) {it.filterValg.veiledere.containsAll(listOf("1"))})
+            assertTrue(finnVeilederDB(veildederGruppe2.filterId, filterList) {
+                it.filterValg.veiledere.containsAll(
+                    listOf("1")
+                )
+            })
         }
     }
 
@@ -150,7 +183,7 @@ class VeilederGrupperServiceImplTest {
     }
 
     private fun finnVeilederDB(gruppeID: Int, filterList: List<FilterModel>, func: (FilterModel) -> Boolean): Boolean {
-        return filterList.find { gruppe -> gruppe.filterId == gruppeID }?.let{func(it)} ?: false
+        return filterList.find { gruppe -> gruppe.filterId == gruppeID }?.let { func(it) } ?: false
     }
 
     private fun getRandomFilter(veiledereList: List<String>): NyttFilterModel {

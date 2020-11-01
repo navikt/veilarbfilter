@@ -38,8 +38,10 @@ fun main(configuration: Configuration) {
         systemUserTokenProvider = systemUserTokenProvider
     )
 
-    val veilederGrupperService = VeilederGrupperServiceImpl(veilarbveilederClient);
     val mineLagredeFilterService = MineLagredeFilterServiceImpl();
+    val veilederGrupperService =
+        VeilederGrupperServiceImpl(veilarbveilederClient, mineLagredeFilterService);
+
 
     val cleanUpVeilederGrupper = CleanupVeilederGrupper(
         veilederGrupperService = veilederGrupperService,
