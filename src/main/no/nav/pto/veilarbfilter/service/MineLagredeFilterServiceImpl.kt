@@ -301,14 +301,19 @@ class MineLagredeFilterServiceImpl() : FilterService {
 
     suspend fun fjernMineFilterMedInaktiveFilter() {
         val alleMineFilter = hentAllLagredeFilter();
-        val permitterteFilter = listOf<String>("PERMITTERTE_ETTER_NIENDE_MARS", "IKKE_PERMITTERTE_ETTER_NIENDE_MARS")
         alleMineFilter.forEach { mineFilter ->
-            if (mineFilter.filterValg.ferdigfilterListe.stream().anyMatch { permitterteFilter.contains(it) }) {
+            if (mineFilter.filterValg.ferdigfilterListe.contains("PERMITTERTE_ETTER_NIENDE_MARS")) {
                 deactiveMineFilter(
                     mineFilter.filterId,
                     "'${mineFilter.filterNavn}' er slettet fordi filteret 'Permitterte etter 09.03.2020' er fjernet."
                 )
+            } else if (mineFilter.filterValg.ferdigfilterListe.contains("IKKE_PERMITTERTE_ETTER_NIENDE_MARS")) {
+                deactiveMineFilter(
+                    mineFilter.filterId,
+                    "'${mineFilter.filterNavn}' er slettet fordi filteret 'Alle utenom permitterte etter 09.03.2020' er fjernet."
+                )
             }
+
         }
 
     }
