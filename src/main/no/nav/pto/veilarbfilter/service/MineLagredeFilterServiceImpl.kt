@@ -270,7 +270,7 @@ class MineLagredeFilterServiceImpl() : FilterService {
             ) {
                 deactiveMineFilter(
                     mineFilter.filterId,
-                    "'${mineFilter.filterNavn}' er slettet fordi filteret '${veilederGroupName}' er fjernet."
+                    veilederGroupName
                 )
             }
 
