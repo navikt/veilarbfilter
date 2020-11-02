@@ -91,7 +91,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
                 MineLagredeFilter.veilederId
             ).select {
                 (Filter.filterNavn eq nyttFilter.filterNavn) and
-                        (MineLagredeFilter.veilederId eq veilederId)
+                        (MineLagredeFilter.veilederId eq veilederId) and
+                        (MineLagredeFilter.aktiv eq 1)
             }.count() > 0
         }
 
@@ -102,7 +103,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
                 MineLagredeFilter.veilederId
             ).select {
                 (Filter.valgteFilter eq nyttFilter.filterValg) and
-                        (MineLagredeFilter.veilederId eq veilederId)
+                        (MineLagredeFilter.veilederId eq veilederId) and
+                        (MineLagredeFilter.aktiv eq 1)
             }.count() > 0
         }
 
@@ -142,7 +144,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
             ).select {
                 (Filter.filterNavn eq filter.filterNavn) and
                         (MineLagredeFilter.veilederId eq veilederId) and
-                        (Filter.filterId neq filter.filterId)
+                        (Filter.filterId neq filter.filterId) and
+                        (MineLagredeFilter.aktiv eq 1)
             }.count() > 0
         }
 
@@ -154,7 +157,8 @@ class MineLagredeFilterServiceImpl() : FilterService {
             ).select {
                 (Filter.valgteFilter eq filter.filterValg) and
                         (MineLagredeFilter.veilederId eq veilederId) and
-                        (Filter.filterId neq filter.filterId)
+                        (Filter.filterId neq filter.filterId) and
+                        (MineLagredeFilter.aktiv eq 1)
             }.count() > 0
         }
 
