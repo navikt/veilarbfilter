@@ -270,7 +270,7 @@ class MineLagredeFilterServiceImpl() : FilterService {
             ) {
                 deactiveMineFilter(
                     mineFilter.filterId,
-                    "'${mineFilter.filterNavn}' er slettet fordi filteret '${veilederGroupName}' er fjernet."
+                    veilederGroupName
                 )
             }
 
@@ -305,12 +305,12 @@ class MineLagredeFilterServiceImpl() : FilterService {
             if (mineFilter.filterValg.ferdigfilterListe.contains("PERMITTERTE_ETTER_NIENDE_MARS")) {
                 deactiveMineFilter(
                     mineFilter.filterId,
-                    "'${mineFilter.filterNavn}' er slettet fordi filteret 'Permitterte etter 09.03.2020' er fjernet."
+                    "Permitterte etter 09.03.2020"
                 )
             } else if (mineFilter.filterValg.ferdigfilterListe.contains("IKKE_PERMITTERTE_ETTER_NIENDE_MARS")) {
                 deactiveMineFilter(
                     mineFilter.filterId,
-                    "'${mineFilter.filterNavn}' er slettet fordi filteret 'Alle utenom permitterte etter 09.03.2020' er fjernet."
+                    "Alle utenom permitterte etter 09.03.2020"
                 )
             }
 
