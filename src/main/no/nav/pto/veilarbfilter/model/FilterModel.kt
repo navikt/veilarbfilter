@@ -12,16 +12,6 @@ open class FilterModel(
         val filterCleanup: Int = 0
 )
 
-class EnhetensLagredeFilterModel(
-        filterId: Int,
-        filterNavn: String,
-        filterValg: PortefoljeFilter,
-        opprettetDato: LocalDateTime?,
-        filterCleanup: Int,
-        val enhetId: String,
-        val sortOrder: Int
-) : FilterModel(filterId, filterNavn, filterValg, opprettetDato, filterCleanup);
-
 class MineLagredeFilterModel(
         filterId: Int,
         filterNavn: String,
@@ -29,7 +19,9 @@ class MineLagredeFilterModel(
         opprettetDato: LocalDateTime?,
         filterCleanup: Int,
         val veilederId: String,
-        val sortOrder: Int
+        val sortOrder: Int,
+        val aktiv: Boolean,
+        val note: String
 ) : FilterModel(filterId, filterNavn, filterValg, opprettetDato, filterCleanup);
 
 class VeilederGruppeFilterModel(
@@ -44,5 +36,3 @@ class VeilederGruppeFilterModel(
 data class NyttFilterModel(val filterNavn: String, val filterValg: PortefoljeFilter)
 
 data class SortOrder(val filterId: Int, val sortOrder: Int)
-
-data class VeilederGrupper(val filterId: Int, val veilederListe: List<String>)
