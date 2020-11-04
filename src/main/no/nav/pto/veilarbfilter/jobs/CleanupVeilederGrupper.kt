@@ -42,7 +42,7 @@ class CleanupVeilederGrupper(
 
     private suspend fun fjernMineFilterMedInaktiveFilter() {
         try {
-            mineLagredeFilterService.fjernMineFilterMedInaktiveFilter()
+            //mineLagredeFilterService.fjernMineFilterMedInaktiveFilter()
         } catch (e: Exception) {
             log.warn("Exception during cleaning up mine filter $e", e)
         }
