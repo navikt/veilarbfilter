@@ -58,3 +58,5 @@ spec:
       value: https://wasapp-{{namespace}}.adeo.no/asm-pdp/authorize
     - name: SECURITY_TOKEN_SERVICE_DISCOVERY_URL
       value: https://security-token-service.nais.preprod.local/rest/v1/sts/.well-known/openid-configuration
+    - name: AZUREAD_JWKS_URL
+      value: https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/discovery/v2.0/keys

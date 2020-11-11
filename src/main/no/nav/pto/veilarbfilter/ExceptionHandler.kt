@@ -5,6 +5,7 @@ import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
+import org.apache.http.auth.AuthenticationException
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("Exceptionhandler")
@@ -15,6 +16,13 @@ fun StatusPages.Configuration.exceptionHandler() {
     exception<Throwable> { cause ->
         call.logErrorAndRespond(cause) { "An internal error occurred during routing" }
     }
+
+    exception<AuthenticationException> { cause ->
+        call.logErrorAndRespond(cause, HttpStatusCode.Unauthorized) {
+            cause.message ?: "Unauthorized."
+        }
+    }
+
 
     exception<IllegalArgumentException> { cause ->
         call.logErrorAndRespond(cause, HttpStatusCode.BadRequest) {
@@ -53,7 +61,7 @@ private suspend inline fun ApplicationCall.logErrorAndRespond(
     lazyMessage: () -> String
 ) {
     val message = lazyMessage()
-    log.error(message)
+    log.error(message, cause)
 
     val response = HttpErrorResponse(
         url = this.request.url(),

@@ -19,7 +19,8 @@ private val defaultProperties = ConfigurationMap(
         "veilarbfilter_DB_USERNAME" to "user",
         "veilarbfilter_DB_PASSWORD" to "password",
         "VAULT_MOUNT_PATH" to notUsedLocally,
-        "SECURITY_TOKEN_SERVICE_DISCOVERY_URL" to notUsedLocally
+        "SECURITY_TOKEN_SERVICE_DISCOVERY_URL" to notUsedLocally,
+        "AZUREAD_JWKS_URL" to notUsedLocally
     )
 )
 
@@ -37,8 +38,10 @@ data class Configuration(
 ) {
 
     data class Jwt(
-        val jwksUrl: JwkProvider = JwtUtil.makeJwkProvider(config()[Key("ISSO_JWKS_URL", stringType)]),
-        val jwtIssuer: String = config()[Key("ISSO_ISSUER", stringType)]
+        val issoJwksUrl: JwkProvider = JwtUtil.makeJwkProvider(config()[Key("ISSO_JWKS_URL", stringType)]),
+        val issoJwtIssuer: String = config()[Key("ISSO_ISSUER", stringType)],
+        val azureAdJwksUrl: JwkProvider = JwtUtil.makeJwkProvider(config()[Key("AZUREAD_JWKS_URL", stringType)]),
+        val azureAdClientId: String = config()[Key("VEILARBLOGIN_AAD_CLIENT_ID", stringType)]
     )
 
     data class DB(

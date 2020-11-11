@@ -11,7 +11,9 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import no.nav.common.log.LogFilter
 import no.nav.common.utils.EnvironmentUtils
+import no.nav.pto.veilarbfilter.JwtUtil.Companion.useJwtFromCookie
 import no.nav.pto.veilarbfilter.abac.PepClient
+import no.nav.pto.veilarbfilter.config.AuthCookies
 import no.nav.pto.veilarbfilter.config.Configuration
 import no.nav.pto.veilarbfilter.routes.internalRoutes
 import no.nav.pto.veilarbfilter.routes.mineLagredeFilterRoutes
@@ -33,13 +35,32 @@ fun createHttpServer(
 
 
     install(Authentication) {
-        jwt {
-            authHeader(JwtUtil.Companion::useJwtFromCookie)
+        jwt("AzureAD") {
+            skipWhen { applicationCall -> applicationCall.request.cookies[AuthCookies.AZURE_AD.cookieName] == null }
             realm = "veilarbfilter"
-            verifier(configuration.jwt.jwksUrl, configuration.jwt.jwtIssuer)
-            validate { JwtUtil.validateJWT(it) }
+            authHeader { applicationCall ->
+                useJwtFromCookie(
+                    applicationCall,
+                    AuthCookies.AZURE_AD.cookieName
+                )
+            }
+            verifier(configuration.jwt.azureAdJwksUrl)
+            validate { JwtUtil.validateJWT(it, configuration.jwt.azureAdClientId) }
+        }
+        jwt("OpenAM") {
+            skipWhen { applicationCall -> applicationCall.request.cookies[AuthCookies.OPEN_AM.cookieName] == null }
+            realm = "veilarbfilter"
+            authHeader { applicationCall ->
+                useJwtFromCookie(
+                    applicationCall,
+                    AuthCookies.OPEN_AM.cookieName
+                )
+            }
+            verifier(configuration.jwt.issoJwksUrl, configuration.jwt.issoJwtIssuer)
+            validate { JwtUtil.validateJWT(it, null) }
         }
     }
+
 
 
     install(CORS) {
