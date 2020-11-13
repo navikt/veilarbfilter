@@ -24,7 +24,10 @@ data class PortefoljeFilter(
     val ytelse: String? = "",
     val registreringstype: List<String>? = emptyList(),
     val cvJobbprofil: String? = "",
-    val arbeidslisteKategori: List<KategoriModell>? = emptyList()
+    val arbeidslisteKategori: List<KategoriModell>? = emptyList(),
+    val utdanning: List<String>? = emptyList(),
+    val utdanningGodkjent: List<String>? = emptyList(),
+    val utdanningBestatt:  List<String>? = emptyList()
 ) {
 
     @JsonIgnore
@@ -48,7 +51,10 @@ data class PortefoljeFilter(
             servicegruppe,
             tiltakstyper,
             veiledere,
-            registreringstype
+            registreringstype,
+            utdanning,
+            utdanningGodkjent,
+            utdanningBestatt
         ).any { it != null && it.isNotEmpty() }
                 || aktiviteter != null
     }
