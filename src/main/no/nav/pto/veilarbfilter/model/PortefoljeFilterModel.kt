@@ -25,9 +25,9 @@ data class PortefoljeFilter(
     val registreringstype: List<String>? = emptyList(),
     val cvJobbprofil: String? = "",
     val arbeidslisteKategori: List<KategoriModell>? = emptyList(),
-    val utdanning: List<String>? = emptyList(),
-    val utdanningGodkjent: List<String>? = emptyList(),
-    val utdanningBestatt:  List<String>? = emptyList()
+    val utdanning: List<String> = emptyList(),
+    val utdanningGodkjent: List<String> = emptyList(),
+    val utdanningBestatt:  List<String> = emptyList()
 ) {
 
     @JsonIgnore
