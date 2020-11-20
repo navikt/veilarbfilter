@@ -56,7 +56,7 @@ data class Configuration(
     data class VeilarbveilederConfig(
         val url: String =
             if (isProduction().orElseThrow()) "https://veilarbveileder.nais.adeo.no/veilarbveileder"
-            else String.format("https://veilarbveileder-%s.nais.preprod.local/veilarbveileder", requireNamespace())
+            else "https://veilarbveileder-${requireNamespace()}.nais.preprod.local/veilarbveileder"
     )
 }
 
