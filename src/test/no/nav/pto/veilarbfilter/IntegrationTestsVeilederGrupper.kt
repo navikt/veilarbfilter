@@ -17,9 +17,12 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
 import org.junit.Assert.fail
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -39,7 +42,7 @@ class IntegrationTestsVeilederGrupper {
         }
         postgresqlContainer.start()
         applicationEngine =
-                mainTestWithMock(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
+            mainTestWithMock(postgresqlContainer.jdbcUrl, postgresqlContainer.username, postgresqlContainer.password)
     }
 
     @AfterAll
@@ -49,12 +52,12 @@ class IntegrationTestsVeilederGrupper {
     }
 
     @Test
-    fun `Lagring av ny veileder filter`() = runBlocking<Unit> {
+    fun `Lagring av ny veileder filter`() {
         val mineLagredeFilterResponse = getFilterGrupper("1")
 
         if (mineLagredeFilterResponse.responseValue == null) {
             fail()
-        }else {
+        } else {
             lagreNyttFilterRespons("1", getRandomFilter(listOf("1")))
             val mineLagredeFilterNyResponsEtterLagring = getFilterGrupper("1")
 
@@ -72,25 +75,27 @@ class IntegrationTestsVeilederGrupper {
 
         if (mineLagredeFilterResponse.responseValue == null) {
             fail()
-        }else {
-            val responsLagring = lagreNyttFilterRespons("1", getRandomFilter(listOf("1", "2", "23546576"))).responseValue
+        } else {
+            val responsLagring =
+                lagreNyttFilterRespons("1", getRandomFilter(listOf("1", "2", "23546576"))).responseValue
             if (responsLagring == null) {
                 fail()
-            }else{
-                delay(  1000)   // Wait for clean up
+            } else {
+                delay(1000)   // Wait for clean up
                 val filterePaEnhet = getFilterGrupper("1").responseValue
 
                 if (filterePaEnhet == null || filterePaEnhet.isEmpty()) {
                     fail()
                 } else {
-                    assertTrue(filterePaEnhet.find { it.filterId == responsLagring.filterId }?.let{it.filterValg.veiledere == listOf("1", "2")} ?: false)
+                    assertTrue(filterePaEnhet.find { it.filterId == responsLagring.filterId }
+                        ?.let { it.filterValg.veiledere == listOf("1", "2") } ?: false)
                 }
             }
         }
     }
 
     @Test
-    fun `Oppdater filter fra 3 til 2 veiledere`() = runBlocking<Unit> {
+    fun `Oppdater filter fra 3 til 2 veiledere`() {
         val veildederGruppeFor = listOf("1", "2", "3")
         val veildederGruppeEtter = listOf("1", "2")
         val responsLagring = lagreNyttFilterRespons("1", getRandomFilter(veildederGruppeFor)).responseValue
@@ -99,7 +104,7 @@ class IntegrationTestsVeilederGrupper {
             fail()
         } else {
             responsLagring.filterValg = PortefoljeFilter(veiledere = veildederGruppeEtter);
-            val responsOppdater = oppdaterFilterRespons("1",  responsLagring).responseValue
+            val responsOppdater = oppdaterFilterRespons("1", responsLagring).responseValue
 
             val alleFilterePaEnhet = getFilterGrupper("1")
 
@@ -107,7 +112,8 @@ class IntegrationTestsVeilederGrupper {
                 fail()
             } else {
                 val filterePaEnhet = alleFilterePaEnhet.responseValue;
-                assertTrue(filterePaEnhet.find { it.filterId == responsLagring.filterId }?.let{it.filterValg.veiledere == veildederGruppeEtter} ?: false)
+                assertTrue(filterePaEnhet.find { it.filterId == responsLagring.filterId }
+                    ?.let { it.filterValg.veiledere == veildederGruppeEtter } ?: false)
                 assertTrue(responsOppdater.filterValg.veiledere == veildederGruppeEtter)
             }
         }
@@ -115,7 +121,7 @@ class IntegrationTestsVeilederGrupper {
 
 
     @Test
-    fun `Slette veiledergruppe`() = runBlocking<Unit> {
+    fun `Slette veiledergruppe`() {
         val veildederGruppe = listOf("1", "2", "3")
         val responsLagring = lagreNyttFilterRespons("1", getRandomFilter(veildederGruppe)).responseValue
 
@@ -123,16 +129,17 @@ class IntegrationTestsVeilederGrupper {
             fail()
         } else {
             val allefilterePaEnhetForSlett = getFilterGrupper("1").responseValue
-            if(allefilterePaEnhetForSlett == null){
+            if (allefilterePaEnhetForSlett == null) {
                 fail()
-            }else{
-                assertTrue(allefilterePaEnhetForSlett.find { it.filterId == responsLagring.filterId }?.let{it.filterValg.veiledere == veildederGruppe} ?: false)
+            } else {
+                assertTrue(allefilterePaEnhetForSlett.find { it.filterId == responsLagring.filterId }
+                    ?.let { it.filterValg.veiledere == veildederGruppe } ?: false)
 
-                slettFilter("1",responsLagring.filterId)
+                slettFilter("1", responsLagring.filterId)
                 val allefilterePaEnhetEtterSlett = getFilterGrupper("1").responseValue
-                if(allefilterePaEnhetEtterSlett == null){
+                if (allefilterePaEnhetEtterSlett == null) {
                     fail()
-                }else{
+                } else {
                     assertNull(allefilterePaEnhetEtterSlett.find { it.filterId == responsLagring.filterId })
                 }
             }
@@ -150,19 +157,19 @@ class IntegrationTestsVeilederGrupper {
 
     private fun lagreNyttFilterRespons(enhet: String, valgteFilter: NyttFilterModel): ApiResponse<FilterModel> {
         val response = Request.Post("http://0.0.0.0:8080/veilarbfilter/api/enhet/$enhet")
-                .bodyString(Gson().toJson(valgteFilter), ContentType.APPLICATION_JSON)
-                .connectTimeout(1000)
-                .execute()
-                .returnResponse()
+            .bodyString(Gson().toJson(valgteFilter), ContentType.APPLICATION_JSON)
+            .connectTimeout(1000)
+            .execute()
+            .returnResponse()
 
         val statusCode = response.statusLine.statusCode
         val responseContent = EntityUtils.toString(response.entity)
 
         if (statusCode == 200) return ApiResponse(
-                responseCode = statusCode,
-                responseValue = deserializeLagredeFilterModel(
-                        responseContent
-                )
+            responseCode = statusCode,
+            responseValue = deserializeLagredeFilterModel(
+                responseContent
+            )
         ) else return ApiResponse(responseCode = statusCode, errorMessage = responseContent)
     }
 
@@ -188,7 +195,7 @@ class IntegrationTestsVeilederGrupper {
         ) else return ApiResponse(responseCode = statusCode, errorMessage = responseContent)
     }
 
-    private fun slettFilter(enhet: String,filterId: Int): Int {
+    private fun slettFilter(enhet: String, filterId: Int): Int {
         val httpclient = HttpClients.createDefault()
         val httpDelete =
             HttpDelete("http://0.0.0.0:8080/veilarbfilter/api/enhet/$enhet/filter/$filterId")
@@ -198,14 +205,14 @@ class IntegrationTestsVeilederGrupper {
 
     private fun deserializeLagredeFilterModels(inputJson: String): List<MineLagredeFilterModel> {
         val gson = GsonBuilder()
-                .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
+            .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
             .create()
         return gson.fromJson(inputJson, Array<MineLagredeFilterModel>::class.java).toList()
     }
 
     private fun deserializeLagredeFilterModel(inputJson: String): MineLagredeFilterModel {
         val gson = GsonBuilder()
-                .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
+            .registerTypeAdapter(LocalDateTime::class.java, DateSerializer())
             .create()
         return gson.fromJson(inputJson, MineLagredeFilterModel::class.java)
     }
@@ -220,8 +227,8 @@ class IntegrationTestsVeilederGrupper {
     private fun getRandomFilter(veiledereList: List<String>): NyttFilterModel {
         val filterId = randomGenerator.nextInt(1, 1000)
         return NyttFilterModel(
-                "Filter $filterId",
-                PortefoljeFilter(veiledere = veiledereList)
+            "Filter $filterId",
+            PortefoljeFilter(veiledere = veiledereList)
         )
     }
 }

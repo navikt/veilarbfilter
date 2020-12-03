@@ -1,15 +1,14 @@
 package no.nav.pto.veilarbfilter.abac
 
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.apache.Apache
+import io.ktor.client.*
+import io.ktor.client.engine.apache.*
+import io.ktor.client.features.auth.*
+import io.ktor.client.features.auth.providers.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.http.content.*
 import kotlinx.coroutines.runBlocking
-import io.ktor.client.features.auth.Auth
-import io.ktor.client.features.auth.providers.basic
-import io.ktor.client.request.post
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.readText
-import io.ktor.http.ContentType
-import io.ktor.http.content.TextContent
 import no.nav.abac.xacml.NavAttributter
 import no.nav.abac.xacml.StandardAttributter
 import no.nav.pto.veilarbfilter.ObjectMapperProvider
@@ -18,15 +17,15 @@ import no.nav.pto.veilarbfilter.config.Configuration
 private const val MEDIA_TYPE = "application/xacml+json"
 private val abacCache = AbacCache()
 
-class PepClient (config: Configuration) {
+class PepClient(config: Configuration) {
     private val abacUrl = config.abac.url
     private val username = config.serviceUser.username
     private val password = config.serviceUser.password
 
-    fun harTilgangTilEnhet (ident: String?, enhetId: String): Boolean {
+    fun harTilgangTilEnhet(ident: String?, enhetId: String): Boolean {
         requireNotNull(ident) { "Ident is not set" }
         val finnesICache = abacCache.harTilgangTilEnheten(ident, enhetId)
-        if(finnesICache != null) {
+        if (finnesICache != null) {
             return finnesICache
         }
         val xacmlRequest = createXacmlRequest(ident, enhetId)
@@ -37,7 +36,7 @@ class PepClient (config: Configuration) {
         return harTilgangFraAabac
     }
 
-    private fun harTilgang (decision: Decision?): Boolean {
+    private fun harTilgang(decision: Decision?): Boolean {
         return decision == Decision.Permit
     }
 
@@ -59,12 +58,16 @@ class PepClient (config: Configuration) {
         }
     }
 
-    private fun createXacmlRequest(subject: String, enhetId: String) : XacmlRequest {
+    private fun createXacmlRequest(subject: String, enhetId: String): XacmlRequest {
         return XacmlRequest()
             .addAttribute("Environment", NavAttributter.ENVIRONMENT_FELLES_PEP_ID, "veilarbfilter")
             .addAttribute("Action", StandardAttributter.ACTION_ID, "read")
             .addAttribute("Resource", NavAttributter.RESOURCE_FELLES_DOMENE, "veilarb")
-            .addAttribute("Resource", NavAttributter.RESOURCE_FELLES_RESOURCE_TYPE, NavAttributter.RESOURCE_FELLES_ENHET)
+            .addAttribute(
+                "Resource",
+                NavAttributter.RESOURCE_FELLES_RESOURCE_TYPE,
+                NavAttributter.RESOURCE_FELLES_ENHET
+            )
             .addAttribute("Resource", NavAttributter.RESOURCE_FELLES_ENHET, enhetId)
             .addAttribute("AccessSubject", StandardAttributter.SUBJECT_ID, subject)
             .addAttribute("AccessSubject", NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, "InternBruker")

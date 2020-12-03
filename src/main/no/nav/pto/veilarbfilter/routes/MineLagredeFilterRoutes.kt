@@ -21,7 +21,7 @@ private val log = LoggerFactory.getLogger("MineLagredeFilterRoutes")
 
 fun Route.conditionalAuthenticate(useAuthentication: Boolean, build: Route.() -> Unit): Route {
     if (useAuthentication) {
-        return authenticate(build = build)
+        return authenticate(build = build, configurations = arrayOf("AzureAD", "OpenAM"))
     }
     val route = createChild(AuthenticationRouteSelector(listOf<String?>(null)))
     route.insertPhaseAfter(ApplicationCallPipeline.Features, Authentication.AuthenticatePhase)
@@ -81,8 +81,13 @@ fun Route.mineLagredeFilterRoutes(mineLagredeFilterService: FilterService, useAu
     }
 }
 
-private fun ApplicationCall.getNavident(): String? {
+fun ApplicationCall.getNavident(): String? {
+    val navIdent = this.principal<JWTPrincipal>()?.payload?.getClaim("NAVident")
+
+    if (navIdent != null && !navIdent.isNull) {
+        return navIdent.asString()
+    }
     return this.principal<JWTPrincipal>()
-            ?.payload
-            ?.subject
+        ?.payload
+        ?.subject
 }
