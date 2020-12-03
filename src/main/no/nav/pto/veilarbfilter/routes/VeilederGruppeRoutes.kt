@@ -1,27 +1,28 @@
 package no.nav.pto.veilarbfilter.routes
 
-import io.ktor.application.ApplicationCall
-import no.nav.pto.veilarbfilter.model.NyttFilterModel
-import io.ktor.application.call
-import io.ktor.auth.authenticate
-import io.ktor.http.HttpStatusCode
-import io.ktor.request.receive
-import io.ktor.response.respond
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.request.*
+import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.util.pipeline.PipelineContext
-import no.nav.pto.veilarbfilter.JwtUtil.Companion.getSubject
+import io.ktor.util.pipeline.*
 import no.nav.pto.veilarbfilter.abac.PepClient
 import no.nav.pto.veilarbfilter.model.FilterModel
+import no.nav.pto.veilarbfilter.model.NyttFilterModel
 import no.nav.pto.veilarbfilter.service.FilterService
 
-suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(pepClient: PepClient,useAuthentication: Boolean, build: suspend PipelineContext<Unit, ApplicationCall>.(id: String) -> Unit) {
-    val ident = getSubject(call)
+suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(
+    pepClient: PepClient,
+    useAuthentication: Boolean,
+    build: suspend PipelineContext<Unit, ApplicationCall>.(id: String) -> Unit
+) {
+    val ident = call.getNavident()
     val enhetId = call.parameters["enhetId"]
 
     enhetId?.let {
-        if(!useAuthentication){
+        if (!useAuthentication) {
             build.invoke(this, it)
-        }else if (!it.matches("\\d{4}$".toRegex())) {
+        } else if (!it.matches("\\d{4}$".toRegex())) {
             call.respond(HttpStatusCode.BadRequest)
         } else if (!pepClient.harTilgangTilEnhet(ident, it)) {
             call.respond(HttpStatusCode.Forbidden)
@@ -31,14 +32,18 @@ suspend fun PipelineContext<Unit, ApplicationCall>.pepAuth(pepClient: PepClient,
     }
 }
 
-fun Route.veilederGruppeRoutes(veilederGrupperService: FilterService, pepClient: PepClient, useAuthentication: Boolean) {
+fun Route.veilederGruppeRoutes(
+    veilederGrupperService: FilterService,
+    pepClient: PepClient,
+    useAuthentication: Boolean
+) {
     conditionalAuthenticate(useAuthentication) {
         route("/enhet") {
             post("/{enhetId}") {
                 pepAuth(pepClient, useAuthentication) {
                     val request = call.receive<NyttFilterModel>()
                     veilederGrupperService.lagreFilter(it, request)
-                        ?.let {nyttfilter -> call.respond(nyttfilter)}
+                        ?.let { nyttfilter -> call.respond(nyttfilter) }
                         ?: throw IllegalStateException()
 
                 }
@@ -59,8 +64,9 @@ fun Route.veilederGruppeRoutes(veilederGrupperService: FilterService, pepClient:
             delete("/{enhetId}/filter/{filterId}") {
                 pepAuth(pepClient, useAuthentication) {
                     call.parameters["filterId"]?.let { filter ->
-                        val slettetFilterId = veilederGrupperService.slettFilter(filter.toInt(), call.parameters["enhetId"]!!)
-                        if(slettetFilterId == 0 ) {
+                        val slettetFilterId =
+                            veilederGrupperService.slettFilter(filter.toInt(), call.parameters["enhetId"]!!)
+                        if (slettetFilterId == 0) {
                             call.respond(HttpStatusCode.NotFound)
                         }
                         call.respond(HttpStatusCode.NoContent)

@@ -34,6 +34,7 @@ spec:
   ingresses:
     - https://veilarbfilter.nais.adeo.no
     - https://app.adeo.no/veilarbfilter
+  webproxy: true
   replicas:
     min: 1
     max: 2
@@ -58,3 +59,5 @@ spec:
       value: https://wasapp.adeo.no/asm-pdp/authorize
     - name: SECURITY_TOKEN_SERVICE_DISCOVERY_URL
       value: https://security-token-service.nais.adeo.no/rest/v1/sts/.well-known/openid-configuration
+    - name: AZUREAD_JWKS_URL
+      value: https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/discovery/v2.0/keys
