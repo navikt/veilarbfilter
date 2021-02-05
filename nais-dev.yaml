@@ -2,7 +2,7 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: veilarbfilter
-  namespace: {{namespace}}
+  namespace: pto
   cluster: dev-fss
   labels:
     team: pto
@@ -14,9 +14,9 @@ spec:
     cpuThresholdPercentage: 50
   port: 8080
   ingresses:
-    - https://veilarbfilter-{{namespace}}.nais.preprod.local
-    - https://app-{{namespace}}.adeo.no/veilarbfilter
-    - https://app-{{namespace}}.dev.adeo.no/veilarbfilter
+    - https://veilarbfilter-q1.nais.preprod.local
+    - https://app-q1.adeo.no/veilarbfilter
+    - https://app-q1.dev.adeo.no/veilarbfilter
   webproxy: true
   vault:
     enabled: true
@@ -56,9 +56,9 @@ spec:
     - name: VAULT_MOUNT_PATH
       value: postgresql/preprod-fss
     - name: VEILARBVEILEDERAPI_URL
-      value: https://veilarbveileder-{{namespace}}.nais.preprod.local/veilarbveileder/api
+      value: https://veilarbveileder-q1.nais.preprod.local/veilarbveileder/api
     - name: ABAC_PDP_ENDPOINT_URL
-      value: https://wasapp-{{namespace}}.adeo.no/asm-pdp/authorize
+      value: https://wasapp-q1.adeo.no/asm-pdp/authorize
     - name: SECURITY_TOKEN_SERVICE_DISCOVERY_URL
       value: https://security-token-service.nais.preprod.local/rest/v1/sts/.well-known/openid-configuration
     - name: AZUREAD_JWKS_URL
