@@ -18,7 +18,7 @@ private val INITIAL_DELAY_CLEANUP = TimeUnit.MINUTES.toMillis(1);
 private val INTERVAL_CLEANUP = TimeUnit.MINUTES.toMillis(5);
 
 private val INITIAL_DELAY_METRICS = TimeUnit.MINUTES.toMillis(2);
-private val INTERVAL_METRICS_REPORT = TimeUnit.MINUTES.toMillis(30);
+private val INTERVAL_METRICS_REPORT = TimeUnit.DAYS.toMillis(3);
 
 fun main() {
     main(Configuration())
