@@ -24,3 +24,8 @@ object VeilederGrupperFilter : Table() {
     val filterId = integer("veiledergruppe_filter_id") references Filter.filterId;
     val enhetId = varchar("enhet_id", 32)
 }
+
+object MetricsReporterInfo : Table() {
+    val reporterId = integer("reporter_id").primaryKey();
+    val opprettetDato = datetime("opprettet")
+}
