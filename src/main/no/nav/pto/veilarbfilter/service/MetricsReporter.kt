@@ -189,7 +189,6 @@ class MetricsReporterService {
             }
             metrikk.addFieldToReport("antallFiltre", antallFiltre)
             metricsClient.report(metrikk)
-            log.info("Metrics reported")
         }
     }
 
