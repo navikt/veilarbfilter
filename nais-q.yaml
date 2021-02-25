@@ -37,14 +37,16 @@ spec:
     path: veilarbfilter/internal/metrics
   resources:
     limits:
-      cpu: "3"
-      memory: 512Mi
+      cpu: "6"
+      memory: 3Gi
     requests:
-      cpu: 300m
-      memory: 1Gi
+      cpu: 500m
+      memory: 2Gi
   envFrom:
     - configmap: pto-config
   env:
+    - name: JAVA_OPTS
+      value: "-XX:MaxRAMPercentage=65.0"
     - name: ISSO_JWKS_URL
       value: https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri
     - name: ISSO_ISSUER
