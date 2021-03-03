@@ -2,7 +2,7 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: veilarbfilter
-  namespace: pto
+  namespace: default
   cluster: prod-fss
   labels:
     team: pto
@@ -26,11 +26,11 @@ spec:
     timeout: 1
   resources:
     limits:
-      cpu: "6"
-      memory: 3Gi
+      cpu: 2000m
+      memory: 512Mi
     requests:
-      cpu: 500m
-      memory: 2Gi
+      cpu: 50m
+      memory: 128Mi
   ingresses:
     - https://veilarbfilter.nais.adeo.no
     - https://app.adeo.no/veilarbfilter
@@ -55,6 +55,8 @@ spec:
       value: jdbc:postgresql://A01DBVL010.adeo.no:5432/veilarbfilter
     - name: VAULT_MOUNT_PATH
       value: /postgresql/prod-fss
+    - name: VEILARBVEILEDERAPI_URL
+      value: https://veilarbveileder.nais.adeo.no/veilarbveileder/api
     - name: ABAC_PDP_ENDPOINT_URL
       value: https://wasapp.adeo.no/asm-pdp/authorize
     - name: SECURITY_TOKEN_SERVICE_DISCOVERY_URL
