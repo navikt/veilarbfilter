@@ -29,7 +29,7 @@ spec:
       cpu: 2000m
       memory: 512Mi
     requests:
-      cpu: 50m
+      cpu: 500m
       memory: 128Mi
   ingresses:
     - https://veilarbfilter.nais.adeo.no
