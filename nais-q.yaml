@@ -37,11 +37,11 @@ spec:
     path: veilarbfilter/internal/metrics
   resources:
     limits:
-      cpu: "6"
-      memory: 3Gi
+      cpu: "2"
+      memory: 1Gi
     requests:
       cpu: 500m
-      memory: 2Gi
+      memory: 128Mi
   envFrom:
     - configmap: pto-config
   env:
