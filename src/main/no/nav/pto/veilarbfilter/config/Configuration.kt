@@ -4,6 +4,7 @@ import com.auth0.jwk.JwkProvider
 import com.natpryce.konfig.*
 import no.nav.common.utils.Credentials
 import no.nav.common.utils.EnvironmentUtils.isProduction
+import no.nav.common.utils.EnvironmentUtils.requireNamespace
 import no.nav.common.utils.NaisUtils.getCredentials
 import no.nav.pto.veilarbfilter.JwtUtil
 
@@ -56,7 +57,9 @@ data class Configuration(
     )
 
     data class VeilarbveilederConfig(
-        val url: String = config()[Key("VEILARBVEILEDERAPI_URL", stringType)]
+        val url: String =
+            if (isProduction().orElseThrow()) "https://veilarbveileder.nais.adeo.no/veilarbveileder"
+            else "https://veilarbveileder-${requireNamespace()}.nais.preprod.local/veilarbveileder"
     )
 }
 
