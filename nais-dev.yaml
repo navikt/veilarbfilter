@@ -40,8 +40,8 @@ spec:
       cpu: "6"
       memory: 3Gi
     requests:
-      cpu: 50m
-      memory: 128Gi
+      cpu: 500m
+      memory: 128Mi
   envFrom:
     - configmap: pto-config
   env:
