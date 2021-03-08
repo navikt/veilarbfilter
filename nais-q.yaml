@@ -37,8 +37,8 @@ spec:
     path: veilarbfilter/internal/metrics
   resources:
     limits:
-      cpu: "2"
-      memory: 1Gi
+      cpu: "1"
+      memory: 600m
     requests:
       cpu: 500m
       memory: 128Mi
