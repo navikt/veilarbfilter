@@ -26,11 +26,11 @@ spec:
     timeout: 1
   resources:
     limits:
-      cpu: "3"
-      memory: 3Gi
+      cpu: 1500m
+      memory: 2Gi
     requests:
       cpu: 500m
-      memory: 2Gi
+      memory: 1Gi
   ingresses:
     - https://veilarbfilter.nais.adeo.no
     - https://app.adeo.no/veilarbfilter
