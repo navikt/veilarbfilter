@@ -28,7 +28,9 @@ data class PortefoljeFilter(
     val utdanning: List<String> = emptyList(),
     val utdanningGodkjent: List<String> = emptyList(),
     val utdanningBestatt: List<String> = emptyList(),
-    val sisteEndringKategori: List<String> = emptyList()
+    val sisteEndringKategori: List<String> = emptyList(),
+    var ulesteEndringer: String? = "",
+    var aktiviteterForenklet: List<String> = emptyList()
 ) {
 
     @JsonIgnore
