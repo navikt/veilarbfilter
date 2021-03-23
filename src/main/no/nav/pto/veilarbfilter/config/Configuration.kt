@@ -20,7 +20,8 @@ private val defaultProperties = ConfigurationMap(
         "veilarbfilter_DB_PASSWORD" to "password",
         "VAULT_MOUNT_PATH" to notUsedLocally,
         "SECURITY_TOKEN_SERVICE_DISCOVERY_URL" to notUsedLocally,
-        "AZUREAD_JWKS_URL" to notUsedLocally
+        "AZUREAD_JWKS_URL" to notUsedLocally,
+        "VEILARBVEILEDERAPI_URL" to notUsedLocally
     )
 )
 
@@ -57,9 +58,7 @@ data class Configuration(
     )
 
     data class VeilarbveilederConfig(
-        val url: String =
-            if (isProduction().orElseThrow()) "https://veilarbveileder.nais.adeo.no/veilarbveileder"
-            else "https://veilarbveileder-${requireNamespace()}.nais.preprod.local/veilarbveileder"
+        val url: String = config()[Key("VEILARBVEILEDERAPI_URL", stringType)]
     )
 }
 
