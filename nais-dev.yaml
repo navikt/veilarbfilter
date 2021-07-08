@@ -56,7 +56,7 @@ spec:
     - name: VAULT_MOUNT_PATH
       value: postgresql/preprod-fss
     - name: ABAC_PDP_ENDPOINT_URL
-      value: https://wasapp-q1.adeo.no/asm-pdp/authorize
+      value: https://abac-veilarb-q1.dev.intern.nav.no/application/asm-pdp/authorize
     - name: SECURITY_TOKEN_SERVICE_DISCOVERY_URL
       value: https://security-token-service.nais.preprod.local/rest/v1/sts/.well-known/openid-configuration
     - name: AZUREAD_JWKS_URL
