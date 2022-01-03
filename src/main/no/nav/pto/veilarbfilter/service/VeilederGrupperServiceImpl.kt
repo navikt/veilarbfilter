@@ -14,15 +14,13 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 class VeilederGrupperServiceImpl(
-    veilarbveilederClient: VeilarbveilederClient,
-    mineLagredeFilterService: MineLagredeFilterServiceImpl
+    private val veilarbveilederClient: VeilarbveilederClient,
+    private val mineLagredeFilterService: MineLagredeFilterServiceImpl
 ) : FilterService {
-    private val veilarbveilederClient: VeilarbveilederClient = veilarbveilederClient;
-    private val mineLagredeFilterService: MineLagredeFilterServiceImpl = mineLagredeFilterService
     private val log = LoggerFactory.getLogger("VeilederGrupperServiceImpl")
 
     override suspend fun lagreFilter(enhetId: String, nyttFilter: NyttFilterModel): FilterModel? {
-        var key = 0;
+        var key = 0
         dbQuery {
             key = (Filter.insert {
                 it[filterNavn] = nyttFilter.filterNavn
@@ -124,12 +122,12 @@ class VeilederGrupperServiceImpl(
     suspend fun slettVeiledereSomIkkeErAktivePaEnheten(enhetId: String) {
         val veilederePaEnheten = veilarbveilederClient
             .hentVeilederePaEnheten(enhetId)
-            ?: throw IllegalStateException("Can not get veiledere for enhet " + enhetId);
+            ?: throw IllegalStateException("Can not get veiledere for enhet " + enhetId)
 
-        val filterForBruker = finnFilterForFilterBruker(enhetId);
+        val filterForBruker = finnFilterForFilterBruker(enhetId)
 
         filterForBruker.forEach {
-            val alleVeiledere = it.filterValg.veiledere;
+            val alleVeiledere = it.filterValg.veiledere
             val aktiveVeileder = alleVeiledere.filter { veilederIdent ->
                 veilederePaEnheten.contains(veilederIdent)
             }
@@ -157,7 +155,7 @@ class VeilederGrupperServiceImpl(
             VeilederGrupperFilter.slice(VeilederGrupperFilter.enhetId)
                 .selectAll()
                 .distinct()
-                .mapNotNull { it[VeilederGrupperFilter.enhetId] }
+                .map { it[VeilederGrupperFilter.enhetId] }
         }
 }
 
