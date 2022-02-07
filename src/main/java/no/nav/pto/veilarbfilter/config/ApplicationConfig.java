@@ -1,31 +1,37 @@
 package no.nav.pto.veilarbfilter.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
-import no.nav.common.abac.VeilarbPepFactory;
+import no.nav.common.abac.*;
+import no.nav.common.abac.audit.AuditConfig;
+import no.nav.common.abac.audit.AuditLogger;
+import no.nav.common.abac.audit.NimbusSubjectProvider;
 import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.sts.NaisSystemUserTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.utils.Credentials;
-import no.nav.pto.veilarbfilter.auth.ModiaPep;
+import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
+import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.time.LocalDateTime;
 
 import static no.nav.common.utils.NaisUtils.getCredentials;
 
 
-@EnableScheduling
 @Configuration
+@Import(DbConfigPostgres.class)
 @EnableConfigurationProperties({EnvironmentProperties.class})
 public class ApplicationConfig {
-
-    public static final String APPLICATION_NAME = "veilarbfilter";
-
 
     @Bean
     public LockProvider lockProvider(JdbcTemplate jdbcTemplate) {
@@ -48,12 +54,27 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public ModiaPep modiaPep(EnvironmentProperties properties, Credentials serviceUserCredentials) {
-        var pep = VeilarbPepFactory.get(
-                properties.getAbacModiaUrl(), serviceUserCredentials.username,
-                serviceUserCredentials.password, new SpringAuditRequestInfoSupplier()
-        );
+    public AbacClient abacClient(EnvironmentProperties properties, Credentials serviceUserCredentials) {
+        return new AbacCachedClient(new AbacHttpClient(properties.getAbacUrl(), serviceUserCredentials.username, serviceUserCredentials.password));
+    }
 
-        return new ModiaPep(pep);
+    @Bean
+    public Pep veilarbPep(Credentials serviceUserCredentials, AbacClient abacClient) {
+        AuditConfig auditConfig = new AuditConfig(new AuditLogger(), new SpringAuditRequestInfoSupplier(), null);
+        return new VeilarbPep(
+                serviceUserCredentials.username, abacClient,
+                new NimbusSubjectProvider(), auditConfig
+        );
+    }
+
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(LocalDateTime.class, new DateDeserializer());
+        module.addSerializer(LocalDateTime.class, new DateSerializer());
+        mapper.registerModule(module);
+        return mapper;
     }
 }

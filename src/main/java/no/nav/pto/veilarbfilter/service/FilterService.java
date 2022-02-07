@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FilterService {
-    Optional<FilterModel> lagreFilter(String filterBrukerId, NyttFilterModel nyttFilter);
+    Optional<FilterModel> lagreFilter(String filterBrukerId, NyttFilterModel nyttFilter) throws IllegalArgumentException;
 
-    Optional<FilterModel> oppdaterFilter(String filterBrukerId, FilterModel filter);
+    Optional<FilterModel> oppdaterFilter(String filterBrukerId, FilterModel filter) throws IllegalArgumentException;
 
     Optional<FilterModel> hentFilter(Integer filterId);
 

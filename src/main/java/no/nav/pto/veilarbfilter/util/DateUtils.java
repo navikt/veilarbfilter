@@ -1,19 +1,20 @@
 package no.nav.pto.veilarbfilter.util;
 
+import lombok.Getter;
+
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class DateUtils {
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    @Getter
+    public static DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static String fromLocalDateTimeToStr(LocalDateTime time) {
-        return time.format(formatter);
+    public static Timestamp fromLocalDateTimeToTimestamp(LocalDateTime dateTime) {
+        return Timestamp.valueOf(dateTime.format(format));
     }
 
-    public static LocalDateTime toLocalDateTimeOrNull(String date) {
-        if (date == null) {
-            return null;
-        }
-        return LocalDateTime.parse(date, formatter);
+    public static LocalDateTime fromTimestampToLocalDateTime(Timestamp timestamp) {
+        return timestamp.toLocalDateTime();
     }
 }

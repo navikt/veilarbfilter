@@ -3,8 +3,8 @@ package no.nav.pto.veilarbfilter.domene.value;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class VeilederId {
-    private final String veilederId;
+public  class VeilederId {
+    private  String veilederId;
 
     public VeilederId(@JsonProperty("veilederId") String veilederId) {
         this.veilederId = veilederId;

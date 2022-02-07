@@ -6,12 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 public class AuthUtils {
-    public static String getInnloggetBrukerToken() {
-        return AuthContextHolderThreadLocal
-                .instance().getIdTokenString()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is missing"));
-    }
-
     public static VeilederId getInnloggetVeilederIdent() {
         return AuthContextHolderThreadLocal
                 .instance().getNavIdent()

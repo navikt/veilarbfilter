@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -21,43 +19,32 @@ import static no.nav.pto.veilarbfilter.util.DbUtils.getSqlAdminRole;
 
 
 @Slf4j
-@Configuration
 @RequiredArgsConstructor
 @EnableTransactionManagement
 public class DbConfigPostgres implements DatabaseConfig {
     private final EnvironmentProperties environmentProperties;
 
-    @Bean("Postgres")
+    @Bean
     @Override
     public DataSource dataSource() {
-        return createDataSource(environmentProperties.getDbUrl(), true);
-    }
-
-    @Bean("PostgresReadOnly")
-    public DataSource dataSourceRead() {
         return createDataSource(environmentProperties.getDbUrl(), false);
     }
 
-    @Bean(name = "PostgresJdbc")
+    @Bean
     @Override
-    public JdbcTemplate db(@Qualifier("Postgres") DataSource dataSource) {
+    public JdbcTemplate db(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
 
-    @Bean(name = "PostgresJdbcReadOnly")
-    public JdbcTemplate dbRead(@Qualifier("PostgresReadOnly") DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
-    }
-
-    @Bean("PostgresNamedJdbc")
+    @Bean
     @Override
-    public NamedParameterJdbcTemplate namedParameterJdbcTemplate(@Qualifier("Postgres") DataSource dataSource) {
+    public NamedParameterJdbcTemplate namedParameterJdbcTemplate(DataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
     }
 
-    @Bean("PostgresTransactionManager")
+    @Bean
     @Override
-    public PlatformTransactionManager transactionManager(@Qualifier("Postgres") DataSource dataSource) {
+    public PlatformTransactionManager transactionManager(DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
 
@@ -68,8 +55,9 @@ public class DbConfigPostgres implements DatabaseConfig {
         DataSource dataSource = createDataSource(environmentProperties.getDbUrl(), true);
 
         Flyway.configure()
+                .encoding("UTF-8")
                 .dataSource(dataSource)
-                .locations("db/")
+                .locations("db/migration")
                 .initSql("SET ROLE '" + getSqlAdminRole() + "';")
                 .baselineOnMigrate(true)
                 .load()

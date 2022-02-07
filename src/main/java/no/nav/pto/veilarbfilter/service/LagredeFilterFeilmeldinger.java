@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public
-enum LagredeFilterFeilmeldinger {
+public enum LagredeFilterFeilmeldinger {
     NAVN_FOR_LANGT("Lengden på navnet kan ikke være mer enn 255 karakterer"),
     NAVN_TOMT("Navn kan ikke være tomt"),
     FILTERVALG_TOMT("Filtervalg kan ikke være tomt"),
