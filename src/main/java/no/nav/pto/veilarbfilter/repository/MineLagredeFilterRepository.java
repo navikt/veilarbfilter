@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -98,6 +99,22 @@ public class MineLagredeFilterRepository implements FilterService {
         }
     }
 
+    public List<FilterModel> hentAllLagredeFilter() {
+        String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.filter_id = f.filter_id",
+                MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME);
+
+        return db.query(sql, (rs, rowNum) ->
+                new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
+                        rs.getString(Filter.FILTER_NAVN),
+                        JsonUtils.deserializeFilterValg(rs.getString(Filter.VALGTE_FILTER)),
+                        DateUtils.toLocalDateTimeOrNull(rs.getString(Filter.OPPRETTET)),
+                        rs.getInt(Filter.FILTER_CLEANUP),
+                        rs.getString(MineLagredeFilter.VEILEDER_ID),
+                        rs.getInt(MineLagredeFilter.SORT_ORDER),
+                        rs.getBoolean(MineLagredeFilter.AKTIV),
+                        rs.getString(MineLagredeFilter.NOTE)));
+    }
+
     public List<FilterModel> finnFilterForFilterBruker(String veilederId) {
 
         String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.filter_id = f.filter_id AND and ml.%s = %s",
@@ -145,6 +162,33 @@ public class MineLagredeFilterRepository implements FilterService {
             });
         }
         return finnFilterForFilterBruker(veilederId);
+    }
+
+    public void deactivateMineFilterWithDeletedVeilederGroup(String veilederGroupName, List<String> veiledereInDeletedGroup) {
+        List<FilterModel> alleMineFilter = hentAllLagredeFilter();
+        alleMineFilter.stream().forEach(mineFilter -> {
+            if (!mineFilter.getFilterValg().getVeiledere().isEmpty() &&
+                    erVeiledereListeErLik(mineFilter.getFilterValg().getVeiledere(), veiledereInDeletedGroup)) {
+                deactiveMineFilter(mineFilter.getFilterId(), veilederGroupName);
+            }
+        });
+    }
+
+    private void deactiveMineFilter(Integer filterId, String note) {
+        try {
+            String sql = String.format("UPDATE %s SET %s = 0, %s = ? WHERE %s = ?", MineLagredeFilter.TABLE_NAME, MineLagredeFilter.AKTIV, MineLagredeFilter.NOTE, MineLagredeFilter.FILTER_ID);
+            db.update(sql, note, filterId);
+        } catch (Exception e) {
+            log.error("Error while deactivating mine filter", e);
+        }
+    }
+
+    private Boolean erVeiledereListeErLik(List<String> veiledereList1, List<String> veiledereList2) {
+        if (veiledereList1.size() != veiledereList2.size()) return false;
+
+        Collections.sort(veiledereList1);
+        Collections.sort(veiledereList2);
+        return veiledereList1.equals(veiledereList2);
     }
 
 

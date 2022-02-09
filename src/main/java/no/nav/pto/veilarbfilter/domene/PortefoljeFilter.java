@@ -3,6 +3,7 @@ package no.nav.pto.veilarbfilter.domene;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -25,7 +26,8 @@ public class PortefoljeFilter {
     private final List<String> servicegruppe = emptyList();
     private final List<String> tiltakstyper = emptyList();
     private final String veilederNavnQuery = "";
-    private final List<String> veiledere = emptyList();
+    @Setter
+    private List<String> veiledere = emptyList();
     private final String ytelse = "";
     private final List<String> registreringstype = emptyList();
     private final String cvJobbprofil = "";
