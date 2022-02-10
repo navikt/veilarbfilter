@@ -2,6 +2,7 @@ package no.nav.pto.veilarbfilter.service;
 
 import lombok.RequiredArgsConstructor;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
+import no.nav.pto.veilarbfilter.domene.MineLagredeFilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.SortOrder;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
@@ -43,5 +44,9 @@ public class MineLagredeFilterService implements FilterService {
     @Override
     public List<FilterModel> lagreSortering(String veilederId, List<SortOrder> sortOrder) {
         return mineLagredeFilterRepository.lagreSortering(veilederId, sortOrder);
+    }
+
+    public List<MineLagredeFilterModel> hentAllLagredeFilter() {
+        return mineLagredeFilterRepository.hentAllLagredeFilter();
     }
 }

@@ -1,7 +1,9 @@
 package no.nav.pto.veilarbfilter.domene;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+@Data
 public class Aktiviteter {
     @JsonProperty("BEHANDLING")
     private final String BEHANDLING = "NA";

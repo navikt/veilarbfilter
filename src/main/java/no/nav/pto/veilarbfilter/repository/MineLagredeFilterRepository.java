@@ -99,7 +99,7 @@ public class MineLagredeFilterRepository implements FilterService {
         }
     }
 
-    public List<FilterModel> hentAllLagredeFilter() {
+    public List<MineLagredeFilterModel> hentAllLagredeFilter() {
         String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.filter_id = f.filter_id",
                 MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME);
 
@@ -165,7 +165,7 @@ public class MineLagredeFilterRepository implements FilterService {
     }
 
     public void deactivateMineFilterWithDeletedVeilederGroup(String veilederGroupName, List<String> veiledereInDeletedGroup) {
-        List<FilterModel> alleMineFilter = hentAllLagredeFilter();
+        List<MineLagredeFilterModel> alleMineFilter = hentAllLagredeFilter();
         alleMineFilter.stream().forEach(mineFilter -> {
             if (!mineFilter.getFilterValg().getVeiledere().isEmpty() &&
                     erVeiledereListeErLik(mineFilter.getFilterValg().getVeiledere(), veiledereInDeletedGroup)) {

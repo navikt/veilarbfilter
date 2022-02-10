@@ -1,12 +1,14 @@
 package no.nav.pto.veilarbfilter.domene;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
+@Data
 public class MineLagredeFilterModel extends FilterModel {
     private Integer filterId = null;
     private String filterNavn = null;
