@@ -14,12 +14,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.EnableScheduling;
-
-import static no.nav.common.utils.NaisUtils.getCredentials;
 
 
-@EnableScheduling
 @Configuration
 @EnableConfigurationProperties({EnvironmentProperties.class})
 public class ApplicationConfig {
@@ -34,7 +30,7 @@ public class ApplicationConfig {
 
     @Bean
     public Credentials serviceUserCredentials() {
-        return getCredentials("service_user");
+        return new Credentials("username", "password");
     }
 
     @Bean

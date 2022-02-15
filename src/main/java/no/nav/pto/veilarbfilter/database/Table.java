@@ -21,7 +21,7 @@ public class Table {
 
     public static final class VeilederGrupperFilter {
         public static final String TABLE_NAME = "EnhetensLagredeFilter";
-        public static final String FILTER_ID = "filter_id";
+        public static final String FILTER_ID = "enhet_filter_id";
         public static final String ENHET_ID = "enhet_id";
         public static final String SORT_ORDER = "sort_order";
 

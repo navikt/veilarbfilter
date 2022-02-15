@@ -2,25 +2,19 @@ package no.nav.pto.veilarbfilter.repository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.common.types.identer.EnhetId;
-import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
 import no.nav.pto.veilarbfilter.database.Table.VeilederGrupperFilter;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.util.DateUtils;
 import no.nav.pto.veilarbfilter.util.JsonUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static no.nav.pto.veilarbfilter.database.Table.Filter;
-import static no.nav.pto.veilarbfilter.database.Table.MineLagredeFilter;
 
 @Service
 @Slf4j
@@ -28,20 +22,19 @@ import static no.nav.pto.veilarbfilter.database.Table.MineLagredeFilter;
 public class VeilederGruppeFilterRepository implements FilterService {
     private final JdbcTemplate db;
     private final MineLagredeFilterRepository mineLagredeFilterRepository;
-    private final VeilarbveilederClient veilarbveilederClient;
 
 
     public Optional<FilterModel> lagreFilter(String enhetId, NyttFilterModel nyttFilterModel) {
         var key = 0;
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        String insertSql = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)",
+        String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?, ?::jsonb, ?)",
                 Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET);
-        int affectedRows = db.update(insertSql, nyttFilterModel.getFilterNavn(), nyttFilterModel.getFilterValg(), LocalDateTime.now(), keyHolder, new String[]{"FILTER_ID"});
+        int affectedRows = db.update(insertSql, nyttFilterModel.getFilterNavn(), nyttFilterModel.getFilterValg(), LocalDateTime.now());
 
         if (affectedRows > 0) {
-            key = keyHolder.getKey().intValue();
+            String lastId = String.format("SELECT currval(%s) FROM %",
+                    Filter.FILTER_ID, Filter.TABLE_NAME);
+            key = db.queryForObject(lastId, Integer.class);
 
             insertSql = String.format("INSERT INTO %s (%s, %s) VALUES (?, ?)",
                     VeilederGrupperFilter.TABLE_NAME, Filter.FILTER_ID, VeilederGrupperFilter.ENHET_ID);
@@ -89,8 +82,8 @@ public class VeilederGruppeFilterRepository implements FilterService {
 
     public List<FilterModel> finnFilterForFilterBruker(String enhetId) {
 
-        String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.filter_id = f.filter_id AND and ml.%s = %s",
-                MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, VeilederGrupperFilter.ENHET_ID, enhetId);
+        String sql = String.format("SELECT * FROM %s AS ml, %s AS f WHERE ml.%s = f.%s AND ml.%s = \'%o\'",
+                VeilederGrupperFilter.TABLE_NAME, Filter.TABLE_NAME, VeilederGrupperFilter.FILTER_ID, Filter.FILTER_ID, VeilederGrupperFilter.ENHET_ID, Integer.parseInt(enhetId));
 
         return db.query(sql, (rs, rowNum) ->
                 new VeilederGruppeFilterModel(rs.getInt(VeilederGrupperFilter.FILTER_ID),
@@ -124,43 +117,15 @@ public class VeilederGruppeFilterRepository implements FilterService {
         return 0;
     }
 
+    public List<String> hentAlleEnheter() {
+        String sql = String.format("SELECT DISTINCT(%s) as enhetId  FROM %s", VeilederGrupperFilter.ENHET_ID, VeilederGrupperFilter.TABLE_NAME);
+        return db.query(sql, (rs, rowNum) -> rs.getString("enhetId"));
+    }
+
     @Override
     public List<FilterModel> lagreSortering(String enhetId, List<SortOrder> sortOrder) {
         //TODO("Not yet implemented");
         return Collections.emptyList();
-    }
-
-    public void slettVeiledereSomIkkeErAktivePaEnheten(String enhetId) {
-        List<String> veilederePaEnheten = veilarbveilederClient.hentVeilederePaaEnhet(EnhetId.of(enhetId));
-
-        List<FilterModel> filterForBruker = finnFilterForFilterBruker(enhetId);
-
-        filterForBruker.stream().forEach(filter -> {
-            List<String> alleVeiledere = filter.getFilterValg().getVeiledere();
-            List<String> aktiveVeileder = alleVeiledere.stream().filter(veilederIdent -> veilederePaEnheten.contains(veilederIdent)).collect(Collectors.toList());
-
-            String removedVeileder = getRemovedVeiledere(alleVeiledere, aktiveVeileder);
-
-            if (aktiveVeileder.isEmpty()) {
-                log.warn("Removed veiledere: " + removedVeileder);
-                slettFilter(filter.getFilterId(), enhetId);
-                log.warn("Removed veiledergruppe: " + filter.getFilterNavn() + " from enhet: " + enhetId);
-            } else if (aktiveVeileder.size() < alleVeiledere.size()) {
-                log.warn("Removed veiledere: " + removedVeileder);
-
-                PortefoljeFilter filterValg = filter.getFilterValg();
-                filterValg.setVeiledere(aktiveVeileder);
-                VeilederGruppeFilterModel updatedVeilederGruppeFilterModel = new VeilederGruppeFilterModel(filter.getFilterId(), filter.getFilterNavn(), filterValg, filter.getOpprettetDato(), 1, enhetId);
-                oppdaterFilter(enhetId, updatedVeilederGruppeFilterModel);
-                log.warn("Updated veiledergruppe: " + filter.getFilterNavn() + " from enhet: " + enhetId);
-            }
-        });
-    }
-
-    private String getRemovedVeiledere(List<String> alleVeiledere, List<String> aktiveVeileder) {
-        return alleVeiledere.stream()
-                .filter(veilederIdent -> !aktiveVeileder.contains(veilederIdent))
-                .collect(Collectors.joining(", "));
     }
 }
 

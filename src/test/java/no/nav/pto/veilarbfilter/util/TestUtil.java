@@ -1,4 +1,4 @@
-package no.nav.veilarbfilter.util;
+package no.nav.pto.veilarbfilter.util;
 
 import org.flywaydb.core.Flyway;
 
@@ -9,7 +9,7 @@ public class TestUtil {
     public static void testMigrate(DataSource dataSource) {
         Flyway.configure()
                 .dataSource(dataSource)
-                .locations("db/")
+                .locations("db")
                 .baselineOnMigrate(true)
                 .load()
                 .migrate();

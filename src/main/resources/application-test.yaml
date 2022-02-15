@@ -1,0 +1,7 @@
+spring:
+  flyway:
+    enabled: true
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    validate-on-migrate: true

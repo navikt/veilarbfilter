@@ -1,4 +1,4 @@
-package no.nav.veilarbfilter.model;
+package no.nav.pto.veilarbfilter.model;
 
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import org.junit.Assert;

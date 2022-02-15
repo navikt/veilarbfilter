@@ -1,4 +1,4 @@
-package no.nav.veilarbfilter.model;
+package no.nav.pto.veilarbfilter.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

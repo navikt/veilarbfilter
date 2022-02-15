@@ -1,4 +1,4 @@
-package no.nav.veilarbfilter.util;
+package no.nav.pto.veilarbfilter.util;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
