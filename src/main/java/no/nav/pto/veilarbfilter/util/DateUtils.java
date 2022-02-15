@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.util;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -15,5 +16,13 @@ public class DateUtils {
             return null;
         }
         return LocalDateTime.parse(date, formatter);
+    }
+
+    public static Timestamp fromLocalDateTimeToTimestamp(LocalDateTime dateTime) {
+        return Timestamp.valueOf(dateTime);
+    }
+
+    public static LocalDateTime fromTimestampToLocalDateTime(Timestamp timestamp) {
+        return timestamp.toLocalDateTime();
     }
 }

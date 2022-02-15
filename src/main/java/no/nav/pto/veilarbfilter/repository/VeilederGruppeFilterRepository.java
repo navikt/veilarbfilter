@@ -7,6 +7,7 @@ import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.util.DateUtils;
 import no.nav.pto.veilarbfilter.util.JsonUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static no.nav.pto.veilarbfilter.database.Table.Filter;
+import static no.nav.pto.veilarbfilter.util.DateUtils.fromLocalDateTimeToTimestamp;
 
 @Service
 @Slf4j
@@ -27,17 +29,23 @@ public class VeilederGruppeFilterRepository implements FilterService {
     public Optional<FilterModel> lagreFilter(String enhetId, NyttFilterModel nyttFilterModel) {
         var key = 0;
 
-        String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?, ?::jsonb, ?)",
+        String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?, to_json(?::JSON), ?)",
                 Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET);
-        int affectedRows = db.update(insertSql, nyttFilterModel.getFilterNavn(), nyttFilterModel.getFilterValg(), LocalDateTime.now());
 
-        if (affectedRows > 0) {
-            String lastId = String.format("SELECT currval(%s) FROM %",
+        Integer updateCount = db.execute(insertSql, (PreparedStatementCallback<Integer>) ps -> {
+            ps.setString(1, nyttFilterModel.getFilterNavn());
+            ps.setString(2, JsonUtils.serializeFilterValg(nyttFilterModel.getFilterValg()));
+            ps.setTimestamp(3, fromLocalDateTimeToTimestamp(LocalDateTime.now()));
+            return ps.executeUpdate();
+        });
+
+        if (updateCount > 0) {
+            String lastId = String.format("SELECT MAX(%s) FROM %s",
                     Filter.FILTER_ID, Filter.TABLE_NAME);
             key = db.queryForObject(lastId, Integer.class);
 
             insertSql = String.format("INSERT INTO %s (%s, %s) VALUES (?, ?)",
-                    VeilederGrupperFilter.TABLE_NAME, Filter.FILTER_ID, VeilederGrupperFilter.ENHET_ID);
+                    VeilederGrupperFilter.TABLE_NAME, VeilederGrupperFilter.FILTER_ID, VeilederGrupperFilter.ENHET_ID);
 
             db.update(insertSql, key, enhetId);
         }
@@ -61,19 +69,18 @@ public class VeilederGruppeFilterRepository implements FilterService {
     @Override
     public Optional<FilterModel> hentFilter(Integer filterId) {
         try {
-            String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.filter_id = f.filter_id AND f.filter_id = ?",
-                    VeilederGrupperFilter.TABLE_NAME, Filter.TABLE_NAME);
-            FilterModel veilederGruppeFilterModel = db.queryForObject(sql, (rs, rowNum) -> {
+            String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s AND f.filter_id = ?",
+                    VeilederGrupperFilter.TABLE_NAME, Filter.TABLE_NAME, VeilederGrupperFilter.FILTER_ID, Filter.FILTER_ID);
+            return Optional.of(db.queryForObject(sql, (rs, rowNum) -> {
                         PortefoljeFilter portefoljeFilter = JsonUtils.deserializeFilterValg(rs.getString(Filter.VALGTE_FILTER));
                         return new VeilederGruppeFilterModel(rs.getInt(VeilederGrupperFilter.FILTER_ID),
                                 rs.getString(Filter.FILTER_NAVN),
                                 portefoljeFilter,
-                                DateUtils.toLocalDateTimeOrNull(rs.getString(Filter.OPPRETTET)),
+                                DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                                 rs.getInt(Filter.FILTER_CLEANUP),
                                 rs.getString(VeilederGrupperFilter.ENHET_ID));
                     }
-                    , filterId);
-            return Optional.of(veilederGruppeFilterModel);
+                    , filterId));
         } catch (Exception e) {
             log.warn("Can't find filter " + e, e);
             return Optional.empty();
