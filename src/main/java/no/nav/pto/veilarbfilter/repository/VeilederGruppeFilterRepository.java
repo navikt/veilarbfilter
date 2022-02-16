@@ -59,8 +59,8 @@ public class VeilederGruppeFilterRepository implements FilterService {
         Integer numOfRows = db.queryForObject(sql, Integer.class, enhetId, filter.getFilterId());
 
         if (numOfRows > 0) {
-            sql = String.format("UPDATE %s SET %s = ?, %s = ? WHERE %s = ?", Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.FILTER_ID);
-            db.update(sql, filter.getFilterNavn(), JsonUtils.serializeFilterValg(filter.getFilterValg()), filter.getFilterId());
+            sql = String.format("UPDATE %s SET %s = ?, %s = to_json(?::JSON), %s = ? WHERE %s = ?", Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.FILTER_CLEANUP, Filter.FILTER_ID);
+            db.update(sql, filter.getFilterNavn(), JsonUtils.serializeFilterValg(filter.getFilterValg()), filter.getFilterCleanup(), filter.getFilterId());
         }
 
         return hentFilter(filter.getFilterId());
@@ -113,7 +113,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
 
             if (numOfRowsUpdated > 0) {
                 sql = String.format("DELETE FROM %s WHERE %s = ?",
-                        Filter.FILTER_ID);
+                        Filter.TABLE_NAME, Filter.FILTER_ID);
                 int rowsUpdated = db.update(sql, filterId);
 
                 mineLagredeFilterRepository.deactivateMineFilterWithDeletedVeilederGroup(filterModelOptional.get().getFilterNavn(), filterModelOptional.get().getFilterValg().getVeiledere());

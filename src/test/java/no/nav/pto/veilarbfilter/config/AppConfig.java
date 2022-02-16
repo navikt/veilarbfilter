@@ -2,15 +2,21 @@ package no.nav.pto.veilarbfilter.config;
 
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.sts.SystemUserTokenProvider;
+import no.nav.common.types.identer.EnhetId;
 import no.nav.common.utils.Credentials;
+import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
+import no.nav.pto.veilarbfilter.service.VeilederGrupperService;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
 
 @TestConfiguration
 @Import(DbConfigTest.class)
@@ -26,7 +32,20 @@ public class AppConfig {
     public SystemUserTokenProvider systemUserTokenProvider;
 
     @Bean
-    VeilederGruppeFilterRepository veilederGruppeFilterRepository(JdbcTemplate db, MineLagredeFilterRepository mineLagredeFilterRepository) {
+    public VeilarbveilederClient veilarbveilederClient() {
+        VeilarbveilederClient mockVeilarbVeilederClient = Mockito.mock(VeilarbveilederClient.class);
+        Mockito.when(mockVeilarbVeilederClient.hentVeilederePaaEnhet(EnhetId.of("1"))).thenReturn(List.of("1", "2", "3"));
+        return mockVeilarbVeilederClient;
+    }
+
+
+    @Bean
+    public VeilederGruppeFilterRepository veilederGruppeFilterRepository(JdbcTemplate db, MineLagredeFilterRepository mineLagredeFilterRepository) {
         return new VeilederGruppeFilterRepository(db, mineLagredeFilterRepository);
+    }
+
+    @Bean
+    public VeilederGrupperService veilederGrupperService(VeilederGruppeFilterRepository veilederGruppeFilterRepository, VeilarbveilederClient veilarbveilederClient) {
+        return new VeilederGrupperService(veilederGruppeFilterRepository, veilarbveilederClient);
     }
 }

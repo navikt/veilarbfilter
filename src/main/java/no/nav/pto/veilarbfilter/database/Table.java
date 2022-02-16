@@ -12,7 +12,7 @@ public class Table {
 
     public static final class MineLagredeFilter {
         public static final String TABLE_NAME = "MineLagredeFilter";
-        public static final String FILTER_ID = "filter_id";
+        public static final String FILTER_ID = "mine_filter_id";
         public static final String VEILEDER_ID = "veileder_id";
         public static final String AKTIV = "aktiv";
         public static final String NOTE = "note";

@@ -100,8 +100,8 @@ public class MineLagredeFilterRepository implements FilterService {
     }
 
     public List<MineLagredeFilterModel> hentAllLagredeFilter() {
-        String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.filter_id = f.filter_id",
-                MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME);
+        String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s",
+                MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID);
 
         return db.query(sql, (rs, rowNum) ->
                 new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
