@@ -47,7 +47,6 @@
                 <version>2.5.5</version>
             </plugin>
         </plugins>
-        <finalName>veilarbportefolje</finalName>
     </build>
 
     <dependencies>
@@ -305,11 +304,6 @@
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
             <version>${avro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>

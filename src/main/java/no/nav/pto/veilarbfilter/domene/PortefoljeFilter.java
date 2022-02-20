@@ -2,7 +2,9 @@ package no.nav.pto.veilarbfilter.domene;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -11,33 +13,35 @@ import static java.util.Collections.emptyList;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PortefoljeFilter {
-    private final Aktiviteter aktiviteter = null;
-    private final List<String> alder = emptyList();
-    private final List<String> ferdigfilterListe = emptyList();
-    private final List<String> fodselsdagIMnd = emptyList();
-    private final List<String> formidlingsgruppe = emptyList();
-    private final List<String> hovedmal = emptyList();
-    private final List<String> innsatsgruppe = emptyList();
-    private final String kjonn = "";
-    private final List<String> manuellBrukerStatus = emptyList();
-    private final String navnEllerFnrQuery = "";
-    private final List<String> rettighetsgruppe = emptyList();
-    private final List<String> servicegruppe = emptyList();
-    private final List<String> tiltakstyper = emptyList();
-    private final String veilederNavnQuery = "";
+    private Aktiviteter aktiviteter = null;
+    private List<String> alder = emptyList();
+    private List<String> ferdigfilterListe = emptyList();
+    private List<String> fodselsdagIMnd = emptyList();
+    private List<String> formidlingsgruppe = emptyList();
+    private List<String> hovedmal = emptyList();
+    private List<String> innsatsgruppe = emptyList();
+    private String kjonn = "";
+    private List<String> manuellBrukerStatus = emptyList();
+    private String navnEllerFnrQuery = "";
+    private List<String> rettighetsgruppe = emptyList();
+    private List<String> servicegruppe = emptyList();
+    private List<String> tiltakstyper = emptyList();
+    private String veilederNavnQuery = "";
     @Setter
     private List<String> veiledere = emptyList();
-    private final String ytelse = "";
-    private final List<String> registreringstype = emptyList();
-    private final String cvJobbprofil = "";
-    private final List<KategoriModell> arbeidslisteKategori = emptyList();
-    private final List<String> utdanning = emptyList();
-    private final List<String> utdanningGodkjent = emptyList();
-    private final List<String> utdanningBestatt = emptyList();
-    private final List<String> sisteEndringKategori = emptyList();
-    private final String ulesteEndringer = "";
-    private final List<String> aktiviteterForenklet = emptyList();
+    private String ytelse = "";
+    private List<String> registreringstype = emptyList();
+    private String cvJobbprofil = "";
+    private List<KategoriModell> arbeidslisteKategori = emptyList();
+    private List<String> utdanning = emptyList();
+    private List<String> utdanningGodkjent = emptyList();
+    private List<String> utdanningBestatt = emptyList();
+    private List<String> sisteEndringKategori = emptyList();
+    private String ulesteEndringer = "";
+    private List<String> aktiviteterForenklet = emptyList();
 
     @JsonIgnore
     public Boolean isNotEmpty() {

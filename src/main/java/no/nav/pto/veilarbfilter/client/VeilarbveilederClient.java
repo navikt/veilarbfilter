@@ -25,9 +25,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Service
 public class VeilarbveilederClient {
 
-    private final String url;
-    private final OkHttpClient client;
-    private final Cache<EnhetId, List<String>> hentVeilederePaaEnhetCache;
+    private  String url;
+    private  OkHttpClient client;
+    private  Cache<EnhetId, List<String>> hentVeilederePaaEnhetCache;
 
     public VeilarbveilederClient(EnvironmentProperties environmentProperties) {
         this.url = environmentProperties.getVeilarbVeilederUrl();

@@ -1,7 +1,11 @@
 spring:
+  datasource:
+    embedded-database-connection: none
   flyway:
     enabled: true
     url: ${spring.datasource.url}
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
     validate-on-migrate: true
+  main:
+    allow-bean-definition-overriding: true

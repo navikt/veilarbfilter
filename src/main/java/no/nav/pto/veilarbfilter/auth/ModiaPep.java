@@ -10,7 +10,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 public class ModiaPep implements Pep {
 
-    private final Pep pep;
+    private  Pep pep;
 
     public ModiaPep(Pep pep) {
         this.pep = pep;

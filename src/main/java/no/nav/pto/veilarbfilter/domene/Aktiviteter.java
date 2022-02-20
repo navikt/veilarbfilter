@@ -6,21 +6,21 @@ import lombok.Data;
 @Data
 public class Aktiviteter {
     @JsonProperty("BEHANDLING")
-    private final String BEHANDLING = "NA";
+    private  String BEHANDLING = "NA";
     @JsonProperty("EGEN")
-    private final String EGEN = "NA";
+    private  String EGEN = "NA";
     @JsonProperty("GRUPPEAKTIVITET")
-    private final String GRUPPEAKTIVITET = "NA";
+    private  String GRUPPEAKTIVITET = "NA";
     @JsonProperty("IJOBB")
-    private final String IJOBB = "NA";
+    private  String IJOBB = "NA";
     @JsonProperty("MOTE")
-    private final String MOTE = "NA";
+    private  String MOTE = "NA";
     @JsonProperty("SOKEAVTALE")
-    private final String SOKEAVTALE = "NA";
+    private  String SOKEAVTALE = "NA";
     @JsonProperty("STILLING")
-    private final String STILLING = "NA";
+    private  String STILLING = "NA";
     @JsonProperty("TILTAK")
-    private final String TILTAK = "NA";
+    private  String TILTAK = "NA";
     @JsonProperty("UTDANNINGAKTIVITET")
-    private final String UTDANNINGAKTIVITET = "NA";
+    private  String UTDANNINGAKTIVITET = "NA";
 }

@@ -20,7 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @EnableConfigurationProperties({EnvironmentProperties.class})
 public class ApplicationConfig {
 
-    public static final String APPLICATION_NAME = "veilarbfilter";
+    public static String APPLICATION_NAME = "veilarbfilter";
 
 
     @Bean

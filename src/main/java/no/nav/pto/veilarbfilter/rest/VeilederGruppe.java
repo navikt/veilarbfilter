@@ -18,7 +18,7 @@ import java.util.Optional;
 @CrossOrigin
 @RequiredArgsConstructor
 public class VeilederGruppe {
-    private final VeilederGrupperService veilederGrupperService;
+    private  VeilederGrupperService veilederGrupperService;
 
     @PostMapping("/{enhetId}")
     public ResponseEntity<FilterModel> lagreFilter(@Param(value = "enhetId") String enhetId, @RequestBody NyttFilterModel nyttFilterModel) {

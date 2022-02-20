@@ -15,9 +15,9 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @EnableScheduling
 @RequiredArgsConstructor
 public class ScheduleConfig implements SchedulingConfigurer {
-    private final LeaderElectionClient leaderElectionClient;
-    private final VeilederGrupperService veilederGrupperService;
-    private final MetricsReporter metricsReporter;
+    private LeaderElectionClient leaderElectionClient;
+    private VeilederGrupperService veilederGrupperService;
+    private MetricsReporter metricsReporter;
 
     @Scheduled(cron = "30 * * * * ?")
     public void fjernVeilederSomErIkkeAktive() {

@@ -14,9 +14,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class MetricsReporter {
-    private final MineLagredeFilterService mineLagredeFilterService;
-    private final InfluxClient metricsClient;
-    private final Integer REPORT_ID = 1;
+    private  MineLagredeFilterService mineLagredeFilterService;
+    private  InfluxClient metricsClient;
+    private  Integer REPORT_ID = 1;
 
     public void reportLagradeFilter() {
         log.info("Reporting metrics...");

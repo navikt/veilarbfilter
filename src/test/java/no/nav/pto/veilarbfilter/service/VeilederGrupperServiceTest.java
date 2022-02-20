@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.service;
 
 import lombok.val;
+import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
@@ -18,7 +19,7 @@ public class VeilederGrupperServiceTest extends AbstractTest {
     @Autowired
     private VeilederGrupperService veilederGrupperService;
 
-    private final Random randomGenerator = new Random();
+    private Random randomGenerator = new Random();
 
     @BeforeEach
     public void wipeAllGroups() {

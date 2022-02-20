@@ -22,7 +22,7 @@ import static no.nav.pto.veilarbfilter.util.DbUtils.getSqlAdminRole;
 @RequiredArgsConstructor
 @EnableTransactionManagement
 public class DbConfigPostgres implements DatabaseConfig {
-    private final EnvironmentProperties environmentProperties;
+    private  EnvironmentProperties environmentProperties;
 
     @Bean
     @Override

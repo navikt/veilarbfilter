@@ -10,11 +10,11 @@ import javax.sql.DataSource;
 
 public class PostgresContainer {
 
-    private final static String DB_IMAGE = "postgres:11.5";
-    private final static String DB_USER = "postgres";
-    private final static int DB_PORT = 5432;
+    private  static String DB_IMAGE = "postgres:11.5";
+    private  static String DB_USER = "postgres";
+    private  static int DB_PORT = 5432;
 
-    private final GenericContainer container;
+    private  GenericContainer container;
 
     public PostgresContainer() {
         container = new GenericContainer(DB_IMAGE).withExposedPorts(DB_PORT);
