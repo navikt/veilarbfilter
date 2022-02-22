@@ -2,13 +2,23 @@ package no.nav.pto.veilarbfilter.rest;
 
 import lombok.val;
 import no.nav.pto.veilarbfilter.AbstractTest;
+import no.nav.pto.veilarbfilter.auth.AuthUtils;
 import no.nav.pto.veilarbfilter.domene.*;
-import org.junit.Test;
+import no.nav.pto.veilarbfilter.domene.value.VeilederId;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.*;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -18,26 +28,30 @@ import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+@WebMvcTest(MineLagredeFilter.class)
+@ActiveProfiles({"Test"})
 public class MineLagredeFilterTest extends AbstractTest {
-    @Autowired
-    private MineLagredeFilter mineLagredeFilter;
-
-    @LocalServerPort
-    private String port;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private MockMvc mockMvc;
+
+    @BeforeAll
+    public static void setUp() {
+        MockedStatic<AuthUtils> authUtilsMockedStatic = Mockito.mockStatic(AuthUtils.class);
+        authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederIdent())
+                .thenReturn(VeilederId.of("1"));
+    }
 
     @Test
-    public void contextLoads() {
-        Assertions.assertNotNull(mineLagredeFilter);
-        Assertions.assertNotNull(restTemplate);
+    public void testInit() {
+        Assertions.assertNotNull(mockMvc);
     }
 
     /**
      * TESTER RELATERT TIL GYLDIGHET FOR LAGRING AV NYTT FILTER
      **/
     @Test
+
     public void LagringAvNyttFilterErGyldig() {
         val mineLagredeFilterResponse = getMineLagredeFilter();
 
@@ -52,20 +66,22 @@ public class MineLagredeFilterTest extends AbstractTest {
             fail();
         }
 
-        assertTrue(mineLagredeFilterResponse.getContent().length < mineLagredeFilterNyResponsEtterLagring.getContent().length);
+        assertTrue(mineLagredeFilterResponse.getContent().size() < mineLagredeFilterNyResponsEtterLagring.getContent().size());
     }
 
     /**
      * HJELPEFUNKSJONER
      **/
-    private ApiResponse<MineLagredeFilterModel[]> getMineLagredeFilter() {
+    private ApiResponse<List<MineLagredeFilterModel>> getMineLagredeFilter() {
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity(String.format("http://localhost:%s/veilarbfilter/api/minelagredefilter/", port), String.class);
-            if (response.getStatusCode().equals(HttpStatus.OK)) {
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/veilarbfilter/api/minelagredefilter").accept(MediaType.APPLICATION_JSON)).andReturn();
+
+            if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                return new ApiResponse<>(response.getStatusCodeValue(), objectMapper.readValue(response.getBody(), MineLagredeFilterModel[].class), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<MineLagredeFilterModel>>() {
+                }), "");
             } else {
-                return new ApiResponse<>(response.getStatusCodeValue(), null, response.getBody());
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
         } catch (Exception e) {
             Assertions.fail();
@@ -75,12 +91,14 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private ApiResponse<MineLagredeFilterModel> lagreNyttFilterRespons(NyttFilterModel valgteFilter) {
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(String.format("http://localhost:%s/veilarbfilter/api/minelagredefilter/", port), valgteFilter, String.class);
-            if (response.getStatusCode().equals(HttpStatus.OK)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                return new ApiResponse<>(response.getStatusCodeValue(), objectMapper.readValue(response.getBody(), MineLagredeFilterModel.class), "");
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/veilarbfilter/api/minelagredefilter").content(objectMapper.writeValueAsString(valgteFilter)).accept(MediaType.APPLICATION_JSON)).andReturn();
+
+            if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
             } else {
-                return new ApiResponse<>(response.getStatusCodeValue(), null, response.getBody());
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
         } catch (Exception e) {
             Assertions.fail();
@@ -90,13 +108,14 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private ApiResponse<MineLagredeFilterModel> oppdaterMineLagredeFilter(FilterModel filterModel) {
         try {
-            HttpEntity<FilterModel> requestEntity = new HttpEntity<>(filterModel, new HttpHeaders());
-            ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%s/veilarbfilter/api/minelagredefilter/", port), HttpMethod.PUT, requestEntity, String.class);
-            if (response.getStatusCode().equals(HttpStatus.OK)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                return new ApiResponse<>(response.getStatusCodeValue(), objectMapper.readValue(response.getBody(), MineLagredeFilterModel.class), "");
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("veilarbfilter/api/minelagredefilter").content(objectMapper.writeValueAsString(filterModel)).accept(MediaType.APPLICATION_JSON)).andReturn();
+
+            if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
             } else {
-                return new ApiResponse<>(response.getStatusCodeValue(), null, response.getBody());
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
         } catch (Exception e) {
             Assertions.fail();
@@ -108,11 +127,11 @@ public class MineLagredeFilterTest extends AbstractTest {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            ResponseEntity<String> response = restTemplate.postForEntity(String.format("http://localhost:%s/veilarbfilter/api/minelagredefilter/lagresortering", port), objectMapper.writeValueAsString(sortOrder), String.class);
-            if (response.getStatusCode().equals(HttpStatus.OK)) {
-                return new ApiResponse<>(response.getStatusCodeValue(), objectMapper.readValue(response.getBody(), MineLagredeFilterModel.class), "");
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("veilarbfilter/api/minelagredefilter/lagresortering").content(objectMapper.writeValueAsString(sortOrder)).accept(MediaType.APPLICATION_JSON)).andReturn();
+            if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
             } else {
-                return new ApiResponse<>(response.getStatusCodeValue(), null, response.getBody());
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
         } catch (Exception e) {
             Assertions.fail();
@@ -122,8 +141,8 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private Integer deleteMineLagredeFilter(Integer filterId) {
         try {
-            ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%s/veilarbfilter/api/minelagredefilter/%s", port, filterId), HttpMethod.DELETE, null, String.class);
-            return response.getStatusCode().value();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("veilarbfilter/api/minelagredefilter/" + filterId).accept(MediaType.APPLICATION_JSON)).andReturn();
+            return mvcResult.getResponse().getStatus();
         } catch (Exception e) {
             Assertions.fail();
             return null;

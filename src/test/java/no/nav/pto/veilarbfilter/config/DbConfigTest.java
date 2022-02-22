@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.config;
 
 import no.nav.pto.veilarbfilter.AbstractTest;
+import org.flywaydb.core.Flyway;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -15,9 +16,7 @@ import javax.sql.DataSource;
 
 @TestConfiguration
 @ActiveProfiles({"Test"})
-
 public class DbConfigTest implements DatabaseConfig {
-
     @Bean
     @Override
     public DataSource dataSource() {
@@ -27,6 +26,12 @@ public class DbConfigTest implements DatabaseConfig {
         dataSource.setUser(postgreDBContainer.getUsername());
         dataSource.setPassword(postgreDBContainer.getPassword());
 
+        Flyway.configure()
+                .dataSource(dataSource)
+                .locations("db")
+                .baselineOnMigrate(true)
+                .load()
+                .migrate();
         return dataSource;
     }
 

@@ -8,16 +8,17 @@ import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.SortOrder;
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.FormParam;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Slf4j
-@Controller
-@RequestMapping("/veilarbfilter/api/minelagredefilter")
+@RestController
+@RequestMapping(value = "/veilarbfilter/api/minelagredefilter", produces = APPLICATION_JSON_VALUE)
 @CrossOrigin
 @RequiredArgsConstructor
 public class MineLagredeFilter {

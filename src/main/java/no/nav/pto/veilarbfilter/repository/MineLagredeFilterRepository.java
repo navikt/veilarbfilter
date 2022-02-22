@@ -77,8 +77,8 @@ public class MineLagredeFilterRepository implements FilterService {
     @Override
     public Optional<FilterModel> hentFilter(Integer filterId) {
         try {
-            String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.filter_id = f.filter_id AND f.filter_id = ?",
-                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME);
+            String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s AND f.filter_id = ?",
+                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID);
             FilterModel mineLagredeFilterModel = db.queryForObject(sql, (rs, rowNum) -> {
                         PortefoljeFilter portefoljeFilter = JsonUtils.deserializeFilterValg(rs.getString(Filter.VALGTE_FILTER));
                         return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
@@ -117,8 +117,8 @@ public class MineLagredeFilterRepository implements FilterService {
 
     public List<FilterModel> finnFilterForFilterBruker(String veilederId) {
 
-        String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.filter_id = f.filter_id AND and ml.%s = %s",
-                MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.VEILEDER_ID, veilederId);
+        String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s AND ml.%s = \'%o\'",
+                MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Integer.parseInt(veilederId));
 
         return db.query(sql, (rs, rowNum) ->
                 new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
@@ -197,13 +197,13 @@ public class MineLagredeFilterRepository implements FilterService {
         Integer count;
         if (filterIdOptional.isPresent()) {
             sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                            "WHERE ml.filter_id = f.filter_id AND f.%s = ? AND f.%s = ? AND %s =  1 AND f.filter_id != ?",
-                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.VEILEDER_ID, Filter.FILTER_NAVN, MineLagredeFilter.AKTIV);
+                            "WHERE ml.%s = f.%s AND f.%s = ? AND f.%s = ? AND %s =  1 AND f.filter_id != ?",
+                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.FILTER_NAVN, MineLagredeFilter.AKTIV);
             count = db.queryForObject(sql, Integer.class, veilederId, filterNavn, filterIdOptional.get());
         } else {
             sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                            "WHERE ml.filter_id = f.filter_id AND f.%s = ? AND f.%s = ? AND %s =  1",
-                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.VEILEDER_ID, Filter.FILTER_NAVN, MineLagredeFilter.AKTIV);
+                            "WHERE ml.%s = f.%s AND f.%s = ? AND f.%s = ? AND %s =  1",
+                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.FILTER_NAVN, MineLagredeFilter.AKTIV);
             count = db.queryForObject(sql, Integer.class, veilederId, filterNavn);
         }
 
@@ -215,13 +215,13 @@ public class MineLagredeFilterRepository implements FilterService {
         String sql;
         if (filterIdOptional.isPresent()) {
             sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                            "WHERE ml.filter_id = f.filter_id AND f.%s = ? AND f.%s = ? AND %s =  1 AND f.filter_id != ?",
-                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
+                            "WHERE ml.%s = f.%s AND f.%s = ? AND f.%s = ? AND %s =  1 AND f.filter_id != ?",
+                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
             count = db.queryForObject(sql, Integer.class, veilederId, filterValg, filterIdOptional.get());
         } else {
             sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                            "WHERE ml.filter_id = f.filter_id AND f.%s = ? AND f.%s = ? AND %s =  1",
-                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
+                            "WHERE ml.%s = f.%s AND f.%s = ? AND f.%s = ? AND %s =  1",
+                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
             count = db.queryForObject(sql, Integer.class, veilederId, filterValg);
         }
 

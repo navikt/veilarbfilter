@@ -63,4 +63,5 @@ public class AppConfig {
     public MineLagredeFilter mineLagredeFilter(MineLagredeFilterService mineLagredeFilterService) {
         return new MineLagredeFilter(mineLagredeFilterService);
     }
+    
 }
