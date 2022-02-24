@@ -1,10 +1,14 @@
 package no.nav.pto.veilarbfilter.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.common.utils.Credentials;
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
+import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
+import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
 import no.nav.pto.veilarbfilter.rest.MineLagredeFilter;
@@ -14,9 +18,11 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @TestConfiguration
@@ -40,8 +46,8 @@ public class AppConfig {
 
 
     @Bean
-    public VeilederGruppeFilterRepository veilederGruppeFilterRepository(JdbcTemplate db, MineLagredeFilterRepository mineLagredeFilterRepository) {
-        return new VeilederGruppeFilterRepository(db, mineLagredeFilterRepository);
+    public VeilederGruppeFilterRepository veilederGruppeFilterRepository(JdbcTemplate db, MineLagredeFilterRepository mineLagredeFilterRepository, ObjectMapper objectMapper) {
+        return new VeilederGruppeFilterRepository(db, mineLagredeFilterRepository, objectMapper);
     }
 
     @Bean
@@ -50,8 +56,8 @@ public class AppConfig {
     }
 
     @Bean
-    public MineLagredeFilterRepository mineLagredeFilterRepository(JdbcTemplate db) {
-        return new MineLagredeFilterRepository(db);
+    public MineLagredeFilterRepository mineLagredeFilterRepository(JdbcTemplate db, ObjectMapper objectMapper) {
+        return new MineLagredeFilterRepository(db, objectMapper);
     }
 
     @Bean
@@ -63,5 +69,15 @@ public class AppConfig {
     public MineLagredeFilter mineLagredeFilter(MineLagredeFilterService mineLagredeFilterService) {
         return new MineLagredeFilter(mineLagredeFilterService);
     }
-    
+
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(LocalDateTime.class, new DateDeserializer());
+        module.addSerializer(LocalDateTime.class, new DateSerializer());
+        mapper.registerModule(module);
+        return mapper;
+    }
 }

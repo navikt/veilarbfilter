@@ -1,5 +1,7 @@
 package no.nav.pto.veilarbfilter.rest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.auth.AuthUtils;
@@ -18,8 +20,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Random;
@@ -34,6 +34,9 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeAll
     public static void setUp() {
@@ -74,11 +77,10 @@ public class MineLagredeFilterTest extends AbstractTest {
      **/
     private ApiResponse<List<MineLagredeFilterModel>> getMineLagredeFilter() {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/veilarbfilter/api/minelagredefilter").accept(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/veilarbfilter/api/minelagredefilter").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<MineLagredeFilterModel>>() {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
                 }), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
@@ -91,9 +93,8 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private ApiResponse<MineLagredeFilterModel> lagreNyttFilterRespons(NyttFilterModel valgteFilter) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/veilarbfilter/api/minelagredefilter").content(objectMapper.writeValueAsString(valgteFilter)).accept(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/veilarbfilter/api/minelagredefilter").content(objectMapper.writeValueAsString(valgteFilter)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
@@ -108,9 +109,8 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private ApiResponse<MineLagredeFilterModel> oppdaterMineLagredeFilter(FilterModel filterModel) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("veilarbfilter/api/minelagredefilter").content(objectMapper.writeValueAsString(filterModel)).accept(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("veilarbfilter/api/minelagredefilter").content(objectMapper.writeValueAsString(filterModel)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
@@ -125,9 +125,7 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private ApiResponse<MineLagredeFilterModel> oppdaterMineLagredeFilter(List<SortOrder> sortOrder) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("veilarbfilter/api/minelagredefilter/lagresortering").content(objectMapper.writeValueAsString(sortOrder)).accept(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("veilarbfilter/api/minelagredefilter/lagresortering").content(objectMapper.writeValueAsString(sortOrder)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
             } else {
@@ -141,7 +139,7 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private Integer deleteMineLagredeFilter(Integer filterId) {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("veilarbfilter/api/minelagredefilter/" + filterId).accept(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("veilarbfilter/api/minelagredefilter/" + filterId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
             return mvcResult.getResponse().getStatus();
         } catch (Exception e) {
             Assertions.fail();

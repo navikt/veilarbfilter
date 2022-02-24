@@ -1,11 +1,12 @@
 package no.nav.pto.veilarbfilter.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
-import no.nav.pto.veilarbfilter.util.JsonUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,9 @@ import java.util.Random;
 class VeilederGrupperServiceTest extends AbstractTest {
     @Autowired
     private VeilederGrupperService veilederGrupperService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private Random randomGenerator = new Random();
 
@@ -60,7 +64,7 @@ class VeilederGrupperServiceTest extends AbstractTest {
     }
 
     @Test
-    public void retriveVeiledergruppe() {
+    public void retriveVeiledergruppe() throws JsonProcessingException {
         Optional<FilterModel> veildederGruppe = veilederGrupperService.lagreFilter("1", getRandomFilter(List.of("1")));
 
         Assertions.assertTrue(veildederGruppe.isPresent());
@@ -69,7 +73,7 @@ class VeilederGrupperServiceTest extends AbstractTest {
             if (filterFromService != null) {
                 Assertions.assertEquals(filterFromService.get().getFilterId(), veildederGruppe.get().getFilterId());
                 Assertions.assertEquals(filterFromService.get().getFilterNavn(), veildederGruppe.get().getFilterNavn());
-                Assertions.assertEquals(JsonUtils.serializeFilterValg(filterFromService.get().getFilterValg()), JsonUtils.serializeFilterValg(veildederGruppe.get().getFilterValg()));
+                Assertions.assertEquals(objectMapper.writeValueAsString(filterFromService.get().getFilterValg()), objectMapper.writeValueAsString(veildederGruppe.get().getFilterValg()));
             } else {
                 Assertions.fail("Filter was not in DB");
             }

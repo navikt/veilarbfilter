@@ -1,5 +1,7 @@
 package no.nav.pto.veilarbfilter.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import no.nav.common.abac.VeilarbPepFactory;
@@ -10,10 +12,15 @@ import no.nav.common.sts.NaisSystemUserTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.utils.Credentials;
 import no.nav.pto.veilarbfilter.auth.ModiaPep;
+import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
+import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.time.LocalDateTime;
 
 
 @Configuration
@@ -51,5 +58,16 @@ public class ApplicationConfig {
         );
 
         return new ModiaPep(pep);
+    }
+
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(LocalDateTime.class, new DateDeserializer());
+        module.addSerializer(LocalDateTime.class, new DateSerializer());
+        mapper.registerModule(module);
+        return mapper;
     }
 }
