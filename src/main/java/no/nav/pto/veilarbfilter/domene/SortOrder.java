@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class SortOrder {
-    private  Integer filterId;
-    private  Integer sortOrder;
+    private final Integer filterId;
+    private final Integer sortOrder;
 }

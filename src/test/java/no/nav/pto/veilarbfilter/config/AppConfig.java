@@ -12,6 +12,7 @@ import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
 import no.nav.pto.veilarbfilter.rest.MineLagredeFilter;
+import no.nav.pto.veilarbfilter.rest.RestResponseEntityExceptionHandler;
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterService;
 import no.nav.pto.veilarbfilter.service.VeilederGrupperService;
 import org.mockito.Mockito;
@@ -63,6 +64,11 @@ public class AppConfig {
     @Bean
     public MineLagredeFilterService mineLagredeFilterService(MineLagredeFilterRepository mineLagredeFilterRepository) {
         return new MineLagredeFilterService(mineLagredeFilterRepository);
+    }
+
+    @Bean
+    public RestResponseEntityExceptionHandler restResponseEntityExceptionHandler() {
+        return new RestResponseEntityExceptionHandler();
     }
 
     @Bean

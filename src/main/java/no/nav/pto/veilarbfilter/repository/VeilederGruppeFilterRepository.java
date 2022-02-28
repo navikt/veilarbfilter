@@ -27,7 +27,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
     private final ObjectMapper objectMapper;
 
 
-    public Optional<FilterModel> lagreFilter(String enhetId, NyttFilterModel nyttFilterModel) {
+    public Optional<FilterModel> lagreFilter(String enhetId, NyttFilterModel nyttFilterModel) throws IllegalArgumentException {
         try {
             var key = 0;
 
@@ -56,6 +56,9 @@ public class VeilederGruppeFilterRepository implements FilterService {
                 db.update(insertSql, key, enhetId);
             }
             return hentFilter(key);
+
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Can't save filter " + e, e);
             return Optional.empty();
@@ -63,7 +66,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
     }
 
     @Override
-    public Optional<FilterModel> oppdaterFilter(String enhetId, FilterModel filter) {
+    public Optional<FilterModel> oppdaterFilter(String enhetId, FilterModel filter) throws IllegalArgumentException {
         try {
             String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ? AND %s = ?", VeilederGrupperFilter.TABLE_NAME, VeilederGrupperFilter.ENHET_ID, VeilederGrupperFilter.FILTER_ID);
             Integer numOfRows = db.queryForObject(sql, Integer.class, enhetId, filter.getFilterId());
@@ -74,6 +77,8 @@ public class VeilederGruppeFilterRepository implements FilterService {
             }
 
             return hentFilter(filter.getFilterId());
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Can't update filter " + e, e);
             return Optional.empty();

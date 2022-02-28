@@ -20,13 +20,21 @@ public class VeilederGrupperService implements FilterService {
     private final VeilarbveilederClient veilarbveilederClient;
 
     @Override
-    public Optional<FilterModel> lagreFilter(String enhetId, NyttFilterModel nyttFilter) {
-        return veilederGruppeFilterRepository.lagreFilter(enhetId, nyttFilter);
+    public Optional<FilterModel> lagreFilter(String enhetId, NyttFilterModel nyttFilter) throws IllegalArgumentException {
+        try {
+            return veilederGruppeFilterRepository.lagreFilter(enhetId, nyttFilter);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
     }
 
     @Override
-    public Optional<FilterModel> oppdaterFilter(String enhetId, FilterModel filter) {
-        return veilederGruppeFilterRepository.oppdaterFilter(enhetId, filter);
+    public Optional<FilterModel> oppdaterFilter(String enhetId, FilterModel filter) throws IllegalArgumentException {
+        try {
+            return veilederGruppeFilterRepository.oppdaterFilter(enhetId, filter);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
     }
 
     @Override

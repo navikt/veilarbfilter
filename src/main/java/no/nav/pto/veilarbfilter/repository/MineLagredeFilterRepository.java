@@ -28,7 +28,7 @@ public class MineLagredeFilterRepository implements FilterService {
     private final ObjectMapper objectMapper;
 
 
-    public Optional<FilterModel> lagreFilter(String veilederId, NyttFilterModel nyttFilterModel) {
+    public Optional<FilterModel> lagreFilter(String veilederId, NyttFilterModel nyttFilterModel) throws IllegalArgumentException {
         try {
             var key = 0;
 
@@ -54,6 +54,8 @@ public class MineLagredeFilterRepository implements FilterService {
 
             return hentFilter(key);
 
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Can't save filter " + e, e);
             return Optional.empty();
@@ -61,7 +63,7 @@ public class MineLagredeFilterRepository implements FilterService {
     }
 
     @Override
-    public Optional<FilterModel> oppdaterFilter(String veilederId, FilterModel filter) {
+    public Optional<FilterModel> oppdaterFilter(String veilederId, FilterModel filter) throws IllegalArgumentException {
         try {
             validerFilterNavn(filter.getFilterNavn());
             validerFilterValg(filter.getFilterValg());
@@ -79,6 +81,8 @@ public class MineLagredeFilterRepository implements FilterService {
             }
 
             return hentFilter(filter.getFilterId());
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Can't update filter " + e, e);
             return Optional.empty();
@@ -244,12 +248,12 @@ public class MineLagredeFilterRepository implements FilterService {
             ObjectMapper objectMapper = new ObjectMapper();
             if (filterIdOptional.isPresent()) {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::json::text = ? AND %s =  1 AND f.filter_id != ?",
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::json::text = to_json(?::JSON)::text AND %s =  1 AND f.filter_id != ?",
                         MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
                 count = db.queryForObject(sql, Integer.class, veilederId, objectMapper.writeValueAsString(filterValg), filterIdOptional.get());
             } else {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::json::text = ? AND %s =  1",
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::json::text = to_json(?::JSON)::text AND %s =  1",
                         MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
                 count = db.queryForObject(sql, Integer.class, veilederId, objectMapper.writeValueAsString(filterValg));
             }

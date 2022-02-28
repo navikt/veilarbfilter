@@ -17,13 +17,21 @@ public class MineLagredeFilterService implements FilterService {
     private final MineLagredeFilterRepository mineLagredeFilterRepository;
 
     @Override
-    public Optional<FilterModel> lagreFilter(String veilederId, NyttFilterModel nyttFilter) {
-        return mineLagredeFilterRepository.lagreFilter(veilederId, nyttFilter);
+    public Optional<FilterModel> lagreFilter(String veilederId, NyttFilterModel nyttFilter) throws IllegalArgumentException {
+        try {
+            return mineLagredeFilterRepository.lagreFilter(veilederId, nyttFilter);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
     }
 
     @Override
-    public Optional<FilterModel> oppdaterFilter(String veilederId, FilterModel filter) {
-        return mineLagredeFilterRepository.oppdaterFilter(veilederId, filter);
+    public Optional<FilterModel> oppdaterFilter(String veilederId, FilterModel filter) throws IllegalArgumentException {
+        try {
+            return mineLagredeFilterRepository.oppdaterFilter(veilederId, filter);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
     }
 
     @Override
