@@ -18,7 +18,7 @@ import java.util.Optional;
 @CrossOrigin
 @RequiredArgsConstructor
 public class VeilederGruppe {
-    private  VeilederGrupperService veilederGrupperService;
+    private VeilederGrupperService veilederGrupperService;
 
     @PostMapping("/{enhetId}")
     public ResponseEntity<FilterModel> lagreFilter(@Param(value = "enhetId") String enhetId, @RequestBody NyttFilterModel nyttFilterModel) {
@@ -46,7 +46,7 @@ public class VeilederGruppe {
     }
 
     @DeleteMapping("{enhetId}/filter/{filterId}")
-    public ResponseEntity slettFilter(@Param(value = "enhetId") String enhetId, @Param(value = "filterId") Integer filterId) {
+    public ResponseEntity slettFilter(@PathVariable(value = "enhetId") String enhetId, @PathVariable(value = "filterId") Integer filterId) {
         Integer slettetFilterId = veilederGrupperService.slettFilter(filterId, enhetId);
         if (slettetFilterId == 0) {
             return ResponseEntity.notFound().build();

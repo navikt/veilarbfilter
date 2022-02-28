@@ -169,8 +169,7 @@ public class MineLagredeFilterRepository implements FilterService {
         int numOfRowsUpdated = db.update(sql, filterId, veilederId);
 
         if (numOfRowsUpdated > 0) {
-            sql = String.format("DELETE FROM %s WHERE %s = ?",
-                    Filter.FILTER_ID);
+            sql = String.format("DELETE FROM %s WHERE %s = ?", Filter.TABLE_NAME, Filter.FILTER_ID);
 
             return db.update(sql, filterId);
         }
@@ -179,10 +178,10 @@ public class MineLagredeFilterRepository implements FilterService {
 
     @Override
     public List<FilterModel> lagreSortering(String veilederId, List<SortOrder> sortOrder) {
-        String filterIdsList = sortOrder.stream().map(x -> String.valueOf(x.getFilterId())).collect(Collectors.joining(",", "(", ")"));
+        String filterIdsList = sortOrder.stream().map(x -> x.getFilterId() + "::int").collect(Collectors.joining(",", "(", ")"));
 
-        String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s IN ? AND %s = ?", MineLagredeFilter.TABLE_NAME, MineLagredeFilter.FILTER_ID, MineLagredeFilter.VEILEDER_ID);
-        Integer numOfAllowedUpdates = db.queryForObject(sql, Integer.class, filterIdsList, veilederId);
+        String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s IN %s AND %s = ?", MineLagredeFilter.TABLE_NAME, MineLagredeFilter.FILTER_ID, filterIdsList, MineLagredeFilter.VEILEDER_ID);
+        Integer numOfAllowedUpdates = db.queryForObject(sql, Integer.class, veilederId);
 
         if (numOfAllowedUpdates.equals(sortOrder.size())) {
             sortOrder.forEach(filter -> {
@@ -248,12 +247,12 @@ public class MineLagredeFilterRepository implements FilterService {
             ObjectMapper objectMapper = new ObjectMapper();
             if (filterIdOptional.isPresent()) {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::json::text = to_json(?::JSON)::text AND %s =  1 AND f.filter_id != ?",
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1 AND f.filter_id != ?",
                         MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
                 count = db.queryForObject(sql, Integer.class, veilederId, objectMapper.writeValueAsString(filterValg), filterIdOptional.get());
             } else {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::json::text = to_json(?::JSON)::text AND %s =  1",
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1",
                         MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
                 count = db.queryForObject(sql, Integer.class, veilederId, objectMapper.writeValueAsString(filterValg));
             }

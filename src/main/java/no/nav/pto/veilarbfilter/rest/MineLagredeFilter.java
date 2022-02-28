@@ -10,7 +10,6 @@ import no.nav.pto.veilarbfilter.service.MineLagredeFilterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.FormParam;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,8 +54,8 @@ public class MineLagredeFilter {
         return ResponseEntity.ok().body(filterModels);
     }
 
-    @DeleteMapping
-    public ResponseEntity slettFilter(@FormParam(value = "filterId") Integer filterId) {
+    @DeleteMapping("/{filterId}")
+    public ResponseEntity slettFilter(@PathVariable("filterId") Integer filterId) {
         String veilederId = AuthUtils.getInnloggetVeilederIdent().toString();
 
         Integer slettetFilterId = mineLagredeFilterService.slettFilter(filterId, veilederId);

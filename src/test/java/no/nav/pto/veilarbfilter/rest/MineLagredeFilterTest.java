@@ -307,6 +307,7 @@ public class MineLagredeFilterTest extends AbstractTest {
         });
 
         val oppdaterSortingMineLagredeFilter = oppdaterMineLagredeFilter(sortOrder);
+        assertTrue(oppdaterSortingMineLagredeFilter.getContent() != null);
         assertTrue(oppdaterSortingMineLagredeFilter.getContent().size() >= 3);
 
         val mineLagredeFilterMedSortOrder = getMineLagredeFilter();
@@ -370,7 +371,7 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private ApiResponse<List<MineLagredeFilterModel>> oppdaterMineLagredeFilter(List<SortOrder> sortOrder) {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("veilarbfilter/api/minelagredefilter/lagresortering").content(objectMapper.writeValueAsString(sortOrder)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/veilarbfilter/api/minelagredefilter/lagresortering").content(objectMapper.writeValueAsString(sortOrder)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
                 }), "");
@@ -385,7 +386,7 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private Integer deleteMineLagredeFilter(Integer filterId) {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("veilarbfilter/api/minelagredefilter/" + filterId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("/veilarbfilter/api/minelagredefilter/" + filterId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
             return mvcResult.getResponse().getStatus();
         } catch (Exception e) {
             Assertions.fail();
@@ -407,8 +408,19 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     public PortefoljeFilter getRandomPortefoljeFilter() {
         Random random = new Random();
+        Aktiviteter aktiviteter = new Aktiviteter();
+        aktiviteter.setBEHANDLING("J");
+        aktiviteter.setIJOBB("N");
         val alderVelg = List.of("19-og-under", "20-24", "25-29", "30-39", "40-49", "50-59", "60-66", "67-70");
         val kjonnVelg = List.of("K", "M");
-        return new PortefoljeFilter(null, List.of(alderVelg.get(random.nextInt(0, 7))), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), kjonnVelg.get(random.nextInt(0, 1)), emptyList(), "", emptyList(), emptyList(), emptyList(), "", emptyList(), "", emptyList(), "", emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList());
+        val ferdigfilterListe = List.of("UFORDELTE_BRUKERE", "NYE_BRUKERE_FOR_VEILEDER", "TRENGER_VURDERING", "INAKTIVE_BRUKERE", "VENTER_PA_SVAR_FRA_NAV", "VENTER_PA_SVAR_FRA_BRUKER", "UTLOPTE_AKTIVITETER");
+        return new PortefoljeFilter(aktiviteter, List.of(alderVelg.get(random.nextInt(0, 7)), alderVelg.get(random.nextInt(0, 7)), alderVelg.get(random.nextInt(0, 7))), List.of(ferdigfilterListe.get(random.nextInt(0, 6)), ferdigfilterListe.get(random.nextInt(0, 6)), ferdigfilterListe.get(random.nextInt(0, 6))), emptyList(), emptyList(), emptyList(), emptyList(), kjonnVelg.get(random.nextInt(0, 1)), emptyList(), String.valueOf(rndChar()), emptyList(), emptyList(), emptyList(), "", emptyList(), "", emptyList(), "", emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList());
+    }
+
+    private static char rndChar() {
+        int rnd = (int) (Math.random() * 52); // or use Random or whatever
+        char base = (rnd < 26) ? 'A' : 'a';
+        return (char) (base + rnd % 26);
+
     }
 }
