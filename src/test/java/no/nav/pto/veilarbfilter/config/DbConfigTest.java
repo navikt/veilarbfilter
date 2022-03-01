@@ -22,11 +22,12 @@ public class DbConfigTest implements DatabaseConfig {
     public DataSource dataSource() {
         PostgreSQLContainer<?> postgreDBContainer = AbstractTest.postgreDBContainer;
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
-        dataSource.setUrl(postgreDBContainer.getJdbcUrl());
+        dataSource.setUrl(postgreDBContainer.getJdbcUrl() + "&characterEncoding=ISO-8859-4");
         dataSource.setUser(postgreDBContainer.getUsername());
         dataSource.setPassword(postgreDBContainer.getPassword());
 
         Flyway.configure()
+                .encoding("ISO-8859-4")
                 .dataSource(dataSource)
                 .locations("db")
                 .baselineOnMigrate(true)

@@ -55,6 +55,7 @@ public class DbConfigPostgres implements DatabaseConfig {
         DataSource dataSource = createDataSource(environmentProperties.getDbUrl(), true);
 
         Flyway.configure()
+                .encoding("ISO-8859-4")
                 .dataSource(dataSource)
                 .locations("db/migration")
                 .initSql("SET ROLE '" + getSqlAdminRole() + "';")
