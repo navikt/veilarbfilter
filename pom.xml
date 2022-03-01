@@ -20,7 +20,6 @@
         <common1.version>1.2021.07.07_10.18-72bd65c546f6</common1.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
-        <veilarbregistrering.skjema.version>1.202108021530-9a956c3</veilarbregistrering.skjema.version>
         <jaxb.version>2.3.1</jaxb.version>
         <testcontainers.version>1.16.3</testcontainers.version>
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
@@ -131,17 +130,6 @@
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>no.nav.arbeid</groupId>
-            <artifactId>veilarbregistrering-skjema</artifactId>
-            <version>${veilarbregistrering.skjema.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.arbeid.pam</groupId>
-            <artifactId>pam-cv-avro-cvmeldinger</artifactId>
-            <version>51</version>
         </dependency>
 
         <dependency>
