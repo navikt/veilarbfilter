@@ -13,6 +13,8 @@ spec:
     paths:
       - kvPath: serviceuser/data/prod/srvveilarbfilter
         mountPath: /var/run/secrets/nais.io/service_user
+      - kvPath: /kv/prod/fss/veilarbfilter/default
+        mountPath: /var/run/secrets/nais.io/vault
   liveness:
     path: /veilarbfilter/internal/isAlive
     initialDelay: 20
@@ -41,22 +43,11 @@ spec:
   prometheus:
     enabled: true
     path: /veilarbfilter/internal/metrics
+  leaderElection: true
   envFrom:
     - configmap: pto-config
   env:
     - name: JAVA_OPTS
-      value: "-XX:MaxRAMPercentage=65.0"
-    - name: ISSO_JWKS_URL
-      value: https://isso.adeo.no/isso/oauth2/connect/jwk_uri
-    - name: ISSO_ISSUER
-      value: https://isso.adeo.no:443/isso/oauth2
-    - name: VEILARBFILTER_DB_URL
-      value: jdbc:postgresql://A01DBVL010.adeo.no:5432/veilarbfilter
-    - name: VAULT_MOUNT_PATH
-      value: /postgresql/prod-fss
-    - name: ABAC_PDP_ENDPOINT_URL
-      value: https://abac-veilarb.intern.nav.no/application/asm-pdp/authorize
-    - name: SECURITY_TOKEN_SERVICE_DISCOVERY_URL
-      value: https://security-token-service.nais.adeo.no/rest/v1/sts/.well-known/openid-configuration
-    - name: AZUREAD_JWKS_URL
-      value: https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/discovery/v2.0/keys
+      value: "-Xms4096m -Xmx10144m --illegal-access=permit --add-opens=java.base/java.lang=ALL-UNNAMED"
+    - name: ABAC_MODIA_URL
+      value: https://abac-modia.intern.nav.no/application/asm-pdp/authorize
