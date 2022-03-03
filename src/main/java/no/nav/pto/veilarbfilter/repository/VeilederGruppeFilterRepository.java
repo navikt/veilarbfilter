@@ -106,7 +106,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
                     , filterId);
             return Optional.of(veilederGruppeFilterModel);
         } catch (Exception e) {
-            log.warn("Can't find filter " + e, e);
+            log.warn("Can't find filter " + e);
             return Optional.empty();
         }
     }
