@@ -27,9 +27,6 @@ import java.time.LocalDateTime;
 @EnableConfigurationProperties({EnvironmentProperties.class})
 public class ApplicationConfig {
 
-    public static String APPLICATION_NAME = "veilarbfilter";
-
-
     @Bean
     public LockProvider lockProvider(JdbcTemplate jdbcTemplate) {
         return new JdbcTemplateLockProvider(jdbcTemplate);
