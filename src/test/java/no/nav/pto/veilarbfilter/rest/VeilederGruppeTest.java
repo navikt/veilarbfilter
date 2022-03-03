@@ -4,18 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import no.nav.pto.veilarbfilter.AbstractTest;
-import no.nav.pto.veilarbfilter.auth.AuthUtils;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.MineLagredeFilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
-import no.nav.pto.veilarbfilter.domene.value.VeilederId;
 import no.nav.pto.veilarbfilter.service.VeilederGrupperService;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
@@ -46,13 +41,6 @@ public class VeilederGruppeTest extends AbstractTest {
     @Autowired
     private MockMvc mockMvc = MockMvcBuilders.standaloneSetup()
             .setControllerAdvice(RestResponseEntityExceptionHandler.class).build();
-
-    @BeforeAll
-    public static void setUp() {
-        MockedStatic<AuthUtils> authUtilsMockedStatic = Mockito.mockStatic(AuthUtils.class);
-        authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederIdent())
-                .thenReturn(VeilederId.of("1"));
-    }
 
     @Test
     public void testInit() {
