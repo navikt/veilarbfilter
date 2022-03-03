@@ -208,7 +208,7 @@ public class VeilederGruppeTest extends AbstractTest {
     private NyttFilterModel getRandomNyttFilter(List<String> veiledersList) {
         Random random = new Random();
 
-        return new NyttFilterModel("Filter navn " + random.nextInt(100, 1000), getRandomPortefoljeFilter(veiledersList));
+        return new NyttFilterModel("Filter navn " + random.nextInt(1000, 100000), getRandomPortefoljeFilter(veiledersList));
     }
 
     public PortefoljeFilter getRandomPortefoljeFilter(List<String> veiledersList) {

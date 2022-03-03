@@ -11,6 +11,7 @@ import no.nav.pto.veilarbfilter.domene.value.VeilederId;
 import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -49,6 +50,11 @@ public class MineLagredeFilterTest extends AbstractTest {
         MockedStatic<AuthUtils> authUtilsMockedStatic = Mockito.mockStatic(AuthUtils.class);
         authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederIdent())
                 .thenReturn(VeilederId.of("1"));
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+
     }
 
     @Test
@@ -404,7 +410,7 @@ public class MineLagredeFilterTest extends AbstractTest {
     private NyttFilterModel getRandomNyttFilter() {
         Random random = new Random();
 
-        return new NyttFilterModel("Filter navn " + random.nextInt(100, 1000), getRandomPortefoljeFilter());
+        return new NyttFilterModel("Filter navn " + random.nextInt(1000, 100000), getRandomPortefoljeFilter());
     }
 
     public PortefoljeFilter getRandomPortefoljeFilter() {
