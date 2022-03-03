@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -22,7 +21,6 @@ import static no.nav.pto.veilarbfilter.util.DbUtils.getSqlAdminRole;
 @Slf4j
 @RequiredArgsConstructor
 @EnableTransactionManagement
-@Configuration
 public class DbConfigPostgres implements DatabaseConfig {
     private final EnvironmentProperties environmentProperties;
 
