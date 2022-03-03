@@ -26,7 +26,7 @@ public class DbUtils {
 
     public static HikariConfig createDataSourceConfig(String dbUrl) {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(dbUrl + "&characterEncoding=ISO-8859-4");
+        config.setJdbcUrl(dbUrl + "?useUnicode=true&amp;characterEncoding=UTF-8");
         config.setMaximumPoolSize(5);
         config.setMinimumIdle(1);
         return config;

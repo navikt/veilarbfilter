@@ -1,7 +1,7 @@
 spring:
   sql:
     init:
-      encoding: ISO-8859-4
+      encoding: UTF-8
   datasource:
     embedded-database-connection: none
   flyway:
@@ -10,6 +10,6 @@ spring:
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
     validate-on-migrate: true
-    encoding: ISO-8859-4
+    encoding: UTF-8
   main:
     allow-bean-definition-overriding: true

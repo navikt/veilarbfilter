@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.service.VeilederGrupperService;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,10 +17,10 @@ import java.util.Optional;
 @CrossOrigin
 @RequiredArgsConstructor
 public class VeilederGruppe {
-    private VeilederGrupperService veilederGrupperService;
+    private final VeilederGrupperService veilederGrupperService;
 
     @PostMapping("/{enhetId}")
-    public ResponseEntity<FilterModel> lagreFilter(@Param(value = "enhetId") String enhetId, @RequestBody NyttFilterModel nyttFilterModel) {
+    public ResponseEntity<FilterModel> lagreFilter(@PathVariable(value = "enhetId") String enhetId, @RequestBody NyttFilterModel nyttFilterModel) {
         Optional<FilterModel> filterModelOptional = veilederGrupperService.lagreFilter(enhetId, nyttFilterModel);
         if (filterModelOptional.isPresent()) {
             return ResponseEntity.ok().body(filterModelOptional.get());
@@ -30,7 +29,7 @@ public class VeilederGruppe {
     }
 
     @PutMapping("/{enhetId}")
-    public ResponseEntity<FilterModel> oppdaterFilter(@Param(value = "enhetId") String enhetId, @RequestBody FilterModel filterModel) {
+    public ResponseEntity<FilterModel> oppdaterFilter(@PathVariable(value = "enhetId") String enhetId, @RequestBody FilterModel filterModel) {
         Optional<FilterModel> filterModelOptional = veilederGrupperService.oppdaterFilter(enhetId, filterModel);
         if (filterModelOptional.isPresent()) {
             return ResponseEntity.ok().body(filterModelOptional.get());
@@ -39,7 +38,7 @@ public class VeilederGruppe {
     }
 
     @GetMapping("/{enhetId}")
-    public ResponseEntity<List<FilterModel>> finnFilterForFilterBruker(@Param(value = "enhetId") String enhetId) {
+    public ResponseEntity<List<FilterModel>> finnFilterForFilterBruker(@PathVariable(value = "enhetId") String enhetId) {
         List<FilterModel> filterModels = veilederGrupperService.finnFilterForFilterBruker(enhetId);
 
         return ResponseEntity.ok().body(filterModels);

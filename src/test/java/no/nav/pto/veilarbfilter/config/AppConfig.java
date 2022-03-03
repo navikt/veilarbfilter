@@ -13,6 +13,7 @@ import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
 import no.nav.pto.veilarbfilter.rest.MineLagredeFilter;
 import no.nav.pto.veilarbfilter.rest.RestResponseEntityExceptionHandler;
+import no.nav.pto.veilarbfilter.rest.VeilederGruppe;
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterService;
 import no.nav.pto.veilarbfilter.service.VeilederGrupperService;
 import org.mockito.Mockito;
@@ -74,6 +75,11 @@ public class AppConfig {
     @Bean
     public MineLagredeFilter mineLagredeFilter(MineLagredeFilterService mineLagredeFilterService) {
         return new MineLagredeFilter(mineLagredeFilterService);
+    }
+
+    @Bean
+    public VeilederGruppe veilederGruppe(VeilederGrupperService veilederGrupperService) {
+        return new VeilederGruppe(veilederGrupperService);
     }
 
     @Bean
