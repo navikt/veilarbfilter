@@ -17,14 +17,12 @@ spec:
         mountPath: /var/run/secrets/nais.io/vault
   liveness:
     path: /veilarbfilter/internal/isAlive
-    initialDelay: 20
-    timeout: 1
-    periodSeconds: 5
-    failureThreshold: 10
+    initialDelay: 60
+    timeout: 10
   readiness:
     path: /veilarbfilter/internal/isReady
-    initialDelay: 20
-    timeout: 1
+    initialDelay: 60
+    timeout: 10
   resources:
     limits:
       cpu: 1500m
