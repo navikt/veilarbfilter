@@ -51,7 +51,7 @@ public class DbConfigPostgres implements DatabaseConfig {
     @PostConstruct
     @SneakyThrows
     public void migrateDb() {
-        log.info("Starting database migration...");
+        log.info("Starting database migration..." + environmentProperties.getDbUrl());
         DataSource dataSource = createDataSource(environmentProperties.getDbUrl(), true);
 
         Flyway.configure()
