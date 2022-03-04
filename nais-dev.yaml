@@ -17,6 +17,8 @@ spec:
     - https://app-q1.adeo.no/veilarbfilter
     - https://app-q1.dev.adeo.no/veilarbfilter
   webproxy: true
+  secureLogs:
+    enabled: true
   vault:
     enabled: true
     paths:
