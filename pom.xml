@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <common.version>2.2022.01.14_09.11-1d258a7225ea</common.version>
+        <common.version>2.2022.02.18_14.38-8d8bb494bd41</common.version>
         <common1.version>1.2021.07.07_10.18-72bd65c546f6</common1.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
@@ -232,11 +232,6 @@
 
         <!--TEST-->
         <dependency>
-            <groupId>org.apache.avro</groupId>
-            <artifactId>avro</artifactId>
-            <version>${avro.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>4.0.0</version>
@@ -280,11 +275,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock</artifactId>
-            <version>2.27.2</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -292,7 +282,7 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>job</artifactId>
-            <version>2.2022.02.18_14.38-8d8bb494bd41</version>
+            <version>${common.version}</version>
         </dependency>
     </dependencies>
 
