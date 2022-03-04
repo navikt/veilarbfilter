@@ -37,7 +37,7 @@ public class DbUtils {
     }
 
     public static String getSqlReadOnlyRole() {
-        return "veilarbfilter-readonly";
+        return "veilarbfilter-user";
     }
 
     @SneakyThrows

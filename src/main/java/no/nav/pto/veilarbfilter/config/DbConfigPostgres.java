@@ -27,7 +27,7 @@ public class DbConfigPostgres implements DatabaseConfig {
     @Bean
     @Override
     public DataSource dataSource() {
-        return createDataSource(environmentProperties.getDbUrl(), true);
+        return createDataSource(environmentProperties.getDbUrl(), false);
     }
 
     @Bean
