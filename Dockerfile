@@ -1,4 +1,4 @@
-FROM  docker.pkg.github.com/navikt/pus-nais-java-app/pus-nais-java-app:java17
+FROM  docker.pkg.github.com/navikt/poao-baseimages/java:17
 
 ENV APPD_ENABLED=true
 ENV APP_NAME=veilarbfilter
