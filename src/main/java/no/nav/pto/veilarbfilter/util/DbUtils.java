@@ -34,12 +34,12 @@ public class DbUtils {
 
     public static String getSqlAdminRole() {
         boolean isProd = isProduction().orElse(false);
-        return (isProd ? "veilarbfilter-admin" : "veilarbfilter-admin");
+        return (isProd ? "veilarbfilter-prod-admin" : "veilarbfilter-dev-admin");
     }
 
     public static String getSqlReadOnlyRole() {
         boolean isProd = isProduction().orElse(false);
-        return (isProd ? "veilarbfilter-readonly" : "veilarbfilter-readonly");
+        return (isProd ? "veilarbfilter-prod-readonly" : "veilarbfilter-dev-readonly");
     }
 
     @SneakyThrows
