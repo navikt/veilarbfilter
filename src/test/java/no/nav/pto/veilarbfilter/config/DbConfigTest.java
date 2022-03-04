@@ -22,7 +22,7 @@ public class DbConfigTest implements DatabaseConfig {
     public DataSource dataSource() {
         PostgreSQLContainer<?> postgreDBContainer = AbstractTest.postgreDBContainer;
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
-        dataSource.setUrl(postgreDBContainer.getJdbcUrl() + "?useUnicode=true&amp;characterEncoding=UTF-8");
+        dataSource.setUrl(postgreDBContainer.getJdbcUrl());
         dataSource.setUser(postgreDBContainer.getUsername());
         dataSource.setPassword(postgreDBContainer.getPassword());
 
