@@ -310,7 +310,7 @@ public class MineLagredeFilterTest extends AbstractTest {
 
         val sortOrder = new ArrayList<SortOrder>();
         mineLagredeFilter.getContent().stream().forEach(x -> {
-            sortOrder.add(new SortOrder(x.getFilterId(), Integer.valueOf(random.nextInt(1, 20))));
+            sortOrder.add(new SortOrder(x.getFilterId(), Integer.valueOf(random.nextInt(20))));
         });
 
         val oppdaterSortingMineLagredeFilter = oppdaterMineLagredeFilter(sortOrder);
@@ -410,7 +410,7 @@ public class MineLagredeFilterTest extends AbstractTest {
     private NyttFilterModel getRandomNyttFilter() {
         Random random = new Random();
 
-        return new NyttFilterModel("Filter navn " + random.nextInt(1000, 100000), getRandomPortefoljeFilter());
+        return new NyttFilterModel("Filter navn " + random.nextInt(100000), getRandomPortefoljeFilter());
     }
 
     public PortefoljeFilter getRandomPortefoljeFilter() {
@@ -421,7 +421,7 @@ public class MineLagredeFilterTest extends AbstractTest {
         val alderVelg = List.of("19-og-under", "20-24", "25-29", "30-39", "40-49", "50-59", "60-66", "67-70");
         val kjonnVelg = List.of("K", "M");
         val ferdigfilterListe = List.of("UFORDELTE_BRUKERE", "NYE_BRUKERE_FOR_VEILEDER", "TRENGER_VURDERING", "INAKTIVE_BRUKERE", "VENTER_PA_SVAR_FRA_NAV", "VENTER_PA_SVAR_FRA_BRUKER", "UTLOPTE_AKTIVITETER");
-        return new PortefoljeFilter(aktiviteter, List.of(alderVelg.get(random.nextInt(0, 7)), alderVelg.get(random.nextInt(0, 7)), alderVelg.get(random.nextInt(0, 7))), List.of(ferdigfilterListe.get(random.nextInt(0, 6)), ferdigfilterListe.get(random.nextInt(0, 6)), ferdigfilterListe.get(random.nextInt(0, 6))), emptyList(), emptyList(), emptyList(), emptyList(), kjonnVelg.get(random.nextInt(0, 1)), emptyList(), String.valueOf(rndChar()), emptyList(), emptyList(), emptyList(), "", emptyList(), "", emptyList(), "", emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList());
+        return new PortefoljeFilter(aktiviteter, List.of(alderVelg.get(random.nextInt(7)), alderVelg.get(random.nextInt(7)), alderVelg.get(random.nextInt(7))), List.of(ferdigfilterListe.get(random.nextInt(6)), ferdigfilterListe.get(random.nextInt(6)), ferdigfilterListe.get(random.nextInt(6))), emptyList(), emptyList(), emptyList(), emptyList(), kjonnVelg.get(random.nextInt(1)), emptyList(), String.valueOf(rndChar()), emptyList(), emptyList(), emptyList(), "", emptyList(), "", emptyList(), "", emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList());
     }
 
     private static char rndChar() {

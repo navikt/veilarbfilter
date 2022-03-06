@@ -27,8 +27,6 @@ class VeilederGrupperServiceTest extends AbstractTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Random randomGenerator = new Random();
-
     @BeforeEach
     public void wipeAllGroups() {
         veilederGrupperService.finnFilterForFilterBruker("1").stream().forEach(filter -> {
@@ -147,7 +145,8 @@ class VeilederGrupperServiceTest extends AbstractTest {
     }
 
     private NyttFilterModel getRandomFilter(List<String> veiledereList) {
-        Integer filterId = randomGenerator.nextInt(1, 1000);
+        Random randomGenerator = new Random();
+        Integer filterId = randomGenerator.nextInt(10000);
         PortefoljeFilter portefoljeFilter = new PortefoljeFilter();
         portefoljeFilter.setVeiledere(veiledereList);
         return new NyttFilterModel(
