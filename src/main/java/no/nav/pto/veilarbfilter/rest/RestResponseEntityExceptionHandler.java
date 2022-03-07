@@ -21,6 +21,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     protected ResponseEntity<Object> handleIllegalArgumentException(
             RuntimeException ex, WebRequest request) {
         String bodyOfResponse = ex.getMessage() == null ? "The request was either invalid or lacked required parameters." : ex.getMessage();
+        log.error(ex.getMessage(), ex);
         return handleExceptionInternal(ex, bodyOfResponse,
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
@@ -30,6 +31,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     protected ResponseEntity<Object> handleIllegalStateException(
             RuntimeException ex, WebRequest request) {
         String bodyOfResponse = ex.getMessage() == null ? "Internal server error" : ex.getMessage();
+        log.error(ex.getMessage(), ex);
         return handleExceptionInternal(ex, bodyOfResponse,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
@@ -39,6 +41,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     protected ResponseEntity<Object> handleBadGatewayException(
             RuntimeException ex, WebRequest request) {
         String bodyOfResponse = ex.getMessage() == null ? "The request failed against backend service or db" : ex.getMessage();
+        log.error(ex.getMessage(), ex);
         return handleExceptionInternal(ex, bodyOfResponse,
                 new HttpHeaders(), HttpStatus.BAD_GATEWAY, request);
     }
@@ -48,6 +51,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     protected ResponseEntity<Object> handleThrowable(
             RuntimeException ex, WebRequest request) {
         String bodyOfResponse = ex.getMessage() == null ? "An internal error occurred during routing" : ex.getMessage();
+        log.error(ex.getMessage(), ex);
         return handleExceptionInternal(ex, bodyOfResponse,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
