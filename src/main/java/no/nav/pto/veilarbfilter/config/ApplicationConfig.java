@@ -23,6 +23,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDateTime;
 
+import static no.nav.common.utils.NaisUtils.getCredentials;
+
 
 @Configuration
 @Import(DbConfigPostgres.class)
@@ -36,7 +38,7 @@ public class ApplicationConfig {
 
     @Bean
     public Credentials serviceUserCredentials() {
-        return new Credentials("username", "password");
+        return getCredentials("service_user");
     }
 
     @Bean
