@@ -16,11 +16,11 @@ spec:
       - kvPath: /kv/prod/fss/veilarbfilter/default
         mountPath: /var/run/secrets/nais.io/vault
   liveness:
-    path: /veilarbfilter/internal/liveness
+    path: /veilarbfilter/internal/health/liveness
     initialDelay: 60
     timeout: 10
   readiness:
-    path: /veilarbfilter/internal/readiness
+    path: /veilarbfilter/internal/health/readiness
     initialDelay: 60
     timeout: 10
   resources:
