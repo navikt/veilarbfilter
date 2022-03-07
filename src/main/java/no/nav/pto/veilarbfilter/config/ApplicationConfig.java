@@ -54,7 +54,7 @@ public class ApplicationConfig {
     @Bean
     public ModiaPep modiaPep(EnvironmentProperties properties, Credentials serviceUserCredentials) {
         var pep = VeilarbPepFactory.get(
-                properties.getAbacModiaUrl(), serviceUserCredentials.username,
+                properties.getAbacUrl(), serviceUserCredentials.username,
                 serviceUserCredentials.password, new SpringAuditRequestInfoSupplier()
         );
 
