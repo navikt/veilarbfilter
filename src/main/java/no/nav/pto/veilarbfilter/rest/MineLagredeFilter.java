@@ -17,7 +17,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/veilarbfilter/api/minelagredefilter", produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/minelagredefilter", produces = APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class MineLagredeFilter {
     private final MineLagredeFilterService mineLagredeFilterService;

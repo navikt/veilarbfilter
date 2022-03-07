@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/veilarbfilter/api/enhet")
+@RequestMapping("/api/enhet")
 @RequiredArgsConstructor
 public class VeilederGruppe {
     private final VeilederGrupperService veilederGrupperService;
