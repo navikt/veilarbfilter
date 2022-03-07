@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.config;
 
+import no.nav.common.abac.Pep;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.types.identer.EnhetId;
@@ -38,6 +39,13 @@ public class AppConfig {
 
     @MockBean
     public SystemUserTokenProvider systemUserTokenProvider;
+
+    @Bean
+    public Pep pep() {
+        Pep mockPep = Mockito.mock(Pep.class);
+        Mockito.when(mockPep.harTilgangTilEnhet(Mockito.any(), Mockito.any())).thenReturn(true);
+        return mockPep;
+    }
 
     @Bean
     public VeilarbveilederClient veilarbveilederClient() {

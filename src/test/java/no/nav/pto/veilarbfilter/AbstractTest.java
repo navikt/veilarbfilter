@@ -1,7 +1,6 @@
 package no.nav.pto.veilarbfilter;
 
 import no.nav.pto.veilarbfilter.config.AppConfig;
-import no.nav.pto.veilarbfilter.config.DbConfigTest;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
@@ -13,7 +12,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @ContextConfiguration(initializers = AbstractTest.DockerPostgreDataSourceInitializer.class)
 @Testcontainers
-@Import({AppConfig.class, DbConfigTest.class})
+@Import({AppConfig.class})
 @ActiveProfiles({"test"})
 public abstract class AbstractTest {
     public static PostgreSQLContainer<?> postgreDBContainer = new PostgreSQLContainer<>("postgres:14.1-alpine");

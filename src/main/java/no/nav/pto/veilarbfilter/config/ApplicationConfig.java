@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+import no.nav.common.abac.Pep;
 import no.nav.common.abac.VeilarbPepFactory;
 import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier;
 import no.nav.common.auth.context.AuthContextHolder;
@@ -11,7 +12,6 @@ import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.sts.NaisSystemUserTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.utils.Credentials;
-import no.nav.pto.veilarbfilter.auth.ModiaPep;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -52,13 +52,11 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public ModiaPep modiaPep(EnvironmentProperties properties, Credentials serviceUserCredentials) {
-        var pep = VeilarbPepFactory.get(
+    public Pep pep(EnvironmentProperties properties, Credentials serviceUserCredentials) {
+        return VeilarbPepFactory.get(
                 properties.getAbacUrl(), serviceUserCredentials.username,
                 serviceUserCredentials.password, new SpringAuditRequestInfoSupplier()
         );
-
-        return new ModiaPep(pep);
     }
 
     @Bean
