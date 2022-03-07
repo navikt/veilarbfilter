@@ -12,4 +12,10 @@ public class EnvironmentProperties {
     private String stsDiscoveryUrl;
     private String dbUrl;
     private String abacUrl;
+    private String azureAdDiscoveryUrl;
+    private String azureAdClientId;
+    private String openAmDiscoveryUrl;
+    private String openAmClientId;
+    private String openAmRefreshUrl;
+
 }
