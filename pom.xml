@@ -15,7 +15,7 @@
     <version>1</version>
 
     <properties>
-        <java.version>16</java.version>
+        <java.version>11</java.version>
         <common.version>2.2022.02.18_14.38-8d8bb494bd41</common.version>
         <common1.version>1.2021.07.07_10.18-72bd65c546f6</common1.version>
         <confluent.version>5.5.1</confluent.version>
@@ -24,9 +24,9 @@
         <testcontainers.version>1.16.3</testcontainers.version>
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
 
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
-        <maven.compiler.release>16</maven.compiler.release>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.release>11</maven.compiler.release>
     </properties>
 
     <build>
