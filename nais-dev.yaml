@@ -28,11 +28,11 @@ spec:
         mountPath: /var/run/secrets/nais.io/vault
   healthcheck:
     liveness:
-      path: veilarbfilter/internal/isAlive
+      path: veilarbfilter/internal/liveness
       initialDelay: 60
       timeout: 10
     readiness:
-      path: veilarbfilter/internal/isReady
+      path: veilarbfilter/internal/readiness
       initialDelay: 60
       timeout: 10
   prometheus:
