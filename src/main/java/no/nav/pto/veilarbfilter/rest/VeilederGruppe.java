@@ -14,7 +14,6 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping("/veilarbfilter/api/enhet")
-@CrossOrigin
 @RequiredArgsConstructor
 public class VeilederGruppe {
     private final VeilederGrupperService veilederGrupperService;

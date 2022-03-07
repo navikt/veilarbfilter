@@ -35,7 +35,7 @@ import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(controllers = MineLagredeFilter.class)
-@ActiveProfiles({"Test"})
+@ActiveProfiles({"test"})
 public class MineLagredeFilterTest extends AbstractTest {
 
     @Autowired

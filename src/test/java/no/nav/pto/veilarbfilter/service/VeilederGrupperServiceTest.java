@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.Random;
 
 @WebMvcTest
-@ActiveProfiles({"Test"})
+@ActiveProfiles({"test"})
 class VeilederGrupperServiceTest extends AbstractTest {
     @Autowired
     private VeilederGrupperService veilederGrupperService;

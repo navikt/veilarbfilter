@@ -14,7 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ContextConfiguration(initializers = AbstractTest.DockerPostgreDataSourceInitializer.class)
 @Testcontainers
 @Import({AppConfig.class, DbConfigTest.class})
-@ActiveProfiles({"Test"})
+@ActiveProfiles({"test"})
 public abstract class AbstractTest {
     public static PostgreSQLContainer<?> postgreDBContainer = new PostgreSQLContainer<>("postgres:14.1-alpine");
 

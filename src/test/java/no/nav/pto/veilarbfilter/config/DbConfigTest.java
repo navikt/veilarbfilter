@@ -3,8 +3,8 @@ package no.nav.pto.veilarbfilter.config;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import org.flywaydb.core.Flyway;
 import org.postgresql.ds.PGSimpleDataSource;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -14,13 +14,14 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
 
-@TestConfiguration
-@ActiveProfiles({"Test"})
+@Configuration
+@ActiveProfiles({"test"})
 public class DbConfigTest implements DatabaseConfig {
     @Bean
     @Override
     public DataSource dataSource() {
         PostgreSQLContainer<?> postgreDBContainer = AbstractTest.postgreDBContainer;
+        postgreDBContainer.start();
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setUrl(postgreDBContainer.getJdbcUrl());
         dataSource.setUser(postgreDBContainer.getUsername());

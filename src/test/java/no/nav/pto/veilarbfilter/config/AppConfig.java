@@ -17,9 +17,10 @@ import no.nav.pto.veilarbfilter.rest.VeilederGruppe;
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterService;
 import no.nav.pto.veilarbfilter.service.VeilederGrupperService;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,8 +28,15 @@ import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@TestConfiguration
-@ActiveProfiles({"Test"})
+@Configuration
+@ActiveProfiles({"test"})
+@Import({DbConfigTest.class,
+        VeilederGruppeFilterRepository.class,
+        MineLagredeFilterRepository.class,
+        VeilederGrupperService.class,
+        MineLagredeFilterService.class,
+        MineLagredeFilter.class,
+        VeilederGruppe.class})
 public class AppConfig {
     @MockBean
     public InfluxClient metricsClient;
@@ -47,42 +55,42 @@ public class AppConfig {
     }
 
 
-    @Bean
+    //@Bean
     public VeilederGruppeFilterRepository veilederGruppeFilterRepository(JdbcTemplate db, MineLagredeFilterRepository mineLagredeFilterRepository, ObjectMapper objectMapper) {
         return new VeilederGruppeFilterRepository(db, mineLagredeFilterRepository, objectMapper);
     }
 
-    @Bean
+    //@Bean
     public VeilederGrupperService veilederGrupperService(VeilederGruppeFilterRepository veilederGruppeFilterRepository, VeilarbveilederClient veilarbveilederClient) {
         return new VeilederGrupperService(veilederGruppeFilterRepository, veilarbveilederClient);
     }
 
-    @Bean
+    //@Bean
     public MineLagredeFilterRepository mineLagredeFilterRepository(JdbcTemplate db, ObjectMapper objectMapper) {
         return new MineLagredeFilterRepository(db, objectMapper);
     }
 
-    @Bean
+    //@Bean
     public MineLagredeFilterService mineLagredeFilterService(MineLagredeFilterRepository mineLagredeFilterRepository) {
         return new MineLagredeFilterService(mineLagredeFilterRepository);
     }
 
-    @Bean
+    //@Bean
     public RestResponseEntityExceptionHandler restResponseEntityExceptionHandler() {
         return new RestResponseEntityExceptionHandler();
     }
 
-    @Bean
+    //@Bean
     public MineLagredeFilter mineLagredeFilter(MineLagredeFilterService mineLagredeFilterService) {
         return new MineLagredeFilter(mineLagredeFilterService);
     }
 
-    @Bean
+    //@Bean
     public VeilederGruppe veilederGruppe(VeilederGrupperService veilederGrupperService) {
         return new VeilederGruppe(veilederGrupperService);
     }
 
-    @Bean
+    //@Bean
     @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();

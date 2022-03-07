@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @WebMvcTest(controllers = VeilederGruppe.class)
-@ActiveProfiles({"Test"})
+@ActiveProfiles({"test"})
 public class VeilederGruppeTest extends AbstractTest {
     @Autowired
     private ObjectMapper objectMapper;
