@@ -329,7 +329,7 @@ public class MineLagredeFilterTest extends AbstractTest {
      **/
     private ApiResponse<List<MineLagredeFilterModel>> getMineLagredeFilter() {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/veilarbfilter/api/minelagredefilter").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/minelagredefilter").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
@@ -347,7 +347,7 @@ public class MineLagredeFilterTest extends AbstractTest {
     private ApiResponse<MineLagredeFilterModel> lagreNyttFilterRespons(NyttFilterModel valgteFilter) {
         try {
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/veilarbfilter/api/minelagredefilter").content(objectMapper.writeValueAsString(valgteFilter)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter").content(objectMapper.writeValueAsString(valgteFilter)).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
@@ -363,7 +363,7 @@ public class MineLagredeFilterTest extends AbstractTest {
     private ApiResponse<MineLagredeFilterModel> oppdaterMineLagredeFilter(FilterModel filterModel) {
         try {
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/veilarbfilter/api/minelagredefilter").content(objectMapper.writeValueAsString(filterModel)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/minelagredefilter").content(objectMapper.writeValueAsString(filterModel)).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
@@ -378,7 +378,7 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private ApiResponse<List<MineLagredeFilterModel>> oppdaterMineLagredeFilter(List<SortOrder> sortOrder) {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/veilarbfilter/api/minelagredefilter/lagresortering").content(objectMapper.writeValueAsString(sortOrder)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter/lagresortering").content(objectMapper.writeValueAsString(sortOrder)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
                 }), "");
@@ -393,7 +393,7 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private Integer deleteMineLagredeFilter(Integer filterId) {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("/veilarbfilter/api/minelagredefilter/" + filterId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/minelagredefilter/" + filterId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
             return mvcResult.getResponse().getStatus();
         } catch (Exception e) {
             Assertions.fail();

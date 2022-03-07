@@ -148,7 +148,7 @@ public class VeilederGruppeTest extends AbstractTest {
      **/
     private ApiResponse<List<MineLagredeFilterModel>> getFilterGrupper(String enhetId) {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/veilarbfilter/api/enhet/" + enhetId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/enhet/" + enhetId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
@@ -166,7 +166,7 @@ public class VeilederGruppeTest extends AbstractTest {
     private ApiResponse<MineLagredeFilterModel> lagreNyttFilterRespons(String enhetId, NyttFilterModel valgteFilter) {
         try {
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/veilarbfilter/api/enhet/" + enhetId).content(objectMapper.writeValueAsString(valgteFilter)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/enhet/" + enhetId).content(objectMapper.writeValueAsString(valgteFilter)).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
@@ -182,7 +182,7 @@ public class VeilederGruppeTest extends AbstractTest {
     private ApiResponse<MineLagredeFilterModel> oppdaterVeilederFilter(String enhetId, FilterModel filterModel) {
         try {
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/veilarbfilter/api/enhet/" + enhetId).content(objectMapper.writeValueAsString(filterModel)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/enhet/" + enhetId).content(objectMapper.writeValueAsString(filterModel)).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
@@ -197,7 +197,7 @@ public class VeilederGruppeTest extends AbstractTest {
 
     private Integer slettFilter(String enhetId, Integer filterId) {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("/veilarbfilter/api/enhet/" + enhetId + "/filter/" + filterId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/enhet/" + enhetId + "/filter/" + filterId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
             return mvcResult.getResponse().getStatus();
         } catch (Exception e) {
             fail();
