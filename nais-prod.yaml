@@ -40,7 +40,7 @@ spec:
     cpuThresholdPercentage: 50
   prometheus:
     enabled: true
-    path: /veilarbfilter/internal/metrics
+    path: /veilarbfilter/internal/prometheus
   leaderElection: true
   envFrom:
     - configmap: pto-config

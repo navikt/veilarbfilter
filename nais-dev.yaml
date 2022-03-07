@@ -36,8 +36,8 @@ spec:
       initialDelay: 60
       timeout: 10
   prometheus:
-    enabled: false
-    path: veilarbfilter/internal/metrics
+    enabled: true
+    path: veilarbfilter/internal/prometheus
   resources:
     limits:
       cpu: "1"
