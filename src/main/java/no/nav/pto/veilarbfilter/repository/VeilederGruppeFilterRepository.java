@@ -113,8 +113,8 @@ public class VeilederGruppeFilterRepository implements FilterService {
 
     public List<FilterModel> finnFilterForFilterBruker(String enhetId) {
 
-        String sql = String.format("SELECT * FROM %s AS ml, %s AS f WHERE ml.%s = f.%s AND ml.%s = \'%o\'",
-                VeilederGrupperFilter.TABLE_NAME, Filter.TABLE_NAME, VeilederGrupperFilter.FILTER_ID, Filter.FILTER_ID, VeilederGrupperFilter.ENHET_ID, Integer.parseInt(enhetId));
+        String sql = String.format("SELECT * FROM %s AS ml, %s AS f WHERE ml.%s = f.%s AND ml.%s = \'%s\'",
+                VeilederGrupperFilter.TABLE_NAME, Filter.TABLE_NAME, VeilederGrupperFilter.FILTER_ID, Filter.FILTER_ID, VeilederGrupperFilter.ENHET_ID, enhetId);
 
         return db.query(sql, (rs, rowNum) -> {
             try {
