@@ -5,16 +5,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import no.nav.pto.veilarbfilter.AbstractTest;
-import no.nav.pto.veilarbfilter.auth.AuthUtils;
 import no.nav.pto.veilarbfilter.domene.*;
-import no.nav.pto.veilarbfilter.domene.value.VeilederId;
 import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
@@ -44,13 +39,6 @@ public class MineLagredeFilterTest extends AbstractTest {
     @Autowired
     private MockMvc mockMvc = MockMvcBuilders.standaloneSetup()
             .setControllerAdvice(RestResponseEntityExceptionHandler.class).build();
-
-    @BeforeAll
-    public static void setUp() {
-        MockedStatic<AuthUtils> authUtilsMockedStatic = Mockito.mockStatic(AuthUtils.class);
-        authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederIdent())
-                .thenReturn(VeilederId.of("1"));
-    }
 
     @BeforeEach
     public void beforeEach() {

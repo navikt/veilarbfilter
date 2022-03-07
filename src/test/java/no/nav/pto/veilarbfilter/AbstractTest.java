@@ -1,6 +1,10 @@
 package no.nav.pto.veilarbfilter;
 
+import no.nav.pto.veilarbfilter.auth.AuthUtils;
 import no.nav.pto.veilarbfilter.config.AppConfig;
+import no.nav.pto.veilarbfilter.domene.value.VeilederId;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
@@ -19,6 +23,10 @@ public abstract class AbstractTest {
 
     static {
         postgreDBContainer.start();
+
+        MockedStatic<AuthUtils> authUtilsMockedStatic = Mockito.mockStatic(AuthUtils.class);
+        authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederIdent())
+                .thenReturn(VeilederId.of("1"));
     }
 
     public static class DockerPostgreDataSourceInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
