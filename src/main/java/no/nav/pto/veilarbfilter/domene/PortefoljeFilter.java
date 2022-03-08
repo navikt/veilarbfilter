@@ -37,7 +37,6 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> innsatsgruppe = emptyList();
 
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private String kjonn = "";
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
@@ -55,20 +54,17 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> tiltakstyper = emptyList();
 
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private String veilederNavnQuery = "";
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     @Setter
     private List<String> veiledere = emptyList();
 
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private String ytelse = "";
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> registreringstype = emptyList();
 
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private String cvJobbprofil = "";
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
@@ -86,9 +82,8 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> sisteEndringKategori = emptyList();
 
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private String ulesteEndringer = "";
-    
+
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> aktiviteterForenklet = emptyList();
 
