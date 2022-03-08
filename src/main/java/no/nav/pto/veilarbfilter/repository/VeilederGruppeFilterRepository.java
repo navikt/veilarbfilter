@@ -100,6 +100,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
                                     rs.getInt(Filter.FILTER_CLEANUP),
                                     rs.getString(VeilederGrupperFilter.ENHET_ID));
                         } catch (Exception e) {
+                            log.error("Error while reading filter " + e, e);
                             throw new RuntimeException(e);
                         }
                     }

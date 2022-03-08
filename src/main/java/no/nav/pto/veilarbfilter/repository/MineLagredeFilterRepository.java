@@ -107,6 +107,7 @@ public class MineLagredeFilterRepository implements FilterService {
                                     rs.getBoolean(MineLagredeFilter.AKTIV),
                                     rs.getString(MineLagredeFilter.NOTE));
                         } catch (Exception e) {
+                            log.error("Error while reading filter " + e, e);
                             throw new RuntimeException(e);
                         }
                     }

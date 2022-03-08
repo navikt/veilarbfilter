@@ -26,7 +26,6 @@ spec:
         mountPath: /var/run/secrets/nais.io/service_user
       - kvPath: /kv/preprod/fss/veilarbfilter/q1
         mountPath: /var/run/secrets/nais.io/vault
-        format: env
   healthcheck:
     liveness:
       path: veilarbfilter/internal/health/liveness
