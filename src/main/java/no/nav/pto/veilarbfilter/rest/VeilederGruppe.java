@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.abac.Pep;
 import no.nav.common.types.identer.EnhetId;
+import no.nav.common.types.identer.NavIdent;
 import no.nav.pto.veilarbfilter.auth.AuthUtils;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
@@ -22,12 +23,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class VeilederGruppe {
     private final VeilederGrupperService veilederGrupperService;
-    private final Pep pep;
+    private final Pep veilarbPep;
 
     @PostMapping("/{enhetId}")
     public ResponseEntity<FilterModel> lagreFilter(@PathVariable(value = "enhetId") String enhetId, @RequestBody NyttFilterModel nyttFilterModel) {
         VeilederId innloggetVeilederIdent = AuthUtils.getInnloggetVeilederIdent();
-        if (pep.harTilgangTilEnhet(innloggetVeilederIdent.toString(), EnhetId.of(enhetId))) {
+        if (veilarbPep.harVeilederTilgangTilEnhet(NavIdent.of(innloggetVeilederIdent.toString()), EnhetId.of(enhetId))) {
             Optional<FilterModel> filterModelOptional = veilederGrupperService.lagreFilter(enhetId, nyttFilterModel);
             if (filterModelOptional.isPresent()) {
                 return ResponseEntity.ok().body(filterModelOptional.get());
@@ -41,7 +42,7 @@ public class VeilederGruppe {
     @PutMapping("/{enhetId}")
     public ResponseEntity<FilterModel> oppdaterFilter(@PathVariable(value = "enhetId") String enhetId, @RequestBody FilterModel filterModel) {
         VeilederId innloggetVeilederIdent = AuthUtils.getInnloggetVeilederIdent();
-        if (pep.harTilgangTilEnhet(innloggetVeilederIdent.toString(), EnhetId.of(enhetId))) {
+        if (veilarbPep.harVeilederTilgangTilEnhet(NavIdent.of(innloggetVeilederIdent.toString()), EnhetId.of(enhetId))) {
             Optional<FilterModel> filterModelOptional = veilederGrupperService.oppdaterFilter(enhetId, filterModel);
             if (filterModelOptional.isPresent()) {
                 return ResponseEntity.ok().body(filterModelOptional.get());
@@ -54,7 +55,7 @@ public class VeilederGruppe {
     @GetMapping("/{enhetId}")
     public ResponseEntity<List<FilterModel>> finnFilterForFilterBruker(@PathVariable(value = "enhetId") String enhetId) {
         VeilederId innloggetVeilederIdent = AuthUtils.getInnloggetVeilederIdent();
-        if (pep.harTilgangTilEnhet(innloggetVeilederIdent.toString(), EnhetId.of(enhetId))) {
+        if (veilarbPep.harVeilederTilgangTilEnhet(NavIdent.of(innloggetVeilederIdent.toString()), EnhetId.of(enhetId))) {
             List<FilterModel> filterModels = veilederGrupperService.finnFilterForFilterBruker(enhetId);
 
             return ResponseEntity.ok().body(filterModels);
@@ -65,7 +66,7 @@ public class VeilederGruppe {
     @DeleteMapping("{enhetId}/filter/{filterId}")
     public ResponseEntity slettFilter(@PathVariable(value = "enhetId") String enhetId, @PathVariable(value = "filterId") Integer filterId) {
         VeilederId innloggetVeilederIdent = AuthUtils.getInnloggetVeilederIdent();
-        if (pep.harTilgangTilEnhet(innloggetVeilederIdent.toString(), EnhetId.of(enhetId))) {
+        if (veilarbPep.harVeilederTilgangTilEnhet(NavIdent.of(innloggetVeilederIdent.toString()), EnhetId.of(enhetId))) {
             Integer slettetFilterId = veilederGrupperService.slettFilter(filterId, enhetId);
             if (slettetFilterId == 0) {
                 return ResponseEntity.notFound().build();

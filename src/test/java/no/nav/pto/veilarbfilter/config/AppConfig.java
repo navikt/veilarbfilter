@@ -43,7 +43,7 @@ public class AppConfig {
     @Bean
     public Pep pep() {
         Pep mockPep = Mockito.mock(Pep.class);
-        Mockito.when(mockPep.harTilgangTilEnhet(Mockito.any(), Mockito.any())).thenReturn(true);
+        Mockito.when(mockPep.harVeilederTilgangTilEnhet(Mockito.any(), Mockito.any())).thenReturn(true);
         return mockPep;
     }
 
