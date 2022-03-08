@@ -11,7 +11,7 @@ public class Table {
     }
 
     public static class MineLagredeFilter {
-        public static String TABLE_NAME = "MineLagredeFilter";
+        public static String TABLE_NAME = "minelagredefilter";
         public static String FILTER_ID = "mine_filter_id";
         public static String VEILEDER_ID = "veileder_id";
         public static String AKTIV = "aktiv";
@@ -20,10 +20,9 @@ public class Table {
     }
 
     public static class VeilederGrupperFilter {
-        public static String TABLE_NAME = "EnhetensLagredeFilter";
-        public static String FILTER_ID = "enhet_filter_id";
+        public static String TABLE_NAME = "veiledergrupperfilter";
+        public static String FILTER_ID = "veiledergruppe_filter_id";
         public static String ENHET_ID = "enhet_id";
-        public static String SORT_ORDER = "sort_order";
 
     }
 

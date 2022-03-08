@@ -39,8 +39,9 @@ class PortefoljeFilterTest {
         Assertions.assertTrue(filterModel.getArbeidslisteKategori().size() == 2);
     }
 
+
     @Test
-    public void testDeserializationWithAktiviteter() throws JsonProcessingException {
+    public void testDeserializationWithAktivitet() throws JsonProcessingException {
         String inputJson = "{\"alder\": [], \"kjonn\": null, \"ytelse\": null, \"hovedmal\": [], \"utdanning\": [], \"veiledere\": [], \"aktiviteter\": {\"EGEN\": \"JA\", \"MOTE\": \"NEI\", \"IJOBB\": \"NA\", \"TILTAK\": \"NA\", \"STILLING\": \"NA\", \"BEHANDLING\": \"NA\", \"SOKEAVTALE\": \"NA\", \"GRUPPEAKTIVITET\": \"NA\", \"UTDANNINGAKTIVITET\": \"NA\"}, \"cvJobbprofil\": null, \"tiltakstyper\": [], \"innsatsgruppe\": [], \"servicegruppe\": [], \"fodselsdagIMnd\": [], \"rettighetsgruppe\": [], \"utdanningBestatt\": [], \"ferdigfilterListe\": [], \"formidlingsgruppe\": [], \"navnEllerFnrQuery\": \"\", \"registreringstype\": [], \"utdanningGodkjent\": [], \"veilederNavnQuery\": \"\", \"manuellBrukerStatus\": [], \"arbeidslisteKategori\": [], \"sisteEndringKategori\": [\"FULLFORT_BEHANDLING\"]}";
 
         PortefoljeFilter filterModel = objectMapper.readValue(inputJson, PortefoljeFilter.class);
@@ -50,6 +51,28 @@ class PortefoljeFilterTest {
         Assertions.assertNotNull(filterModel.getAktiviteter().getEGEN());
         Assertions.assertTrue(filterModel.getAktiviteter().getEGEN().equals("JA"));
         Assertions.assertTrue(filterModel.getAktiviteter().getMOTE().equals("NEI"));
+    }
+
+    @Test
+    public void testDeserializationWithSisteEndringKategori() throws JsonProcessingException {
+        String inputJson = "{\"alder\": [], \"kjonn\": null, \"ytelse\": null, \"hovedmal\": [], \"utdanning\": [], \"veiledere\": [], \"aktiviteter\": {\"EGEN\": \"NA\", \"MOTE\": \"NA\", \"IJOBB\": \"NA\", \"TILTAK\": \"NA\", \"STILLING\": \"NA\", \"BEHANDLING\": \"NA\", \"SOKEAVTALE\": \"NA\", \"GRUPPEAKTIVITET\": \"NA\", \"UTDANNINGAKTIVITET\": \"NA\"}, \"cvJobbprofil\": null, \"tiltakstyper\": [], \"innsatsgruppe\": [], \"servicegruppe\": [], \"fodselsdagIMnd\": [], \"rettighetsgruppe\": [], \"utdanningBestatt\": [], \"ferdigfilterListe\": [], \"formidlingsgruppe\": [], \"navnEllerFnrQuery\": \"\", \"registreringstype\": [], \"utdanningGodkjent\": [], \"veilederNavnQuery\": \"\", \"manuellBrukerStatus\": [], \"arbeidslisteKategori\": [], \"sisteEndringKategori\": [\"FULLFORT_BEHANDLING\"]}";
+
+        PortefoljeFilter filterModel = objectMapper.readValue(inputJson, PortefoljeFilter.class);
+
+        Assertions.assertNotNull(filterModel);
+        Assertions.assertNotNull(filterModel.getSisteEndringKategori());
+        Assertions.assertTrue(filterModel.getSisteEndringKategori().contains("FULLFORT_BEHANDLING"));
+    }
+
+    @Test
+    public void testDeserializationWithFerdigfilterListe() throws JsonProcessingException {
+        String inputJson = "{\"alder\": [], \"kjonn\": null, \"ytelse\": null, \"hovedmal\": [], \"veiledere\": [], \"aktiviteter\": {\"EGEN\": \"NA\", \"MOTE\": \"NA\", \"IJOBB\": \"NA\", \"TILTAK\": \"NA\", \"STILLING\": \"NA\", \"BEHANDLING\": \"NA\", \"SOKEAVTALE\": \"NA\", \"GRUPPEAKTIVITET\": \"NA\", \"UTDANNINGAKTIVITET\": \"NA\"}, \"cvJobbprofil\": null, \"tiltakstyper\": [], \"innsatsgruppe\": [], \"servicegruppe\": [], \"fodselsdagIMnd\": [], \"rettighetsgruppe\": [], \"ferdigfilterListe\": [\"TRENGER_VURDERING\", \"UFORDELTE_BRUKERE\"], \"formidlingsgruppe\": [], \"navnEllerFnrQuery\": \"\", \"registreringstype\": [], \"veilederNavnQuery\": \"\", \"manuellBrukerStatus\": [], \"arbeidslisteKategori\": []}";
+
+        PortefoljeFilter filterModel = objectMapper.readValue(inputJson, PortefoljeFilter.class);
+
+        Assertions.assertNotNull(filterModel);
+        Assertions.assertNotNull(filterModel.getFerdigfilterListe());
+        Assertions.assertTrue(filterModel.getFerdigfilterListe().contains("TRENGER_VURDERING"));
     }
 
 }
