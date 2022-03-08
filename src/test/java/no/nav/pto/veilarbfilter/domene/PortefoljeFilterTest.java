@@ -75,4 +75,15 @@ class PortefoljeFilterTest {
         Assertions.assertTrue(filterModel.getFerdigfilterListe().contains("TRENGER_VURDERING"));
     }
 
+    @Test
+    public void testDeserializationAndSettingDefaultValue() throws JsonProcessingException {
+        String inputJson = "{\"alder\": [], \"kjonn\": null, \"ytelse\": null, \"hovedmal\": [], \"veiledere\": [], \"aktiviteter\": {\"EGEN\": \"NA\", \"MOTE\": \"NA\", \"IJOBB\": \"NA\", \"TILTAK\": \"NA\", \"STILLING\": \"NA\", \"BEHANDLING\": \"NA\", \"SOKEAVTALE\": \"NA\", \"GRUPPEAKTIVITET\": \"NA\", \"UTDANNINGAKTIVITET\": \"NA\"}, \"cvJobbprofil\": null, \"tiltakstyper\": [], \"innsatsgruppe\": [], \"servicegruppe\": [], \"fodselsdagIMnd\": [], \"rettighetsgruppe\": [], \"ferdigfilterListe\": [\"TRENGER_VURDERING\", \"UFORDELTE_BRUKERE\"], \"formidlingsgruppe\": [], \"navnEllerFnrQuery\": \"\", \"registreringstype\": [], \"veilederNavnQuery\": \"\", \"manuellBrukerStatus\": [], \"arbeidslisteKategori\": []}";
+
+        PortefoljeFilter filterModel = objectMapper.readValue(inputJson, PortefoljeFilter.class);
+
+        Assertions.assertNotNull(filterModel.getAktiviteterForenklet());
+        Assertions.assertEquals(filterModel.getAktiviteterForenklet().size(), 0);
+
+    }
+
 }
