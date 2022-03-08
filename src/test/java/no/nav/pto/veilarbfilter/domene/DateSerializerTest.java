@@ -1,9 +1,8 @@
-package no.nav.pto.veilarbfilter.model;
+package no.nav.pto.veilarbfilter.domene;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import no.nav.pto.veilarbfilter.domene.MineLagredeFilterModel;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
 import org.junit.Assert;
