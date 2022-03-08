@@ -94,7 +94,8 @@ public class PortefoljeFilter {
                 navnEllerFnrQuery,
                 veilederNavnQuery,
                 ytelse,
-                cvJobbprofil
+                cvJobbprofil,
+                ulesteEndringer
         ).stream().anyMatch(x -> x != null && !x.isEmpty());
 
         boolean existsNonEmptyArrays = List.of(
@@ -112,7 +113,9 @@ public class PortefoljeFilter {
                 registreringstype,
                 utdanning,
                 utdanningGodkjent,
-                utdanningBestatt
+                utdanningBestatt,
+                sisteEndringKategori,
+                aktiviteterForenklet
         ).stream().anyMatch(x -> x != null && !x.isEmpty());
 
         return existsNonEmptyStringVars || existsNonEmptyArrays || aktiviteter != null;
