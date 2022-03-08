@@ -145,7 +145,6 @@ public class MineLagredeFilterRepository implements FilterService {
         try {
             String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s AND ml.%s = \'%s\'",
                     MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, veilederId);
-            log.info(sql);
 
             return db.query(sql, (rs, rowNum) -> {
                 try {
