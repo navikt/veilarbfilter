@@ -41,6 +41,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
                     ps.setTimestamp(3, fromLocalDateTimeToTimestamp(LocalDateTime.now()));
                     return ps.executeUpdate();
                 } catch (Exception e) {
+                    log.error("Cant save filter " + e, e);
                     throw new RuntimeException(e);
                 }
             });
@@ -126,6 +127,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
                         rs.getInt(Filter.FILTER_CLEANUP),
                         rs.getString(VeilederGrupperFilter.ENHET_ID));
             } catch (Exception e) {
+                log.error("Can't load filter " + e, e);
                 throw new RuntimeException(e);
             }
         });

@@ -135,6 +135,7 @@ public class MineLagredeFilterRepository implements FilterService {
                         rs.getBoolean(MineLagredeFilter.AKTIV),
                         rs.getString(MineLagredeFilter.NOTE));
             } catch (Exception e) {
+                log.error("Can't load filters " + e, e);
                 throw new RuntimeException(e);
             }
         });
@@ -157,6 +158,7 @@ public class MineLagredeFilterRepository implements FilterService {
                         rs.getBoolean(MineLagredeFilter.AKTIV),
                         rs.getString(MineLagredeFilter.NOTE));
             } catch (Exception e) {
+                log.error("Can't load filter " + e, e);
                 throw new RuntimeException(e);
             }
         });
