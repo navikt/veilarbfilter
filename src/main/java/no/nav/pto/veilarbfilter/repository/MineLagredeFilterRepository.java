@@ -142,26 +142,31 @@ public class MineLagredeFilterRepository implements FilterService {
     }
 
     public List<FilterModel> finnFilterForFilterBruker(String veilederId) {
+        try {
+            String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s AND ml.%s = \'%s\'",
+                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, veilederId);
+            log.info(sql);
 
-        String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s AND ml.%s = \'%s\'",
-                MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, veilederId);
-
-        return db.query(sql, (rs, rowNum) -> {
-            try {
-                return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
-                        rs.getString(Filter.FILTER_NAVN),
-                        objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class),
-                        DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
-                        rs.getInt(Filter.FILTER_CLEANUP),
-                        rs.getString(MineLagredeFilter.VEILEDER_ID),
-                        rs.getInt(MineLagredeFilter.SORT_ORDER),
-                        rs.getBoolean(MineLagredeFilter.AKTIV),
-                        rs.getString(MineLagredeFilter.NOTE));
-            } catch (Exception e) {
-                log.error("Can't load filter " + e, e);
-                throw new RuntimeException(e);
-            }
-        });
+            return db.query(sql, (rs, rowNum) -> {
+                try {
+                    return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
+                            rs.getString(Filter.FILTER_NAVN),
+                            objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class),
+                            DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
+                            rs.getInt(Filter.FILTER_CLEANUP),
+                            rs.getString(MineLagredeFilter.VEILEDER_ID),
+                            rs.getInt(MineLagredeFilter.SORT_ORDER),
+                            rs.getBoolean(MineLagredeFilter.AKTIV),
+                            rs.getString(MineLagredeFilter.NOTE));
+                } catch (Exception e) {
+                    log.error("Can't load filter " + e, e);
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (Exception e) {
+            log.error("Can't load filters " + e, e);
+            return Collections.emptyList();
+        }
     }
 
     @Override
