@@ -89,36 +89,29 @@ public class PortefoljeFilter {
 
     @JsonIgnore
     public Boolean isNotEmpty() {
-        boolean existsNonEmptyStringVars = List.of(
-                kjonn,
-                navnEllerFnrQuery,
-                veilederNavnQuery,
-                ytelse,
-                cvJobbprofil,
-                ulesteEndringer
-        ).stream().anyMatch(x -> x != null && !x.isEmpty());
-
-        boolean existsNonEmptyArrays = List.of(
-                alder,
-                ferdigfilterListe,
-                fodselsdagIMnd,
-                formidlingsgruppe,
-                hovedmal,
-                innsatsgruppe,
-                manuellBrukerStatus,
-                rettighetsgruppe,
-                servicegruppe,
-                tiltakstyper,
-                veiledere,
-                registreringstype,
-                utdanning,
-                utdanningGodkjent,
-                utdanningBestatt,
-                sisteEndringKategori,
-                aktiviteterForenklet
-        ).stream().anyMatch(x -> x != null && !x.isEmpty());
-
-        return existsNonEmptyStringVars || existsNonEmptyArrays || aktiviteter != null;
+        return (kjonn != null && !kjonn.isEmpty()) ||
+                (navnEllerFnrQuery != null && !navnEllerFnrQuery.isEmpty()) ||
+                (veilederNavnQuery != null && !veilederNavnQuery.isEmpty()) ||
+                (ytelse != null && !ytelse.isEmpty()) ||
+                (cvJobbprofil != null && !cvJobbprofil.isEmpty()) ||
+                (alder != null && !alder.isEmpty()) ||
+                (ferdigfilterListe != null && !ferdigfilterListe.isEmpty()) ||
+                (fodselsdagIMnd != null && !fodselsdagIMnd.isEmpty()) ||
+                (formidlingsgruppe != null && !formidlingsgruppe.isEmpty()) ||
+                (hovedmal != null && !hovedmal.isEmpty()) ||
+                (innsatsgruppe != null && !innsatsgruppe.isEmpty()) ||
+                (manuellBrukerStatus != null && !manuellBrukerStatus.isEmpty()) ||
+                (rettighetsgruppe != null && !rettighetsgruppe.isEmpty()) ||
+                (servicegruppe != null && !servicegruppe.isEmpty()) ||
+                (tiltakstyper != null && !tiltakstyper.isEmpty()) ||
+                (veiledere != null && !veiledere.isEmpty()) ||
+                (registreringstype != null && !registreringstype.isEmpty()) ||
+                (utdanning != null && !utdanning.isEmpty()) ||
+                (utdanningGodkjent != null && !utdanningGodkjent.isEmpty()) ||
+                (utdanningBestatt != null && !utdanningBestatt.isEmpty()) ||
+                (sisteEndringKategori != null && !sisteEndringKategori.isEmpty()) ||
+                (aktiviteterForenklet != null && !aktiviteterForenklet.isEmpty()) ||
+                aktiviteter != null;
     }
 
 }
