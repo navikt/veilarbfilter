@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.pto.veilarbfilter.database.Table.VeilederGrupperFilter;
 import no.nav.pto.veilarbfilter.domene.*;
+import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger;
 import no.nav.pto.veilarbfilter.util.DateUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -29,6 +31,9 @@ public class VeilederGruppeFilterRepository implements FilterService {
 
     public Optional<FilterModel> lagreFilter(String enhetId, NyttFilterModel nyttFilterModel) throws IllegalArgumentException {
         try {
+            validerFilterNavn(nyttFilterModel.getFilterNavn());
+            validerFilterValg(nyttFilterModel.getFilterValg());
+
             var key = 0;
 
             String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?, to_json(?::JSON), ?)",
@@ -69,6 +74,9 @@ public class VeilederGruppeFilterRepository implements FilterService {
     @Override
     public Optional<FilterModel> oppdaterFilter(String enhetId, FilterModel filter) throws IllegalArgumentException {
         try {
+            validerFilterNavn(filter.getFilterNavn());
+            validerFilterValg(filter.getFilterValg());
+            
             String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ? AND %s = ?", VeilederGrupperFilter.TABLE_NAME, VeilederGrupperFilter.ENHET_ID, VeilederGrupperFilter.FILTER_ID);
             Integer numOfRows = db.queryForObject(sql, Integer.class, enhetId, filter.getFilterId());
 
@@ -169,6 +177,20 @@ public class VeilederGruppeFilterRepository implements FilterService {
     public List<FilterModel> lagreSortering(String enhetId, List<SortOrder> sortOrder) {
         //TODO("Not yet implemented");
         return Collections.emptyList();
+    }
+
+    private void validerFilterNavn(String navn) {
+        Assert.hasLength(navn, LagredeFilterFeilmeldinger.NAVN_TOMT.message);
+        Assert.isTrue(navn.length() < 255, LagredeFilterFeilmeldinger.NAVN_FOR_LANGT.message);
+    }
+
+    private void validerFilterValg(PortefoljeFilter valg) {
+        Assert.isTrue(valg.isNotEmpty(), LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message);
+    }
+
+    private void validerUnikhet(Boolean navn, Boolean valg) {
+        Assert.isTrue(!navn, LagredeFilterFeilmeldinger.NAVN_EKSISTERER.message);
+        Assert.isTrue(!valg, LagredeFilterFeilmeldinger.FILTERVALG_EKSISTERER.message);
     }
 }
 
