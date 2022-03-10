@@ -45,7 +45,5 @@ spec:
   envFrom:
     - configmap: pto-config
   env:
-    - name: ABAC_MODIA_URL
-      value: https://abac-modia.intern.nav.no/application/asm-pdp/authorize
     - name: VEILARBFILTER_DB_URL
       value: jdbc:postgresql://A01DBVL010.adeo.no:5432/veilarbfilter

@@ -32,7 +32,9 @@ class PortefoljeFilterTest {
     @Test
     public void testDeserialization() throws IOException {
         var jsonString =
-                "{\"aktiviteter\":{\"BEHANDLING\":\"NA\",\"EGEN\":\"NA\",\"GRUPPEAKTIVITET\":\"NA\",\"IJOBB\":\"NA\",\"MOTE\":\"NA\",\"SOKEAVTALE\":\"NA\",\"STILLING\":\"NA\",\"TILTAK\":\"NA\",\"UTDANNINGAKTIVITET\":\"NA\"},\"alder\":[],\"ferdigfilterListe\":[\"MIN_ARBEIDSLISTE\",\"NYE_BRUKERE_FOR_VEILEDER\",\"PERMITTERTE_ETTER_NIENDE_MARS\"],\"fodselsdagIMnd\":[],\"formidlingsgruppe\":[],\"hovedmal\":[],\"innsatsgruppe\":[],\"kjonn\":null,\"manuellBrukerStatus\":[],\"navnEllerFnrQuery\":\"\",\"rettighetsgruppe\":[],\"servicegruppe\":[],\"tiltakstyper\":[],\"veilederNavnQuery\":\"\",\"veiledere\":[],\"ytelse\":\"DAGPENGER\",\"registreringstype\":[],\"cvJobbprofil\":null,\"arbeidslisteKategori\":[\"BLA\",\"LILLA\"]}";
+                """
+                                 {"aktiviteter":{"BEHANDLING":"NA","EGEN":"NA","GRUPPEAKTIVITET":"NA","IJOBB":"NA","MOTE":"NA","SOKEAVTALE":"NA","STILLING":"NA","TILTAK":"NA","UTDANNINGAKTIVITET":"NA"},"alder":[],"ferdigfilterListe":["MIN_ARBEIDSLISTE","NYE_BRUKERE_FOR_VEILEDER","PERMITTERTE_ETTER_NIENDE_MARS"],"fodselsdagIMnd":[],"formidlingsgruppe":[],"hovedmal":[],"innsatsgruppe":[],"kjonn":null,"manuellBrukerStatus":[],"navnEllerFnrQuery":"","rettighetsgruppe":[],"servicegruppe":[],"tiltakstyper":[],"veilederNavnQuery":"","veiledere":[],"ytelse":"DAGPENGER","registreringstype":[],"cvJobbprofil":null,"arbeidslisteKategori":["BLA","LILLA"]}"
+                        """;
         PortefoljeFilter filterModel = objectMapper.readValue(jsonString, PortefoljeFilter.class);
 
         Assertions.assertTrue(filterModel.getArbeidslisteKategori() != null);
@@ -42,7 +44,9 @@ class PortefoljeFilterTest {
 
     @Test
     public void testDeserializationWithAktivitet() throws JsonProcessingException {
-        String inputJson = "{\"alder\": [], \"kjonn\": null, \"ytelse\": null, \"hovedmal\": [], \"utdanning\": [], \"veiledere\": [], \"aktiviteter\": {\"EGEN\": \"JA\", \"MOTE\": \"NEI\", \"IJOBB\": \"NA\", \"TILTAK\": \"NA\", \"STILLING\": \"NA\", \"BEHANDLING\": \"NA\", \"SOKEAVTALE\": \"NA\", \"GRUPPEAKTIVITET\": \"NA\", \"UTDANNINGAKTIVITET\": \"NA\"}, \"cvJobbprofil\": null, \"tiltakstyper\": [], \"innsatsgruppe\": [], \"servicegruppe\": [], \"fodselsdagIMnd\": [], \"rettighetsgruppe\": [], \"utdanningBestatt\": [], \"ferdigfilterListe\": [], \"formidlingsgruppe\": [], \"navnEllerFnrQuery\": \"\", \"registreringstype\": [], \"utdanningGodkjent\": [], \"veilederNavnQuery\": \"\", \"manuellBrukerStatus\": [], \"arbeidslisteKategori\": [], \"sisteEndringKategori\": [\"FULLFORT_BEHANDLING\"]}";
+        String inputJson = """
+                 {"alder": [],"kjonn": null,"ytelse": null,"hovedmal": [],"utdanning": [],"veiledere": [],"aktiviteter": {"EGEN":"JA","MOTE":"NEI","IJOBB":"NA","TILTAK":"NA","STILLING":"NA","BEHANDLING":"NA","SOKEAVTALE":"NA","GRUPPEAKTIVITET":"NA","UTDANNINGAKTIVITET":"NA"},"cvJobbprofil": null,"tiltakstyper": [],"innsatsgruppe": [],"servicegruppe": [],"fodselsdagIMnd": [],"rettighetsgruppe": [],"utdanningBestatt": [],"ferdigfilterListe": [],"formidlingsgruppe": [],"navnEllerFnrQuery":"","registreringstype": [],"utdanningGodkjent": [],"veilederNavnQuery":"","manuellBrukerStatus": [],"arbeidslisteKategori": [],"sisteEndringKategori": ["FULLFORT_BEHANDLING"]}
+                """;
 
         PortefoljeFilter filterModel = objectMapper.readValue(inputJson, PortefoljeFilter.class);
 
@@ -55,7 +59,9 @@ class PortefoljeFilterTest {
 
     @Test
     public void testDeserializationWithSisteEndringKategori() throws JsonProcessingException {
-        String inputJson = "{\"alder\": [], \"kjonn\": null, \"ytelse\": null, \"hovedmal\": [], \"utdanning\": [], \"veiledere\": [], \"aktiviteter\": {\"EGEN\": \"NA\", \"MOTE\": \"NA\", \"IJOBB\": \"NA\", \"TILTAK\": \"NA\", \"STILLING\": \"NA\", \"BEHANDLING\": \"NA\", \"SOKEAVTALE\": \"NA\", \"GRUPPEAKTIVITET\": \"NA\", \"UTDANNINGAKTIVITET\": \"NA\"}, \"cvJobbprofil\": null, \"tiltakstyper\": [], \"innsatsgruppe\": [], \"servicegruppe\": [], \"fodselsdagIMnd\": [], \"rettighetsgruppe\": [], \"utdanningBestatt\": [], \"ferdigfilterListe\": [], \"formidlingsgruppe\": [], \"navnEllerFnrQuery\": \"\", \"registreringstype\": [], \"utdanningGodkjent\": [], \"veilederNavnQuery\": \"\", \"manuellBrukerStatus\": [], \"arbeidslisteKategori\": [], \"sisteEndringKategori\": [\"FULLFORT_BEHANDLING\"]}";
+        String inputJson = """
+                 {"alder": [],"kjonn": null,"ytelse": null,"hovedmal": [],"utdanning": [],"veiledere": [],"aktiviteter": {"EGEN":"NA","MOTE":"NA","IJOBB":"NA","TILTAK":"NA","STILLING":"NA","BEHANDLING":"NA","SOKEAVTALE":"NA","GRUPPEAKTIVITET":"NA","UTDANNINGAKTIVITET":"NA"},"cvJobbprofil": null,"tiltakstyper": [],"innsatsgruppe": [],"servicegruppe": [],"fodselsdagIMnd": [],"rettighetsgruppe": [],"utdanningBestatt": [],"ferdigfilterListe": [],"formidlingsgruppe": [],"navnEllerFnrQuery":"","registreringstype": [],"utdanningGodkjent": [],"veilederNavnQuery":"","manuellBrukerStatus": [],"arbeidslisteKategori": [],"sisteEndringKategori": ["FULLFORT_BEHANDLING"]}
+                """;
 
         PortefoljeFilter filterModel = objectMapper.readValue(inputJson, PortefoljeFilter.class);
 
@@ -66,7 +72,8 @@ class PortefoljeFilterTest {
 
     @Test
     public void testDeserializationWithFerdigfilterListe() throws JsonProcessingException {
-        String inputJson = "{\"alder\": [], \"kjonn\": null, \"ytelse\": null, \"hovedmal\": [], \"veiledere\": [], \"aktiviteter\": {\"EGEN\": \"NA\", \"MOTE\": \"NA\", \"IJOBB\": \"NA\", \"TILTAK\": \"NA\", \"STILLING\": \"NA\", \"BEHANDLING\": \"NA\", \"SOKEAVTALE\": \"NA\", \"GRUPPEAKTIVITET\": \"NA\", \"UTDANNINGAKTIVITET\": \"NA\"}, \"cvJobbprofil\": null, \"tiltakstyper\": [], \"innsatsgruppe\": [], \"servicegruppe\": [], \"fodselsdagIMnd\": [], \"rettighetsgruppe\": [], \"ferdigfilterListe\": [\"TRENGER_VURDERING\", \"UFORDELTE_BRUKERE\"], \"formidlingsgruppe\": [], \"navnEllerFnrQuery\": \"\", \"registreringstype\": [], \"veilederNavnQuery\": \"\", \"manuellBrukerStatus\": [], \"arbeidslisteKategori\": []}";
+        String inputJson = """
+                {"alder": [],"kjonn": null,"ytelse": null,"hovedmal": [],"veiledere": [],"aktiviteter": {"EGEN":"NA","MOTE":"NA","IJOBB":"NA","TILTAK":"NA","STILLING":"NA","BEHANDLING":"NA","SOKEAVTALE":"NA","GRUPPEAKTIVITET":"NA","UTDANNINGAKTIVITET":"NA"},"cvJobbprofil": null,"tiltakstyper": [],"innsatsgruppe": [],"servicegruppe": [],"fodselsdagIMnd": [],"rettighetsgruppe": [],"ferdigfilterListe": ["TRENGER_VURDERING","UFORDELTE_BRUKERE"],"formidlingsgruppe": [],"navnEllerFnrQuery":"","registreringstype": [],"veilederNavnQuery":"","manuellBrukerStatus": [],"arbeidslisteKategori": []}""";
 
         PortefoljeFilter filterModel = objectMapper.readValue(inputJson, PortefoljeFilter.class);
 
@@ -77,7 +84,9 @@ class PortefoljeFilterTest {
 
     @Test
     public void testDeserializationAndSettingDefaultValue() throws JsonProcessingException {
-        String inputJson = "{\"alder\": [], \"kjonn\": null, \"ytelse\": null, \"hovedmal\": [], \"veiledere\": [], \"aktiviteter\": {\"EGEN\": \"NA\", \"MOTE\": \"NA\", \"IJOBB\": \"NA\", \"TILTAK\": \"NA\", \"STILLING\": \"NA\", \"BEHANDLING\": \"NA\", \"SOKEAVTALE\": \"NA\", \"GRUPPEAKTIVITET\": \"NA\", \"UTDANNINGAKTIVITET\": \"NA\"}, \"cvJobbprofil\": null, \"tiltakstyper\": [], \"innsatsgruppe\": [], \"servicegruppe\": [], \"fodselsdagIMnd\": [], \"rettighetsgruppe\": [], \"ferdigfilterListe\": [\"TRENGER_VURDERING\", \"UFORDELTE_BRUKERE\"], \"formidlingsgruppe\": [], \"navnEllerFnrQuery\": \"\", \"registreringstype\": [], \"veilederNavnQuery\": \"\", \"manuellBrukerStatus\": [], \"arbeidslisteKategori\": []}";
+        String inputJson = """
+                 {"alder": [],"kjonn": null,"ytelse": null,"hovedmal": [],"veiledere": [],"aktiviteter": {"EGEN":"NA","MOTE":"NA","IJOBB":"NA","TILTAK":"NA","STILLING":"NA","BEHANDLING":"NA","SOKEAVTALE":"NA","GRUPPEAKTIVITET":"NA","UTDANNINGAKTIVITET":"NA"},"cvJobbprofil": null,"tiltakstyper": [],"innsatsgruppe": [],"servicegruppe": [],"fodselsdagIMnd": [],"rettighetsgruppe": [],"ferdigfilterListe": ["TRENGER_VURDERING","UFORDELTE_BRUKERE"],"formidlingsgruppe": [],"navnEllerFnrQuery":"","registreringstype": [],"veilederNavnQuery":"","manuellBrukerStatus": [],"arbeidslisteKategori": []}
+                """;
 
         PortefoljeFilter filterModel = objectMapper.readValue(inputJson, PortefoljeFilter.class);
 

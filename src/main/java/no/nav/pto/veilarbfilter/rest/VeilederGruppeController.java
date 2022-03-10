@@ -21,7 +21,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/enhet")
 @RequiredArgsConstructor
-public class VeilederGruppe {
+public class VeilederGruppeController {
     private final VeilederGrupperService veilederGrupperService;
     private final Pep veilarbPep;
 

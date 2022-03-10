@@ -29,7 +29,7 @@ import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-@WebMvcTest(controllers = VeilederGruppe.class)
+@WebMvcTest(controllers = VeilederGruppeController.class)
 @ActiveProfiles({"test"})
 public class VeilederGruppeTest extends AbstractTest {
     @Autowired

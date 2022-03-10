@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 
-@WebMvcTest(controllers = MineLagredeFilter.class)
+@WebMvcTest(controllers = MineLagredeFilterController.class)
 @ActiveProfiles({"test"})
 public class MineLagredeFilterTest extends AbstractTest {
 

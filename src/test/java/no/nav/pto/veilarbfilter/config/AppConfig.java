@@ -8,8 +8,8 @@ import no.nav.common.utils.Credentials;
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
-import no.nav.pto.veilarbfilter.rest.MineLagredeFilter;
-import no.nav.pto.veilarbfilter.rest.VeilederGruppe;
+import no.nav.pto.veilarbfilter.rest.MineLagredeFilterController;
+import no.nav.pto.veilarbfilter.rest.VeilederGruppeController;
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterService;
 import no.nav.pto.veilarbfilter.service.VeilederGrupperService;
 import org.mockito.Mockito;
@@ -28,8 +28,8 @@ import java.util.List;
         MineLagredeFilterRepository.class,
         VeilederGrupperService.class,
         MineLagredeFilterService.class,
-        MineLagredeFilter.class,
-        VeilederGruppe.class})
+        MineLagredeFilterController.class,
+        VeilederGruppeController.class})
 public class AppConfig {
     @MockBean
     public InfluxClient metricsClient;

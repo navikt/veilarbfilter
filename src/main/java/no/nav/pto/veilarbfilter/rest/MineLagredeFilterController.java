@@ -19,7 +19,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping(value = "/api/minelagredefilter", produces = APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
-public class MineLagredeFilter {
+public class MineLagredeFilterController {
     private final MineLagredeFilterService mineLagredeFilterService;
 
     @PostMapping
