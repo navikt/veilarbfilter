@@ -1,9 +1,6 @@
 package no.nav.pto.veilarbfilter.domene;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
+import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,8 +14,10 @@ import static java.util.Collections.emptyList;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonPropertyOrder(alphabetic = true)
 public class PortefoljeFilter {
     private Aktiviteter aktiviteter = null;
+
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> alder = emptyList();
 

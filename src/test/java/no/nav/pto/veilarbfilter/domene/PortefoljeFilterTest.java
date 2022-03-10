@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 class PortefoljeFilterTest {
@@ -92,7 +93,24 @@ class PortefoljeFilterTest {
 
         Assertions.assertNotNull(filterModel.getAktiviteterForenklet());
         Assertions.assertEquals(filterModel.getAktiviteterForenklet().size(), 0);
+    }
 
+    @Test
+    public void testSerializationOfEmptyFilter() throws JsonProcessingException {
+        String correctOutput = """
+                {"aktiviteter":null,"aktiviteterForenklet":[],"alder":[],"arbeidslisteKategori":[],"cvJobbprofil":"","ferdigfilterListe":[],"fodselsdagIMnd":[],"formidlingsgruppe":[],"hovedmal":[],"innsatsgruppe":[],"kjonn":"","manuellBrukerStatus":[],"navnEllerFnrQuery":"","registreringstype":[],"rettighetsgruppe":[],"servicegruppe":[],"sisteEndringKategori":[],"tiltakstyper":[],"ulesteEndringer":"","utdanning":[],"utdanningBestatt":[],"utdanningGodkjent":[],"veilederNavnQuery":"","veiledere":[],"ytelse":""}""";
+        PortefoljeFilter portefoljeFilter = new PortefoljeFilter();
+        String jsonString = objectMapper.writeValueAsString(portefoljeFilter);
+        Assertions.assertEquals(jsonString, correctOutput);
+    }
+
+    @Test
+    public void testSerializationOfVeiledere() throws JsonProcessingException {
+        String correctOutput = """
+                {"aktiviteter":null,"aktiviteterForenklet":null,"alder":null,"arbeidslisteKategori":null,"cvJobbprofil":null,"ferdigfilterListe":null,"fodselsdagIMnd":null,"formidlingsgruppe":null,"hovedmal":null,"innsatsgruppe":null,"kjonn":null,"manuellBrukerStatus":null,"navnEllerFnrQuery":null,"registreringstype":null,"rettighetsgruppe":null,"servicegruppe":null,"sisteEndringKategori":null,"tiltakstyper":null,"ulesteEndringer":null,"utdanning":null,"utdanningBestatt":null,"utdanningGodkjent":null,"veilederNavnQuery":null,"veiledere":["A123","B123"],"ytelse":null}""";
+        PortefoljeFilter portefoljeFilter = new PortefoljeFilter(null, null, null, null, null, null, null, null, null, null, null, null, null, null, List.of("A123", "B123"), null, null, null, null, null, null, null, null, null, null);
+        String jsonString = objectMapper.writeValueAsString(portefoljeFilter);
+        Assertions.assertEquals(jsonString, correctOutput);
     }
 
 }
