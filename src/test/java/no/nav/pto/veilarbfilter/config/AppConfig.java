@@ -53,6 +53,4 @@ public class AppConfig {
         Mockito.when(mockVeilarbVeilederClient.hentVeilederePaaEnhet(EnhetId.of("1"))).thenReturn(List.of("1", "2", "3"));
         return mockVeilarbVeilederClient;
     }
-
-
 }
