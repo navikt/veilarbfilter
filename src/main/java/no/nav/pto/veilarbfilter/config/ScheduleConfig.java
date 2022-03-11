@@ -19,7 +19,7 @@ public class ScheduleConfig implements SchedulingConfigurer {
     private final VeilederGrupperService veilederGrupperService;
     private final MetricsReporter metricsReporter;
 
-    @Scheduled(cron = "30 * * * * ?")
+    @Scheduled(fixedDelay = 1_800_000)
     public void fjernVeilederSomErIkkeAktive() {
         if (leaderElectionClient.isLeader()) {
             try {
@@ -34,7 +34,7 @@ public class ScheduleConfig implements SchedulingConfigurer {
         }
     }
 
-    @Scheduled(cron = "10 * * * * ?")
+    @Scheduled(fixedDelay = 600_000)
     public void reportLagradeFilter() {
         if (leaderElectionClient.isLeader()) {
             metricsReporter.reportLagradeFilter();
