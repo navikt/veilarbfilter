@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
-import no.nav.common.abac.*;
-import no.nav.common.abac.audit.AuditConfig;
-import no.nav.common.abac.audit.AuditLogger;
-import no.nav.common.abac.audit.NimbusSubjectProvider;
+import no.nav.common.abac.Pep;
+import no.nav.common.abac.VeilarbPepFactory;
 import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
@@ -54,16 +52,12 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public AbacClient abacClient(EnvironmentProperties properties, Credentials serviceUserCredentials) {
-        return new AbacCachedClient(new AbacHttpClient(properties.getAbacUrl(), serviceUserCredentials.username, serviceUserCredentials.password));
-    }
-
-    @Bean
-    public Pep veilarbPep(Credentials serviceUserCredentials, AbacClient abacClient) {
-        AuditConfig auditConfig = new AuditConfig(new AuditLogger(), new SpringAuditRequestInfoSupplier(), null);
-        return new VeilarbPep(
-                serviceUserCredentials.username, abacClient,
-                new NimbusSubjectProvider(), auditConfig
+    public Pep veilarbPep(EnvironmentProperties properties, Credentials serviceUserCredentials) {
+        return VeilarbPepFactory.get(
+                properties.getAbacUrl(),
+                serviceUserCredentials.username,
+                serviceUserCredentials.password,
+                new SpringAuditRequestInfoSupplier()
         );
     }
 

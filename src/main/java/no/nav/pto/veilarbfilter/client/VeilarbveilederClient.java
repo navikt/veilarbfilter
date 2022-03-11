@@ -25,15 +25,15 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Service
 public class VeilarbveilederClient {
 
-    private  String url;
-    private  OkHttpClient client;
-    private  Cache<EnhetId, List<String>> hentVeilederePaaEnhetCache;
+    private String url;
+    private OkHttpClient client;
+    private Cache<EnhetId, List<String>> hentVeilederePaaEnhetCache;
 
     public VeilarbveilederClient(EnvironmentProperties environmentProperties) {
         this.url = environmentProperties.getVeilarbVeilederUrl();
         this.client = RestClient.baseClient();
         hentVeilederePaaEnhetCache = Caffeine.newBuilder()
-                .expireAfterWrite(10, TimeUnit.HOURS)
+                .expireAfterWrite(5, TimeUnit.MINUTES)
                 .maximumSize(600)
                 .build();
     }
