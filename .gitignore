@@ -1,4 +1,6 @@
+.idea/*
+!.idea/runConfigurations/
 *.iml
-.idea
-.DS_STORE
+*.log
 target
+.DS_Store

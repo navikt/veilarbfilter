@@ -1,0 +1,134 @@
+name: Build, push and deploy
+on: push
+env:
+  IMAGE_TAG: ${{ github.sha }}
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/veilarbfilter
+  PRINT_PAYLOAD: true
+jobs:
+  link-to-trello:
+    runs-on: ubuntu-latest
+    name: Trello update
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get trello card id
+        id: card
+        uses: navikt/veilarbtrelloactions/get-card@v2.0
+        with:
+          key: ${{ secrets.TRELLO_KEY }}
+          token: ${{ secrets.TRELLO_TOKEN }}
+          board: BcjrjQZk
+      - name: Attach branch to card
+        id: Attach
+        uses: navikt/veilarbtrelloactions/create-attachment@v2.0
+        if: ${{ steps.card.outputs.success }}
+        with:
+          key: ${{ secrets.TRELLO_KEY }}
+          token: ${{ secrets.TRELLO_TOKEN }}
+          card-id: ${{ steps.card.outputs.card-id }}
+          attachment-type: branch
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+          distribution: 'temurin'
+      - name: Set up cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - name: Run maven tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B verify
+  build-and-push:
+    name: Build and push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+          distribution: 'temurin'
+      - name: Set up cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - name: Build maven artifacts
+        run: mvn -B package -D skipTests
+      - name: Build and push Docker image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} --password-stdin
+          docker build -t ${IMAGE}:${IMAGE_TAG} .
+          docker push ${IMAGE}:${IMAGE_TAG}
+  deploy-dev:
+    name: Deploy application to dev
+    if: github.ref == 'refs/heads/dev'
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy application
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-fss
+          RESOURCE: nais-dev.yaml
+          VAR: version=${{ env.IMAGE_TAG }},namespace=pto
+  deploy-prod:
+    name: Deploy application to prod
+    if: github.ref == 'refs/heads/master'
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy application
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-fss
+          RESOURCE: nais-prod.yaml
+          VAR: version=${{ env.IMAGE_TAG }}
+  release-dev:
+    name: Create dev release
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: release/dev@${{ env.IMAGE_TAG }}
+          release_name: Release to dev
+          prerelease: true
+  release-prod:
+    name: Create prod release
+    needs: deploy-prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: release/prod@${{ env.IMAGE_TAG }}
+          release_name: Release to prod
+          prerelease: false
