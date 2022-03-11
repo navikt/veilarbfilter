@@ -3,7 +3,7 @@ package no.nav.pto.veilarbfilter.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.metrics.Event;
-import no.nav.common.metrics.InfluxClient;
+import no.nav.common.metrics.MetricsClient;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.List;
 @Slf4j
 public class MetricsReporter {
     private final MineLagredeFilterService mineLagredeFilterService;
-    private final InfluxClient metricsClient;
+    private final MetricsClient metricsClient;
 
     public void reportLagradeFilter() {
         log.info("Reporting metrics...");

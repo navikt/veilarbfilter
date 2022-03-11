@@ -9,6 +9,8 @@ import no.nav.common.abac.VeilarbPepFactory;
 import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
+import no.nav.common.metrics.InfluxClient;
+import no.nav.common.metrics.MetricsClient;
 import no.nav.common.sts.NaisSystemUserTokenProvider;
 import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.utils.Credentials;
@@ -70,5 +72,10 @@ public class ApplicationConfig {
         module.addSerializer(LocalDateTime.class, new DateSerializer());
         mapper.registerModule(module);
         return mapper;
+    }
+
+    @Bean
+    public MetricsClient metricsClient() {
+        return new InfluxClient();
     }
 }
