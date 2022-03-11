@@ -11,6 +11,8 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @EnableScheduling
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class ScheduleConfig implements SchedulingConfigurer {
     private final VeilederGrupperService veilederGrupperService;
     private final MetricsReporter metricsReporter;
 
-    @Scheduled(fixedDelay = 1_800_000)
+    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.MINUTES)
     public void fjernVeilederSomErIkkeAktive() {
         if (leaderElectionClient.isLeader()) {
             try {
@@ -34,7 +36,7 @@ public class ScheduleConfig implements SchedulingConfigurer {
         }
     }
 
-    @Scheduled(fixedDelay = 600_000)
+    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.MINUTES)
     public void reportLagradeFilter() {
         if (leaderElectionClient.isLeader()) {
             metricsReporter.reportLagradeFilter();

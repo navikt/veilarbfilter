@@ -76,7 +76,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
         try {
             validerFilterNavn(filter.getFilterNavn());
             validerFilterValg(filter.getFilterValg());
-            
+
             String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ? AND %s = ?", VeilederGrupperFilter.TABLE_NAME, VeilederGrupperFilter.ENHET_ID, VeilederGrupperFilter.FILTER_ID);
             Integer numOfRows = db.queryForObject(sql, Integer.class, enhetId, filter.getFilterId());
 
@@ -186,11 +186,6 @@ public class VeilederGruppeFilterRepository implements FilterService {
 
     private void validerFilterValg(PortefoljeFilter valg) {
         Assert.isTrue(valg.isNotEmpty(), LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message);
-    }
-
-    private void validerUnikhet(Boolean navn, Boolean valg) {
-        Assert.isTrue(!navn, LagredeFilterFeilmeldinger.NAVN_EKSISTERER.message);
-        Assert.isTrue(!valg, LagredeFilterFeilmeldinger.FILTERVALG_EKSISTERER.message);
     }
 }
 

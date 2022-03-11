@@ -251,7 +251,6 @@ public class MineLagredeFilterRepository implements FilterService {
         try {
             Integer count;
             String sql;
-            ObjectMapper objectMapper = new ObjectMapper();
             if (filterIdOptional.isPresent()) {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
                                 "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1 AND f.filter_id != ?",

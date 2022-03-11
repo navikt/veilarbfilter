@@ -14,9 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class MetricsReporter {
-    private  MineLagredeFilterService mineLagredeFilterService;
-    private  InfluxClient metricsClient;
-    private  Integer REPORT_ID = 1;
+    private final MineLagredeFilterService mineLagredeFilterService;
+    private final InfluxClient metricsClient;
 
     public void reportLagradeFilter() {
         log.info("Reporting metrics...");
@@ -162,6 +161,4 @@ public class MetricsReporter {
     private String getHash(String veilederId) {
         return DigestUtils.md5Hex(veilederId);
     }
-
-    ;
 }

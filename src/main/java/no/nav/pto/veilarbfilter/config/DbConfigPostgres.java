@@ -59,7 +59,6 @@ public class DbConfigPostgres implements DatabaseConfig {
                 .dataSource(dataSource)
                 .locations("db/migration")
                 .initSql("SET ROLE '" + getSqlAdminRole() + "';")
-                .baselineOnMigrate(true)
                 .load()
                 .migrate();
 
