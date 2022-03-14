@@ -78,4 +78,5 @@ public class ApplicationConfig {
     public MetricsClient metricsClient() {
         return new InfluxClient();
     }
+
 }
