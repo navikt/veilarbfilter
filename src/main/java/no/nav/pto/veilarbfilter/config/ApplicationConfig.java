@@ -9,6 +9,8 @@ import no.nav.common.abac.VeilarbPepFactory;
 import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
+import no.nav.common.job.leader_election.LeaderElectionClient;
+import no.nav.common.job.leader_election.LeaderElectionHttpClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.metrics.MetricsClient;
 import no.nav.common.sts.NaisSystemUserTokenProvider;
@@ -79,4 +81,8 @@ public class ApplicationConfig {
         return new InfluxClient();
     }
 
+    @Bean
+    public LeaderElectionClient leaderElectionClient() {
+        return new LeaderElectionHttpClient();
+    }
 }
