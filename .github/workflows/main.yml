@@ -30,7 +30,7 @@ jobs:
   test:
     name: Run tests
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/master'
+    if: github.ref != 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -52,7 +52,7 @@ jobs:
   build-and-push:
     name: Build and push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -93,7 +93,7 @@ jobs:
           VAR: version=${{ env.IMAGE_TAG }},namespace=pto
   deploy-prod:
     name: Deploy application to prod
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
