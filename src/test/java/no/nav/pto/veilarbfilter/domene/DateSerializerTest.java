@@ -5,19 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Month;
 
 public class DateSerializerTest {
-    private ObjectMapper mapper;
+    private static ObjectMapper mapper;
 
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void setup() {
         mapper = new ObjectMapper();
 
         SimpleModule module = new SimpleModule();
@@ -28,18 +28,18 @@ public class DateSerializerTest {
 
     @Test
     public void whenDateIsValidThenDeserializeIt() throws IOException {
-        String json = "{\"opprettetDato\": \"2020-03-05T23:05:45.224\"}";
+        String json = "{\"opprettetDato\": \"2020-03-05 23:05:45\"}";
 
         MineLagredeFilterModel deserializedData = mapper.readValue(json, MineLagredeFilterModel.class);
 
         LocalDateTime deserializedDate = deserializedData.getOpprettetDato();
-        Assert.assertTrue(deserializedDate != null);
-        Assert.assertTrue(deserializedDate.getYear() == 2020);
-        Assert.assertTrue(deserializedDate.getMonthValue() == 3);
-        Assert.assertTrue(deserializedDate.getDayOfMonth() == 5);
-        Assert.assertTrue(deserializedDate.getHour() == 23);
-        Assert.assertTrue(deserializedDate.getMinute() == 5);
-        Assert.assertTrue(deserializedDate.getSecond() == 45);
+        Assertions.assertNotNull(deserializedDate);
+        Assertions.assertEquals(2020, deserializedDate.getYear());
+        Assertions.assertEquals(3, deserializedDate.getMonthValue());
+        Assertions.assertEquals(5, deserializedDate.getDayOfMonth());
+        Assertions.assertEquals(deserializedDate.getHour(), 23);
+        Assertions.assertEquals(deserializedDate.getMinute(), 5);
+        Assertions.assertEquals(deserializedDate.getSecond(), 45);
     }
 
     @Test
@@ -49,9 +49,9 @@ public class DateSerializerTest {
             String json = "{\"opprettetDato\": \"20220-03-05T23:05:45.224\"}";
 
             deserializedData = mapper.readValue(json, MineLagredeFilterModel.class);
-            Assert.fail();
+            Assertions.fail();
         } catch (JsonProcessingException e) {
-            Assert.assertNull(deserializedData.getOpprettetDato());
+            Assertions.assertNull(deserializedData.getOpprettetDato());
         }
     }
 
@@ -59,7 +59,7 @@ public class DateSerializerTest {
     public void whenDateIsValidTestSerialization() throws IOException {
         String jsonValue = mapper.writeValueAsString(LocalDateTime.of(2022, Month.JANUARY, 1, 0, 0));
 
-        Assert.assertNotNull(jsonValue);
-        Assert.assertTrue(jsonValue.length() > 10);
+        Assertions.assertNotNull(jsonValue);
+        Assertions.assertTrue(jsonValue.length() > 10);
     }
 }

@@ -38,8 +38,8 @@ class PortefoljeFilterTest {
                         """;
         PortefoljeFilter filterModel = objectMapper.readValue(jsonString, PortefoljeFilter.class);
 
-        Assertions.assertTrue(filterModel.getArbeidslisteKategori() != null);
-        Assertions.assertTrue(filterModel.getArbeidslisteKategori().size() == 2);
+        Assertions.assertNotNull(filterModel.getArbeidslisteKategori());
+        Assertions.assertEquals(2, filterModel.getArbeidslisteKategori().size());
     }
 
 
@@ -54,8 +54,8 @@ class PortefoljeFilterTest {
         Assertions.assertNotNull(filterModel);
         Assertions.assertNotNull(filterModel.getAktiviteter());
         Assertions.assertNotNull(filterModel.getAktiviteter().getEGEN());
-        Assertions.assertTrue(filterModel.getAktiviteter().getEGEN().equals("JA"));
-        Assertions.assertTrue(filterModel.getAktiviteter().getMOTE().equals("NEI"));
+        Assertions.assertEquals("JA", filterModel.getAktiviteter().getEGEN());
+        Assertions.assertEquals("NEI", filterModel.getAktiviteter().getMOTE());
     }
 
     @Test
