@@ -17,7 +17,6 @@
     <properties>
         <java.version>17</java.version>
         <common.version>2.2022.06.09_14.12-35aa4a6ecaa7</common.version>
-        <common1.version>1.2021.07.07_10.18-72bd65c546f6</common1.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
         <jaxb.version>2.3.1</jaxb.version>
@@ -166,11 +165,6 @@
             <groupId>no.nav.common</groupId>
             <artifactId>log</artifactId>
             <version>${common.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.common</groupId>
-            <artifactId>jdbc</artifactId>
-            <version>${common1.version}</version>
         </dependency>
 
         <!--Logging-->
