@@ -23,6 +23,18 @@ spec:
     path: /veilarbfilter/internal/health/readiness
     initialDelay: 60
     timeout: 10
+  azure:
+    application:
+      enabled: true
+      claims:
+        extra:
+          - "NAVident"
+  accessPolicy:
+    inbound:
+      rules:
+        - application: veilarbportefoljeflatefs
+          namespace: obo
+          cluster: prod-gcp
   resources:
     limits:
       cpu: 1500m
@@ -31,6 +43,7 @@ spec:
       cpu: 500m
       memory: 1Gi
   ingresses:
+    - https://veilarbfilter.prod-fss-pub.nais.io
     - https://veilarbfilter.nais.adeo.no
     - https://app.adeo.no/veilarbfilter
   webproxy: true
