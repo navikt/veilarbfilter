@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.config;
 
 import no.nav.common.auth.context.UserRole;
+import no.nav.common.auth.oidc.filter.AzureAdUserRoleResolver;
 import no.nav.common.auth.oidc.filter.OidcAuthenticationFilter;
 import no.nav.common.auth.oidc.filter.OidcAuthenticatorConfig;
 import no.nav.common.auth.utils.UserTokenFinder;
@@ -17,12 +18,11 @@ import static no.nav.common.utils.EnvironmentUtils.requireApplicationName;
 
 @Configuration
 public class FilterConfig {
-    public OidcAuthenticatorConfig azureAdAuthConfig(EnvironmentProperties environmentProperties) {
+    public OidcAuthenticatorConfig azureAdAuthConfig(EnvironmentProperties properties) {
         return new OidcAuthenticatorConfig()
-                .withDiscoveryUrl(environmentProperties.getAzureAdDiscoveryUrl())
-                .withClientId(environmentProperties.getAzureAdClientId())
-                .withIdTokenCookieName(AZURE_AD_ID_TOKEN_COOKIE_NAME)
-                .withUserRole(UserRole.INTERN);
+                .withDiscoveryUrl(properties.getNaisAadDiscoveryUrl())
+                .withClientId(properties.getNaisAadClientId())
+                .withUserRoleResolver(new AzureAdUserRoleResolver());
     }
 
     private OidcAuthenticatorConfig openAmAuthConfig(EnvironmentProperties properties) {

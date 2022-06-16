@@ -13,6 +13,7 @@ spec:
     cpuThresholdPercentage: 50
   port: 8080
   ingresses:
+    - https://veilarbfilter.dev-fss-pub.nais.io
     - https://veilarbfilter-q1.nais.preprod.local
     - https://app-q1.adeo.no/veilarbfilter
     - https://app-q1.dev.adeo.no/veilarbfilter
@@ -38,6 +39,18 @@ spec:
   prometheus:
     enabled: true
     path: veilarbfilter/internal/prometheus
+  azure:
+    application:
+      enabled: true
+      claims:
+        extra:
+          - "NAVident"
+  accessPolicy:
+    inbound:
+      rules:
+        - application: veilarbportefoljeflatefs
+          namespace: obo
+          cluster: dev-gcp
   resources:
     limits:
       cpu: "1"
