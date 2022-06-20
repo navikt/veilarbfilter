@@ -86,6 +86,18 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> aktiviteterForenklet = emptyList();
 
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> landgruppe = emptyList();
+
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> foedeland = emptyList();
+
+    private Boolean talespraaktolk;
+
+    private Boolean tegnspraaktolk;
+
+    private String tolkBehovSpraak = "";
+
     @JsonIgnore
     public Boolean isNotEmpty() {
         return (kjonn != null && !kjonn.isEmpty()) ||
@@ -110,7 +122,9 @@ public class PortefoljeFilter {
                 (utdanningBestatt != null && !utdanningBestatt.isEmpty()) ||
                 (sisteEndringKategori != null && !sisteEndringKategori.isEmpty()) ||
                 (aktiviteterForenklet != null && !aktiviteterForenklet.isEmpty()) ||
-                aktiviteter != null;
+                aktiviteter != null ||
+                !landgruppe.isEmpty() || !foedeland.isEmpty() || !tolkBehovSpraak.isEmpty() ||
+                talespraaktolk != null || tegnspraaktolk != null;
     }
 
 }
