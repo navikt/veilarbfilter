@@ -409,7 +409,13 @@ public class MineLagredeFilterTest extends AbstractTest {
         val alderVelg = List.of("19-og-under", "20-24", "25-29", "30-39", "40-49", "50-59", "60-66", "67-70");
         val kjonnVelg = List.of("K", "M");
         val ferdigfilterListe = List.of("UFORDELTE_BRUKERE", "NYE_BRUKERE_FOR_VEILEDER", "TRENGER_VURDERING", "INAKTIVE_BRUKERE", "VENTER_PA_SVAR_FRA_NAV", "VENTER_PA_SVAR_FRA_BRUKER", "UTLOPTE_AKTIVITETER");
-        return new PortefoljeFilter(aktiviteter, List.of(alderVelg.get(random.nextInt(7)), alderVelg.get(random.nextInt(7)), alderVelg.get(random.nextInt(7))), List.of(ferdigfilterListe.get(random.nextInt(6)), ferdigfilterListe.get(random.nextInt(6)), ferdigfilterListe.get(random.nextInt(6))), emptyList(), emptyList(), emptyList(), emptyList(), kjonnVelg.get(random.nextInt(1)), emptyList(), String.valueOf(rndChar()), emptyList(), emptyList(), emptyList(), "", emptyList(), "", emptyList(), "", emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList());
+        return new PortefoljeFilter(aktiviteter, List.of(alderVelg.get(random.nextInt(7)), alderVelg.get(random.nextInt(7)),
+                alderVelg.get(random.nextInt(7))), List.of(ferdigfilterListe.get(random.nextInt(6)),
+                ferdigfilterListe.get(random.nextInt(6)), ferdigfilterListe.get(random.nextInt(6))),
+                emptyList(), emptyList(), emptyList(), emptyList(), kjonnVelg.get(random.nextInt(1)), emptyList(),
+                String.valueOf(rndChar()), emptyList(), emptyList(), emptyList(), "", emptyList(), "", emptyList(), "",
+                emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList(), emptyList(), emptyList(),
+                null, null, "");
     }
 
     private static char rndChar() {
