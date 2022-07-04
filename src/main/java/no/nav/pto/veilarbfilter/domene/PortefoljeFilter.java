@@ -92,10 +92,8 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> foedeland = emptyList();
 
-    private Boolean talespraaktolk;
-
-    private Boolean tegnspraaktolk;
-
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> tolkebehov = emptyList();;
     private String tolkBehovSpraak = "";
 
     @JsonIgnore
@@ -124,7 +122,7 @@ public class PortefoljeFilter {
                 (aktiviteterForenklet != null && !aktiviteterForenklet.isEmpty()) ||
                 aktiviteter != null ||
                 !landgruppe.isEmpty() || !foedeland.isEmpty() || !tolkBehovSpraak.isEmpty() ||
-                talespraaktolk != null || tegnspraaktolk != null;
+                !tolkebehov.isEmpty();
     }
 
 }
