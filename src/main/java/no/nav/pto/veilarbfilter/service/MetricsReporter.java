@@ -67,31 +67,31 @@ public class MetricsReporter {
                     antallFiltre++;
                 }
             }
-            if (!filterValg.getAlder().isEmpty()) {
+            if (filterValg.getAlder() != null && !filterValg.getAlder().isEmpty()) {
                 metrikk.addTagToReport("alder", "1");
                 addValuesAsTags(metrikk, filterValg.getAlder());
                 antallFiltre += filterValg.getAlder().size();
             }
-            if (!filterValg.getFerdigfilterListe().isEmpty()) {
+            if (filterValg.getFerdigfilterListe() != null && !filterValg.getFerdigfilterListe().isEmpty()) {
                 metrikk.addTagToReport("ferdigfilterListe", "1");
                 addValuesAsTags(metrikk, filterValg.getFerdigfilterListe());
                 antallFiltre += filterValg.getFerdigfilterListe().size();
             }
-            if (!filterValg.getFodselsdagIMnd().isEmpty()) {
+            if (filterValg.getFodselsdagIMnd() != null && !filterValg.getFodselsdagIMnd().isEmpty()) {
                 metrikk.addTagToReport("fodselsdagIMnd", "1");
                 antallFiltre += filterValg.getFodselsdagIMnd().size();
             }
-            if (!filterValg.getFormidlingsgruppe().isEmpty()) {
+            if (filterValg.getFormidlingsgruppe() != null && !filterValg.getFormidlingsgruppe().isEmpty()) {
                 metrikk.addTagToReport("formidlingsgruppe", "1");
                 addValuesAsTags(metrikk, filterValg.getFormidlingsgruppe());
                 antallFiltre += filterValg.getFormidlingsgruppe().size();
             }
-            if (!filterValg.getHovedmal().isEmpty()) {
+            if (filterValg.getHovedmal() != null && !filterValg.getHovedmal().isEmpty()) {
                 metrikk.addTagToReport("hovedmal", "1");
                 addValuesAsTags(metrikk, filterValg.getHovedmal());
                 antallFiltre += filterValg.getHovedmal().size();
             }
-            if (!filterValg.getInnsatsgruppe().isEmpty()) {
+            if (filterValg.getInnsatsgruppe() != null && !filterValg.getInnsatsgruppe().isEmpty()) {
                 metrikk.addTagToReport("innsatsgruppe", "1");
                 addValuesAsTags(metrikk, filterValg.getInnsatsgruppe());
                 antallFiltre += filterValg.getInnsatsgruppe().size();
@@ -101,31 +101,31 @@ public class MetricsReporter {
                 metrikk.addTagToReport(filterValg.getKjonn(), "1");
                 antallFiltre++;
             }
-            if (!filterValg.getManuellBrukerStatus().isEmpty()) {
+            if (filterValg.getManuellBrukerStatus() != null && !filterValg.getManuellBrukerStatus().isEmpty()) {
                 metrikk.addTagToReport("manuellBrukerStatus", "1");
                 addValuesAsTags(metrikk, filterValg.getManuellBrukerStatus());
                 antallFiltre += filterValg.getManuellBrukerStatus().size();
             }
-            if (!filterValg.getRettighetsgruppe().isEmpty()) {
+            if (filterValg.getRettighetsgruppe() != null && !filterValg.getRettighetsgruppe().isEmpty()) {
                 metrikk.addTagToReport("rettighetsgruppe", "1");
                 addValuesAsTags(metrikk, filterValg.getRettighetsgruppe());
                 antallFiltre += filterValg.getRettighetsgruppe().size();
             }
-            if (!filterValg.getServicegruppe().isEmpty()) {
+            if (filterValg.getServicegruppe() != null && !filterValg.getServicegruppe().isEmpty()) {
                 metrikk.addTagToReport("servicegruppe", "1");
                 addValuesAsTags(metrikk, filterValg.getServicegruppe());
                 antallFiltre += filterValg.getServicegruppe().size();
             }
-            if (!filterValg.getTiltakstyper().isEmpty()) {
+            if (filterValg.getTiltakstyper() != null && !filterValg.getTiltakstyper().isEmpty()) {
                 metrikk.addTagToReport("tiltakstyper", "1");
                 addValuesAsTags(metrikk, filterValg.getTiltakstyper());
                 antallFiltre += filterValg.getTiltakstyper().size();
             }
-            if (!filterValg.getVeilederNavnQuery().isEmpty()) {
+            if (filterValg.getVeilederNavnQuery() != null && !filterValg.getVeilederNavnQuery().isEmpty()) {
                 metrikk.addTagToReport("veilederNavnQuery", "1");
                 antallFiltre++;
             }
-            if (!filterValg.getVeiledere().isEmpty()) {
+            if (filterValg.getVeiledere() != null && !filterValg.getVeiledere().isEmpty()) {
                 metrikk.addTagToReport("veiledere", "1");
                 antallFiltre += filterValg.getVeiledere().size();
             }
@@ -147,6 +147,16 @@ public class MetricsReporter {
             if (filterValg.getArbeidslisteKategori() != null && !filterValg.getArbeidslisteKategori().isEmpty()) {
                 metrikk.addTagToReport("arbeidslisteKategori", "1");
                 antallFiltre += filterValg.getArbeidslisteKategori().size();
+            }
+            if (filterValg.getLandgruppe() != null && !filterValg.getLandgruppe().isEmpty()) {
+                metrikk.addTagToReport("landgruppe", "1");
+                addValuesAsTags(metrikk, filterValg.getLandgruppe());
+                antallFiltre += filterValg.getLandgruppe().size();
+            }
+            if (filterValg.getTolkebehov() != null && !filterValg.getTolkebehov().isEmpty()) {
+                metrikk.addTagToReport("tolkbehov", "1");
+                addValuesAsTags(metrikk, filterValg.getTolkebehov());
+                antallFiltre += filterValg.getTolkebehov().size();
             }
             metrikk.addFieldToReport("antallFiltre", antallFiltre);
             metricsClient.report(metrikk);
