@@ -10,11 +10,11 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 
-@JsonIgnoreProperties
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonPropertyOrder(alphabetic = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PortefoljeFilter {
     private Aktiviteter aktiviteter = null;
 
