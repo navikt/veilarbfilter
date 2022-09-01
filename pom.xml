@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <common.version>2.2022.09.02_11.04-2530dd139a0a</common.version>
+        <common.version>2.2022.07.01_07.12-6a0864fa6938</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
         <jaxb.version>2.3.1</jaxb.version>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>no.nav</groupId>
             <artifactId>vault-jdbc</artifactId>
-            <version>1.3.10</version>
+            <version>1.3.9</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -143,6 +143,11 @@
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
+            <artifactId>cxf</artifactId>
+            <version>${common.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
             <artifactId>feature-toggle</artifactId>
             <version>${common.version}</version>
         </dependency>
@@ -153,12 +158,12 @@
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
-            <artifactId>log</artifactId>
+            <artifactId>sts</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
-            <artifactId>token-client</artifactId>
+            <artifactId>log</artifactId>
             <version>${common.version}</version>
         </dependency>
 
@@ -186,11 +191,6 @@
 
         <!--Diverse-->
         <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.15</version>
-        </dependency>
-        <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>7.15.0</version>
@@ -199,7 +199,7 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>4.37.0</version>
+            <version>4.36.0</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -222,7 +222,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.9.1</version>
+            <version>1.9.0</version>
         </dependency>
 
         <!--TEST-->
