@@ -23,7 +23,7 @@ public class FilterConfig {
     }
 
     @Bean
-    public FilterRegistrationBean authenticationFilterRegistrationBean(EnvironmentProperties properties) {
+    public FilterRegistrationBean<OidcAuthenticationFilter> authenticationFilterRegistrationBean(EnvironmentProperties properties) {
         FilterRegistrationBean<OidcAuthenticationFilter> registration = new FilterRegistrationBean<>();
         OidcAuthenticationFilter authenticationFilter = new OidcAuthenticationFilter(
                 fromConfigs(
@@ -38,7 +38,7 @@ public class FilterConfig {
 
 
     @Bean
-    public FilterRegistrationBean logFilterRegistrationBean() {
+    public FilterRegistrationBean<LogFilter>  logFilterRegistrationBean() {
         FilterRegistrationBean<LogFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new LogFilter(requireApplicationName(), isDevelopment().orElse(false)));
         registration.setOrder(2);
@@ -47,7 +47,7 @@ public class FilterConfig {
     }
 
     @Bean
-    public FilterRegistrationBean setStandardHeadersFilterRegistrationBean() {
+    public FilterRegistrationBean<SetStandardHttpHeadersFilter> setStandardHeadersFilterRegistrationBean() {
         FilterRegistrationBean<SetStandardHttpHeadersFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new SetStandardHttpHeadersFilter());
         registration.setOrder(3);
