@@ -143,11 +143,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
-            <artifactId>cxf</artifactId>
-            <version>${common.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.common</groupId>
             <artifactId>feature-toggle</artifactId>
             <version>${common.version}</version>
         </dependency>
@@ -158,12 +153,12 @@
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
-            <artifactId>sts</artifactId>
+            <artifactId>log</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
-            <artifactId>log</artifactId>
+            <artifactId>token-client</artifactId>
             <version>${common.version}</version>
         </dependency>
 
