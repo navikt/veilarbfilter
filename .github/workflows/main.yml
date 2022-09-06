@@ -106,10 +106,6 @@ jobs:
           CLUSTER: prod-fss
           RESOURCE: nais-prod.yaml
           VAR: version=${{ env.IMAGE_TAG }}
-  release-dev:
-    name: Create dev release
-    needs: deploy-dev
-    runs-on: ubuntu-latest
   release-prod:
     name: Create prod release
     needs: deploy-prod
