@@ -1,17 +1,14 @@
 package no.nav.pto.veilarbfilter.config;
 
-import no.nav.common.auth.context.UserRole;
 import no.nav.common.auth.oidc.filter.AzureAdUserRoleResolver;
 import no.nav.common.auth.oidc.filter.OidcAuthenticationFilter;
 import no.nav.common.auth.oidc.filter.OidcAuthenticatorConfig;
-import no.nav.common.auth.utils.UserTokenFinder;
 import no.nav.common.log.LogFilter;
 import no.nav.common.rest.filter.SetStandardHttpHeadersFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static no.nav.common.auth.Constants.*;
 import static no.nav.common.auth.oidc.filter.OidcAuthenticator.fromConfigs;
 import static no.nav.common.utils.EnvironmentUtils.isDevelopment;
 import static no.nav.common.utils.EnvironmentUtils.requireApplicationName;
@@ -25,23 +22,11 @@ public class FilterConfig {
                 .withUserRoleResolver(new AzureAdUserRoleResolver());
     }
 
-    private OidcAuthenticatorConfig openAmAuthConfig(EnvironmentProperties properties) {
-        return new OidcAuthenticatorConfig()
-                .withDiscoveryUrl(properties.getOpenAmDiscoveryUrl())
-                .withClientId(properties.getOpenAmClientId())
-                .withIdTokenCookieName(OPEN_AM_ID_TOKEN_COOKIE_NAME)
-                .withRefreshTokenCookieName(REFRESH_TOKEN_COOKIE_NAME)
-                .withIdTokenFinder(new UserTokenFinder())
-                .withRefreshUrl(properties.getOpenAmRefreshUrl())
-                .withUserRole(UserRole.INTERN);
-    }
-
     @Bean
     public FilterRegistrationBean authenticationFilterRegistrationBean(EnvironmentProperties properties) {
         FilterRegistrationBean<OidcAuthenticationFilter> registration = new FilterRegistrationBean<>();
         OidcAuthenticationFilter authenticationFilter = new OidcAuthenticationFilter(
                 fromConfigs(
-                        openAmAuthConfig(properties),
                         azureAdAuthConfig(properties)
                 )
         );

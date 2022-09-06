@@ -2,9 +2,7 @@ package no.nav.pto.veilarbfilter.config;
 
 import no.nav.common.abac.Pep;
 import no.nav.common.metrics.InfluxClient;
-import no.nav.common.sts.SystemUserTokenProvider;
 import no.nav.common.types.identer.EnhetId;
-import no.nav.common.utils.Credentials;
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
@@ -33,12 +31,6 @@ import java.util.List;
 public class AppConfig {
     @MockBean
     public InfluxClient metricsClient;
-
-    @MockBean
-    public Credentials serviceUserCredentials;
-
-    @MockBean
-    public SystemUserTokenProvider systemUserTokenProvider;
 
     @Bean
     public Pep pep() {
