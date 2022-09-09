@@ -6,34 +6,43 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.rest.client.RestUtils;
-import no.nav.common.sts.SystemUserTokenProvider;
+import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.types.identer.EnhetId;
-import no.nav.pto.veilarbfilter.config.EnvironmentProperties;
+import no.nav.common.utils.EnvironmentUtils;
+import no.nav.common.utils.UrlUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
-import static java.lang.String.format;
 import static no.nav.common.client.utils.CacheUtils.tryCacheFirst;
+import static no.nav.common.utils.UrlUtils.joinPaths;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 @Service
-
 public class VeilarbveilederClient {
-    private SystemUserTokenProvider systemUserTokenProvider;
-    private String url;
-    private OkHttpClient client;
-    private Cache<EnhetId, List<String>> hentVeilederePaaEnhetCache;
+    private final String veilarbveilederBaseUrl;
+    private final OkHttpClient client;
+    private final Cache<EnhetId, List<String>> hentVeilederePaaEnhetCache;
+    private final Supplier<String> systemUserTokenProvider;
 
-    public VeilarbveilederClient(EnvironmentProperties environmentProperties, SystemUserTokenProvider systemUserTokenProvider) {
-        this.url = environmentProperties.getVeilarbVeilederUrl();
+    @Autowired
+    public VeilarbveilederClient(AzureAdMachineToMachineTokenClient tokenClient) {
+        final String appName = "veilarbveileder";
+        final String namespace = "pto";
+        this.veilarbveilederBaseUrl = UrlUtils.createServiceUrl(appName, namespace, true);
         this.client = RestClient.baseClient();
-        this.systemUserTokenProvider = systemUserTokenProvider;
+        systemUserTokenProvider = () ->
+                tokenClient.createMachineToMachineToken(String.format("api://%s-fss.%s.%s/.default",
+                        (EnvironmentUtils.isProduction().orElseThrow()) ? "prod" : "dev", namespace, appName)
+                );
+
         hentVeilederePaaEnhetCache = Caffeine.newBuilder()
                 .expireAfterWrite(5, TimeUnit.MINUTES)
                 .maximumSize(600)
@@ -47,11 +56,9 @@ public class VeilarbveilederClient {
 
     @SneakyThrows
     private List<String> hentVeilederePaaEnhetQuery(EnhetId enhet) {
-        String path = format("/enhet/%s/identer", enhet);
-
         Request request = new Request.Builder()
-                .header(AUTHORIZATION, "Bearer " + systemUserTokenProvider.getSystemUserToken())
-                .url(url + path)
+                .header(AUTHORIZATION, "Bearer " + systemUserTokenProvider.get())
+                .url(joinPaths(veilarbveilederBaseUrl, "/api/enhet/", enhet.get(), "/identer"))
                 .build();
 
         try (Response response = client.newCall(request).execute()) {

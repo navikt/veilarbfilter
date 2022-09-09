@@ -20,7 +20,7 @@ public class MetricsReporter {
     public void reportLagradeFilter() {
         log.info("Reporting metrics...");
 
-        mineLagredeFilterService.hentAllLagredeFilter().stream().forEach(filterModel -> {
+        mineLagredeFilterService.hentAllLagredeFilter().forEach(filterModel -> {
             Event metrikk = new Event("portefolje.metrikker.lagredefilter.veileder-filter-counter");
             metrikk.addFieldToReport("navn-lengde", filterModel.getFilterNavn().length());
             metrikk.addTagToReport("id", getHash(filterModel.getVeilederId()));
@@ -30,39 +30,39 @@ public class MetricsReporter {
 
             if (filterValg.getAktiviteter() != null) {
                 metrikk.addTagToReport("aktiviteter", "1");
-                if (filterValg.getAktiviteter().getBEHANDLING() != "NA") {
+                if (!"NA".equals(filterValg.getAktiviteter().getBEHANDLING())) {
                     metrikk.addTagToReport("BEHANDLING", "1");
                     antallFiltre++;
                 }
-                if (filterValg.getAktiviteter().getEGEN() != "NA") {
+                if (!"NA".equals(filterValg.getAktiviteter().getEGEN())) {
                     metrikk.addTagToReport("EGEN", "1");
                     antallFiltre++;
                 }
-                if (filterValg.getAktiviteter().getGRUPPEAKTIVITET() != "NA") {
+                if (!"NA".equals(filterValg.getAktiviteter().getGRUPPEAKTIVITET())) {
                     metrikk.addTagToReport("GRUPPEAKTIVITET", "1");
                     antallFiltre++;
                 }
-                if (filterValg.getAktiviteter().getIJOBB() != "NA") {
+                if (!"NA".equals(filterValg.getAktiviteter().getIJOBB())) {
                     metrikk.addTagToReport("IJOBB", "1");
                     antallFiltre++;
                 }
-                if (filterValg.getAktiviteter().getMOTE() != "NA") {
+                if (!"NA".equals(filterValg.getAktiviteter().getMOTE())) {
                     metrikk.addTagToReport("MOTE", "1");
                     antallFiltre++;
                 }
-                if (filterValg.getAktiviteter().getSOKEAVTALE() != "NA") {
+                if (!"NA".equals(filterValg.getAktiviteter().getSOKEAVTALE())) {
                     metrikk.addTagToReport("SOKEAVTALE", "1");
                     antallFiltre++;
                 }
-                if (filterValg.getAktiviteter().getSTILLING() != "NA") {
+                if (!"NA".equals(filterValg.getAktiviteter().getSTILLING())) {
                     metrikk.addTagToReport("STILLING", "1");
                     antallFiltre++;
                 }
-                if (filterValg.getAktiviteter().getTILTAK() != "NA") {
+                if (!"NA".equals(filterValg.getAktiviteter().getTILTAK())) {
                     metrikk.addTagToReport("TILTAK", "1");
                     antallFiltre++;
                 }
-                if (filterValg.getAktiviteter().getUTDANNINGAKTIVITET() != "NA") {
+                if (!"NA".equals(filterValg.getAktiviteter().getUTDANNINGAKTIVITET())) {
                     metrikk.addTagToReport("UTDANNINGAKTIVITET", "1");
                     antallFiltre++;
                 }
@@ -165,7 +165,7 @@ public class MetricsReporter {
     }
 
     private void addValuesAsTags(Event metrikk, List<String> listValues) {
-        listValues.stream().forEach(x -> metrikk.addTagToReport(x, "1"));
+        listValues.forEach(x -> metrikk.addTagToReport(x, "1"));
     }
 
     private String getHash(String veilederId) {

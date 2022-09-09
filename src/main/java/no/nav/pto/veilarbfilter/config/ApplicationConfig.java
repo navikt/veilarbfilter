@@ -13,8 +13,8 @@ import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.job.leader_election.LeaderElectionHttpClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.metrics.MetricsClient;
-import no.nav.common.sts.NaisSystemUserTokenProvider;
-import no.nav.common.sts.SystemUserTokenProvider;
+import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
+import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.utils.Credentials;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
@@ -41,28 +41,24 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public Credentials serviceUserCredentials() {
-        return getCredentials("service_user");
-    }
-
-    @Bean
-    public SystemUserTokenProvider systemUserTokenProvider(EnvironmentProperties properties, Credentials serviceUserCredentials) {
-        return new NaisSystemUserTokenProvider(properties.getStsDiscoveryUrl(), serviceUserCredentials.username, serviceUserCredentials.password);
-    }
-
-    @Bean
     public AuthContextHolder authContextHolder() {
         return AuthContextHolderThreadLocal.instance();
     }
 
     @Bean
-    public Pep veilarbPep(EnvironmentProperties properties, Credentials serviceUserCredentials) {
+    public Pep veilarbPep(EnvironmentProperties properties) {
+        Credentials serviceUserCredentials = getCredentials("service_user");
         return VeilarbPepFactory.get(
-                properties.getAbacUrl(),
-                serviceUserCredentials.username,
-                serviceUserCredentials.password,
-                new SpringAuditRequestInfoSupplier()
+                properties.getAbacUrl(), serviceUserCredentials.username,
+                serviceUserCredentials.password, new SpringAuditRequestInfoSupplier()
         );
+    }
+
+    @Bean
+    public AzureAdMachineToMachineTokenClient azureAdMachineToMachineTokenClient() {
+        return AzureAdTokenClientBuilder.builder()
+                .withNaisDefaults()
+                .buildMachineToMachineTokenClient();
     }
 
     @Bean
