@@ -6,7 +6,7 @@ metadata:
   labels:
     team: pto
 spec:
-  image: docker.pkg.github.com/navikt/veilarbfilter/veilarbfilter:{{version}}
+  image: ghcr.io/navikt/veilarbfilter/veilarbfilter:{{version}}
   port: 8080
   vault:
     enabled: true
