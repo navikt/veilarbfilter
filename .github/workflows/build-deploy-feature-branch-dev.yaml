@@ -10,7 +10,6 @@ jobs:
   build-and-push:
     name: Build and push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -41,7 +40,6 @@ jobs:
           tags: ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
   deploy-dev:
     name: Deploy application to dev
-    if: github.ref == 'refs/heads/dev'
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
