@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 env:
   IMAGE_TAG: ${{ github.sha }}
-  IMAGE: ghcr.io/${{ github.repository }}/veilarbveileder
+  IMAGE: ghcr.io/${{ github.repository }}/veilarbfilter
   PRINT_PAYLOAD: true
 
 jobs:
