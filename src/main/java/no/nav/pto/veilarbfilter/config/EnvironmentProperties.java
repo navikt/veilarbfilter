@@ -8,13 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties(prefix = "app.env")
 public class EnvironmentProperties {
-    private String veilarbVeilederUrl;
-    private String stsDiscoveryUrl;
     private String dbUrl;
     private String abacUrl;
-    private String openAmDiscoveryUrl;
-    private String openAmClientId;
-    private String openAmRefreshUrl;
     private String naisAadDiscoveryUrl;
     private String naisAadClientId;
 

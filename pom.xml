@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <common.version>2.2022.08.31_10.30-f0905803be03</common.version>
+        <common.version>2.2022.09.02_11.04-2530dd139a0a</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
         <jaxb.version>2.3.1</jaxb.version>
@@ -143,11 +143,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
-            <artifactId>cxf</artifactId>
-            <version>${common.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.common</groupId>
             <artifactId>feature-toggle</artifactId>
             <version>${common.version}</version>
         </dependency>
@@ -158,12 +153,12 @@
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
-            <artifactId>sts</artifactId>
+            <artifactId>log</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
-            <artifactId>log</artifactId>
+            <artifactId>token-client</artifactId>
             <version>${common.version}</version>
         </dependency>
 
@@ -190,6 +185,11 @@
         </dependency>
 
         <!--Diverse-->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
+        </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>

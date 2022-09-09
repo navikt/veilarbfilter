@@ -66,7 +66,7 @@ public class VeilederGrupperService implements FilterService {
 
         List<FilterModel> filterForBruker = finnFilterForFilterBruker(enhetId);
 
-        filterForBruker.stream().forEach(filter -> {
+        filterForBruker.forEach(filter -> {
             List<String> alleVeiledere = filter.getFilterValg().getVeiledere();
             List<String> aktiveVeileder = alleVeiledere.stream().filter(veilederIdent -> veilederePaEnheten.contains(veilederIdent)).collect(Collectors.toList());
 

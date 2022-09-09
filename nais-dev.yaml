@@ -14,9 +14,7 @@ spec:
   port: 8080
   ingresses:
     - https://veilarbfilter.dev-fss-pub.nais.io
-    - https://veilarbfilter-q1.nais.preprod.local
-    - https://app-q1.adeo.no/veilarbfilter
-    - https://app-q1.dev.adeo.no/veilarbfilter
+    - https://veilarbfilter.dev.intern.nav.no
   webproxy: true
   secureLogs:
     enabled: true
@@ -44,7 +42,7 @@ spec:
       enabled: true
       claims:
         extra:
-          - "NAVident"
+          - NAVident
   accessPolicy:
     inbound:
       rules:
