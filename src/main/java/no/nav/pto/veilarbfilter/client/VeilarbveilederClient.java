@@ -34,11 +34,13 @@ public class VeilarbveilederClient {
 
     @Autowired
     public VeilarbveilederClient(AzureAdMachineToMachineTokenClient tokenClient) {
-        this.veilarbveilederBaseUrl = UrlUtils.createServiceUrl("veilarbveileder", "pto", true);
+        final String appName = "veilarbveileder";
+        final String namespace = "pto";
+        this.veilarbveilederBaseUrl = UrlUtils.createServiceUrl(appName, namespace, true);
         this.client = RestClient.baseClient();
         systemUserTokenProvider = () ->
-                tokenClient.createMachineToMachineToken(String.format("api://%s-fss.pto.veilarboppfolging/.default",
-                        (EnvironmentUtils.isProduction().orElseThrow()) ? "prod" : "dev")
+                tokenClient.createMachineToMachineToken(String.format("api://%s-fss.%s.%s/.default",
+                        (EnvironmentUtils.isProduction().orElseThrow()) ? "prod" : "dev", namespace, appName)
                 );
 
         hentVeilederePaaEnhetCache = Caffeine.newBuilder()
