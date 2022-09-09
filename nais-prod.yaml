@@ -6,7 +6,7 @@ metadata:
   labels:
     team: pto
 spec:
-  image: docker.pkg.github.com/navikt/veilarbfilter/veilarbfilter:{{version}}
+  image: ghcr.io/navikt/veilarbfilter/veilarbfilter:{{version}}
   port: 8080
   vault:
     enabled: true
@@ -28,7 +28,7 @@ spec:
       enabled: true
       claims:
         extra:
-          - "NAVident"
+          - NAVident
   accessPolicy:
     inbound:
       rules:
@@ -44,8 +44,7 @@ spec:
       memory: 1Gi
   ingresses:
     - https://veilarbfilter.prod-fss-pub.nais.io
-    - https://veilarbfilter.nais.adeo.no
-    - https://app.adeo.no/veilarbfilter
+    - https://veilarbfilter.intern.nav.no
   webproxy: true
   replicas:
     min: 1

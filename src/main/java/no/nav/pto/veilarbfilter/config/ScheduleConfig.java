@@ -20,12 +20,12 @@ public class ScheduleConfig {
     private final VeilederGrupperService veilederGrupperService;
     private final MetricsReporter metricsReporter;
 
-    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedDelay = 30, initialDelay = 2, timeUnit = TimeUnit.MINUTES)
     public void fjernVeilederSomErIkkeAktive() {
         if (leaderElectionClient.isLeader()) {
             try {
                 log.info("Fjern veileder som er ikke aktive...");
-                veilederGrupperService.hentAlleEnheter().stream().forEach(enhetId -> veilederGrupperService.slettVeiledereSomIkkeErAktivePaEnheten(enhetId));
+                veilederGrupperService.hentAlleEnheter().forEach(veilederGrupperService::slettVeiledereSomIkkeErAktivePaEnheten);
                 log.info("Fjern veileder som er ikke aktive er ferdig");
             } catch (Exception e) {
                 log.warn("Exception during clanup " + e, e);
