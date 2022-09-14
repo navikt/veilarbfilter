@@ -95,6 +95,15 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> tolkebehov = emptyList();;
 
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> tolkBehovSpraak = emptyList();
+
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> geografiskBosted = emptyList();
+
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> visGeografiskBosted = emptyList();
+
     @JsonIgnore
     public Boolean isNotEmpty() {
         return (kjonn != null && !kjonn.isEmpty()) ||
@@ -121,7 +130,10 @@ public class PortefoljeFilter {
                 (aktiviteterForenklet != null && !aktiviteterForenklet.isEmpty()) ||
                 aktiviteter != null ||
                 (landgruppe != null && !landgruppe.isEmpty()) || (foedeland != null && !foedeland.isEmpty()) ||
-                (tolkebehov != null && !tolkebehov.isEmpty());
+                (tolkebehov != null && !tolkebehov.isEmpty()) ||
+                (tolkBehovSpraak != null && !tolkBehovSpraak.isEmpty()) ||
+                (geografiskBosted != null && !geografiskBosted.isEmpty()) ||
+                (visGeografiskBosted != null && !visGeografiskBosted.isEmpty());
     }
 
 }
