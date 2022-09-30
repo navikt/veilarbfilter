@@ -104,6 +104,9 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> visGeografiskBosted = emptyList();
 
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> stillingFraNavFilter = emptyList();
+
     @JsonIgnore
     public Boolean isNotEmpty() {
         return (kjonn != null && !kjonn.isEmpty()) ||
@@ -133,7 +136,8 @@ public class PortefoljeFilter {
                 (tolkebehov != null && !tolkebehov.isEmpty()) ||
                 (tolkBehovSpraak != null && !tolkBehovSpraak.isEmpty()) ||
                 (geografiskBosted != null && !geografiskBosted.isEmpty()) ||
-                (visGeografiskBosted != null && !visGeografiskBosted.isEmpty());
+                (visGeografiskBosted != null && !visGeografiskBosted.isEmpty()) ||
+                (stillingFraNavFilter != null && !stillingFraNavFilter.isEmpty());
     }
 
 }
