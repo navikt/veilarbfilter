@@ -199,7 +199,7 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>4.39.0</version>
+            <version>4.42.0</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -222,7 +222,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.9.3</version>
+            <version>1.9.4</version>
         </dependency>
 
         <!--TEST-->
