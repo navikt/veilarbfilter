@@ -281,7 +281,18 @@
         <dependency>
             <groupId>com.github.navikt.poao-tilgang</groupId>
             <artifactId>client</artifactId>
-            <version>2023.01.20_12.27-9c71f4326723</version>
+            <version>2023.01.27_14.49-9fe135865a9f</version>
         </dependency>
     </dependencies>
+    <repositories>
+        <!-- Legger til central eksplisitt for prioritet over jitpack -->
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 </project>
