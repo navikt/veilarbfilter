@@ -10,6 +10,8 @@ import no.nav.common.abac.Pep;
 import no.nav.common.abac.VeilarbPepFactory;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
+import no.nav.common.featuretoggle.UnleashClient;
+import no.nav.common.featuretoggle.UnleashClientImpl;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.job.leader_election.LeaderElectionHttpClient;
 import no.nav.common.metrics.InfluxClient;
@@ -40,6 +42,7 @@ import static no.nav.common.utils.NaisUtils.getCredentials;
 @Import(DbConfigPostgres.class)
 @EnableConfigurationProperties({EnvironmentProperties.class})
 public class ApplicationConfig {
+    public static final String APPLICATION_NAME = "veilarbfilter";
     private final Cache<PolicyInput, Decision> policyInputToDecisionCache = Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofMinutes(30))
             .build();
@@ -108,5 +111,10 @@ public class ApplicationConfig {
                 navAnsattIdToAzureAdGrupperCache,
                 norskIdentToErSkjermetCache
         );
+    }
+
+    @Bean
+    public UnleashClient unleashClient(EnvironmentProperties properties, AuthContextHolder authContextHolder) {
+        return new UnleashClientImpl(properties.getUnleashUrl(), APPLICATION_NAME);
     }
 }
