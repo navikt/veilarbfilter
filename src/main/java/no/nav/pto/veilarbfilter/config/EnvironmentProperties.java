@@ -12,5 +12,7 @@ public class EnvironmentProperties {
     private String abacUrl;
     private String naisAadDiscoveryUrl;
     private String naisAadClientId;
-
+    private String poaoTilgangUrl;
+    private String poaoTilgangScope;
+    private String unleashUrl;
 }

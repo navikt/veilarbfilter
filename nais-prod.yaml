@@ -59,3 +59,7 @@ spec:
   env:
     - name: VEILARBFILTER_DB_URL
       value: jdbc:postgresql://A01DBVL010.adeo.no:5432/veilarbfilter
+    - name: POAO_TILGANG_URL
+      value: https://poao-tilgang.intern.nav.no
+    - name: POAO_TILGANG_SCOPE
+      value: api://prod-gcp.poao.poao-tilgang/.default
