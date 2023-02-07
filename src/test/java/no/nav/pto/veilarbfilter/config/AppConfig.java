@@ -22,6 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 @Configuration
@@ -41,11 +42,12 @@ public class AppConfig {
     @Bean
     public Pep pep() {
         Pep mockPep = mock(Pep.class);
-        Mockito.when(mockPep.harVeilederTilgangTilEnhet(Mockito.any(), Mockito.any())).thenReturn(true);
+        Mockito.when(mockPep.harVeilederTilgangTilEnhet(any(), any())).thenReturn(true);
         return mockPep;
     }
     @Bean
     public PoaoTilgangClient poaoTilgangClient() {
+
         return mock(PoaoTilgangClient.class); }
 
     @Bean
@@ -57,6 +59,8 @@ public class AppConfig {
 
     @Bean
     public UnleashClient unleashClient() {
-        return mock(UnleashClient.class);
+        UnleashClient mockUnleashClient = mock(UnleashClient.class);
+        Mockito.when(mockUnleashClient.isEnabled(any())).thenReturn(true);
+        return mockUnleashClient;
     }
 }
