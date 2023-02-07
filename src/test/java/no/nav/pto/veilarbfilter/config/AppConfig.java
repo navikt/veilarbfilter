@@ -4,7 +4,9 @@ import no.nav.common.abac.Pep;
 import no.nav.common.featuretoggle.UnleashClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.types.identer.EnhetId;
+import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.PoaoTilgangClient;
+import no.nav.poao_tilgang.client.api.ApiResult;
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
@@ -47,8 +49,9 @@ public class AppConfig {
     }
     @Bean
     public PoaoTilgangClient poaoTilgangClient() {
-
-        return mock(PoaoTilgangClient.class); }
+        PoaoTilgangClient mockPoaoTilgangClient = mock(PoaoTilgangClient.class);
+        Mockito.when(mockPoaoTilgangClient.evaluatePolicy(any())).thenReturn(new ApiResult<>(null, Decision.Permit.INSTANCE));
+        return mockPoaoTilgangClient; }
 
     @Bean
     public VeilarbveilederClient veilarbveilederClient() {

@@ -14,6 +14,8 @@ import org.springframework.test.context.support.TestPropertySourceUtils;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.UUID;
+
 @ContextConfiguration(initializers = AbstractTest.DockerPostgreDataSourceInitializer.class)
 @Testcontainers
 @Import({AppConfig.class})
@@ -27,6 +29,8 @@ public abstract class AbstractTest {
         MockedStatic<AuthUtils> authUtilsMockedStatic = Mockito.mockStatic(AuthUtils.class);
         authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederIdent())
                 .thenReturn(VeilederId.of("1"));
+        authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederUUID())
+                .thenReturn(UUID.randomUUID());
     }
 
     public static class DockerPostgreDataSourceInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
