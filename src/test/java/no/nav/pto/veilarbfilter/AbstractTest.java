@@ -16,6 +16,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+
+
 @ContextConfiguration(initializers = AbstractTest.DockerPostgreDataSourceInitializer.class)
 @Testcontainers
 @Import({AppConfig.class})
@@ -29,7 +32,7 @@ public abstract class AbstractTest {
         MockedStatic<AuthUtils> authUtilsMockedStatic = Mockito.mockStatic(AuthUtils.class);
         authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederIdent())
                 .thenReturn(VeilederId.of("1"));
-        authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederUUID())
+        authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederUUID(any()))
                 .thenReturn(UUID.randomUUID());
     }
 

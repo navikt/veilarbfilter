@@ -1,6 +1,8 @@
 package no.nav.pto.veilarbfilter.config;
 
 import no.nav.common.abac.Pep;
+import no.nav.common.auth.context.AuthContextHolder;
+import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.featuretoggle.UnleashClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.types.identer.EnhetId;
@@ -40,6 +42,11 @@ import static org.mockito.Mockito.mock;
 public class AppConfig {
     @MockBean
     public InfluxClient metricsClient;
+
+    @Bean
+    public AuthContextHolder authContextHolder() {
+        return AuthContextHolderThreadLocal.instance();
+    }
 
     @Bean
     public Pep pep() {
