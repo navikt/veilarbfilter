@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <common.version>2.2023.01.02_13.51-1c6adeb1653b</common.version>
+        <common.version>2023.02.08_14.02-e5f1a7a4b9e4</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
         <jaxb.version>2.3.1</jaxb.version>
@@ -117,47 +117,47 @@
 
         <!-- Common -->
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>abac</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>rest</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>types</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>auth</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>metrics</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>feature-toggle</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>client</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>log</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>token-client</artifactId>
             <version>${common.version}</version>
         </dependency>
@@ -181,7 +181,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.13.4</version>
+            <version>2.14.1</version>
         </dependency>
 
         <!--Diverse-->
@@ -199,7 +199,7 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>4.42.0</version>
+            <version>4.44.0</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -222,7 +222,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.9.5</version>
+            <version>1.10.3</version>
         </dependency>
 
         <!--TEST-->
@@ -275,9 +275,25 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>no.nav.common</groupId>
+            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>job</artifactId>
             <version>${common.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.navikt.poao-tilgang</groupId>
+            <artifactId>client</artifactId>
+            <version>2023.01.27_14.49-9fe135865a9f</version>
+        </dependency>
     </dependencies>
+    <repositories>
+        <!-- Legger til central eksplisitt for prioritet over jitpack -->
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 </project>
