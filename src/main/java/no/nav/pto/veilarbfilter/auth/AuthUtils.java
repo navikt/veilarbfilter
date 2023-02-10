@@ -25,7 +25,7 @@ public class AuthUtils {
         return authContextHolder.getIdTokenClaims()
                 .flatMap(claims -> getStringClaimOrEmpty(claims, "oid"))
                 .map(UUID::fromString)
-                .orElse(null);
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is missing from subject"));
     }
 
     public static Optional<String> getStringClaimOrEmpty(JWTClaimsSet claims, String claimName) {
