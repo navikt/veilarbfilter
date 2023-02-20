@@ -25,6 +25,7 @@ spec:
     timeout: 10
   azure:
     application:
+      allowAllUsers: true
       enabled: true
       claims:
         extra:
