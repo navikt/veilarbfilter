@@ -111,7 +111,7 @@ class PortefoljeFilterTest {
                 {"aktiviteter":null,"aktiviteterForenklet":null,"alder":null,"arbeidslisteKategori":null,"avvik14aVedtak":null,"cvJobbprofil":null,"ferdigfilterListe":null,"fodselsdagIMnd":null,"foedeland":null,"formidlingsgruppe":null,"geografiskBosted":null,"hovedmal":null,"innsatsgruppe":null,"kjonn":null,"landgruppe":null,"manuellBrukerStatus":null,"navnEllerFnrQuery":null,"registreringstype":null,"rettighetsgruppe":null,"servicegruppe":null,"sisteEndringKategori":null,"stillingFraNavFilter":null,"tiltakstyper":null,"tolkBehovSpraak":null,"tolkebehov":null,"ulesteEndringer":null,"utdanning":null,"utdanningBestatt":null,"utdanningGodkjent":null,"veilederNavnQuery":null,"veiledere":["A123","B123"],"visGeografiskBosted":null,"ytelse":null}""";
         PortefoljeFilter portefoljeFilter = new PortefoljeFilter(null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null, List.of("A123", "B123"), null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null,null, null, null);
+                null, null, null, null, null,null, null, null, null);
         String jsonString = objectMapper.writeValueAsString(portefoljeFilter);
         Assertions.assertEquals(jsonString, correctOutput);
     }
