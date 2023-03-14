@@ -11,7 +11,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import static no.nav.pto.veilarbfilter.util.DbUtils.createDataSource;
