@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.2</version>
+        <version>3.0.4</version>
         <relativePath/>
     </parent>
 
@@ -19,7 +19,6 @@
         <common.version>3.2023.02.24_13.46-3c88f74b064e</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
-        <jaxb.version>2.3.1</jaxb.version>
         <testcontainers.version>1.17.2</testcontainers.version>
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
 
@@ -42,7 +41,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.6.6</version>
             </plugin>
         </plugins>
         <finalName>veilarbfilter</finalName>
@@ -81,9 +79,8 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.4.0-b180830.0359</version>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
         <!-- database -->
         <dependency>
@@ -180,7 +177,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.14.2</version>
         </dependency>
 
         <!--Diverse-->
