@@ -16,10 +16,9 @@
 
     <properties>
         <java.version>17</java.version>
-        <common.version>3.2023.02.24_13.46-3c88f74b064e</common.version>
+        <common.version>3.2023.03.01_11.54-2d19b8e33bd0</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
-        <jaxb.version>2.3.1</jaxb.version>
         <testcontainers.version>1.17.6</testcontainers.version>
         <junit.jupiter.version>5.9.2</junit.jupiter.version>
 
