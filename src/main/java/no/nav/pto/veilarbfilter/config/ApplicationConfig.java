@@ -8,7 +8,7 @@ import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import no.nav.common.abac.Pep;
 import no.nav.common.abac.VeilarbPepFactory;
-import no.nav.common.abac.audit.JavaxSpringAuditRequestInfoSupplier;
+import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.featuretoggle.UnleashClient;
@@ -68,7 +68,7 @@ public class ApplicationConfig {
         Credentials serviceUserCredentials = getCredentials("service_user");
         return VeilarbPepFactory.get(
                 properties.getAbacUrl(), serviceUserCredentials.username,
-                serviceUserCredentials.password, new JavaxSpringAuditRequestInfoSupplier()
+                serviceUserCredentials.password, new SpringAuditRequestInfoSupplier()
         );
     }
 
@@ -115,7 +115,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public UnleashClient unleashClient(EnvironmentProperties properties, AuthContextHolder authContextHolder) {
+    public UnleashClient unleashClient(EnvironmentProperties properties) {
         return new UnleashClientImpl(properties.getUnleashUrl(), APPLICATION_NAME);
     }
 }
