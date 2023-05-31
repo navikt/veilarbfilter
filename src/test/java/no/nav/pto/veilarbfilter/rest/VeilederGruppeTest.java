@@ -215,6 +215,6 @@ public class VeilederGruppeTest extends AbstractTest {
     public PortefoljeFilter getRandomPortefoljeFilter(List<String> veiledersList) {
         return new PortefoljeFilter(null, emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), "",
                 emptyList(), "", emptyList(), emptyList(), emptyList(), "", veiledersList, "", emptyList(), "", emptyList(),
-                emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList());
+                emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList());
     }
 }
