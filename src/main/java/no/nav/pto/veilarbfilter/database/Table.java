@@ -31,4 +31,12 @@ public class Table {
         public static String REPORTER_ID = "reporter_id";
         public static String OPPRETTET = "opprettet";
     }
+
+    public static class DetaljerVisning {
+        public static String TABLE_NAME = "DetaljerVisning";
+        public static String VEILEDER_ID = "veileder_id";
+        public static String OPPRETTET = "opprettet";
+        public static String DETALJER_VISNING = "detaljer_visning";
+    }
 }
+
