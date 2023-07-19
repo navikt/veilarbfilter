@@ -1,18 +1,13 @@
 package no.nav.pto.veilarbfilter.rest;
 
-import jakarta.ws.rs.GET;
 import lombok.RequiredArgsConstructor;
 import no.nav.pto.veilarbfilter.auth.AuthUtils;
-import no.nav.pto.veilarbfilter.domene.Chips;
 import no.nav.pto.veilarbfilter.domene.ChipsModel;
 import no.nav.pto.veilarbfilter.domene.NyttChipsModel;
-import no.nav.pto.veilarbfilter.repository.MineLagredeChipsRepository;
 import no.nav.pto.veilarbfilter.service.ChipsService;
-import okhttp3.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -27,7 +22,7 @@ public class MineChipsController {
 
 
 @PostMapping
-    public ResponseEntity lagreOgOppdaterVisning(@RequestBody NyttChipsModel nyttChipsModel) throws Exception {
+    public ResponseEntity lagreOgOppdater(@RequestBody NyttChipsModel nyttChipsModel) throws Exception {
         String veilederId = AuthUtils.getInnloggetVeilederIdent().toString();
 
         chipsService.lagreOgOppdater(veilederId, nyttChipsModel.getDetaljerVisning());

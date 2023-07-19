@@ -3,7 +3,6 @@ package no.nav.pto.veilarbfilter.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.pto.veilarbfilter.domene.ChipsModel;
-import no.nav.pto.veilarbfilter.domene.NyttChipsModel;
 import no.nav.pto.veilarbfilter.repository.MineLagredeChipsRepository;
 import org.springframework.stereotype.Service;
 

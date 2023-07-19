@@ -1,8 +1,6 @@
 package no.nav.pto.veilarbfilter.service;
 
 import no.nav.pto.veilarbfilter.domene.ChipsModel;
-import no.nav.pto.veilarbfilter.domene.NyttChipsModel;
-import no.nav.pto.veilarbfilter.domene.SortOrder;
 
 import java.util.List;
 import java.util.Optional;
