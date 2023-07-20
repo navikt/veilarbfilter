@@ -42,7 +42,7 @@ public class OverblikkVisningRepository {
 
     public void lagreVisning(String veilederId, List<String> detaljerVisning) throws IllegalArgumentException {
         try {
-            String insertSql = String.format("INSERT INTO %s (%s, to_json(?::JSON), %s) VALUES (?, ?, ?)",
+            String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?,  to_json(?::JSON), ?)",
                     OverblikkVisning.TABLE_NAME, OverblikkVisning.VEILEDER_ID, OverblikkVisning.OVERBLIKK_VISNING, OverblikkVisning.OPPRETTET);
             db.update(insertSql, veilederId, objectMapper.writeValueAsString(detaljerVisning), fromLocalDateTimeToTimestamp(LocalDateTime.now()));
         } catch (IllegalArgumentException e) {
