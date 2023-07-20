@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.List;
 
 @Data
@@ -13,6 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @JsonDeserialize
 @NoArgsConstructor
-public class NyttChipsModel {
-    List<String> detaljerVisning;
+public class NyOverblikkVisningModel {
+    List<String> overblikkVisning;
 }

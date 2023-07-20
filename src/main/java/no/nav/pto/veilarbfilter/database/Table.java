@@ -32,11 +32,11 @@ public class Table {
         public static String OPPRETTET = "opprettet";
     }
 
-    public static class DetaljerVisning {
-        public static String TABLE_NAME = "DetaljerVisning";
+    public static class OverblikkVisning {
+        public static String TABLE_NAME = "OverblikkVisning";
         public static String VEILEDER_ID = "veileder_id";
         public static String OPPRETTET = "opprettet";
-        public static String DETALJER_VISNING = "detaljer_visning";
+        public static String OVERBLIKK_VISNING = "overblikk_visning";
     }
 }
 

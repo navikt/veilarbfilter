@@ -10,11 +10,11 @@ import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.PoaoTilgangClient;
 import no.nav.poao_tilgang.client.api.ApiResult;
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
-import no.nav.pto.veilarbfilter.repository.MineLagredeChipsRepository;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
+import no.nav.pto.veilarbfilter.repository.OverblikkVisningRepository;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
-import no.nav.pto.veilarbfilter.rest.MineChipsController;
 import no.nav.pto.veilarbfilter.rest.MineLagredeFilterController;
+import no.nav.pto.veilarbfilter.rest.OverblikkVisningController;
 import no.nav.pto.veilarbfilter.rest.VeilederGruppeController;
 import no.nav.pto.veilarbfilter.service.*;
 import org.mockito.Mockito;
@@ -23,9 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
 import java.util.List;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
@@ -38,7 +36,7 @@ import static org.mockito.Mockito.mock;
         MineLagredeFilterService.class,
         MineLagredeFilterController.class,
         VeilederGruppeController.class,
-        UnleashService.class, ChipsServiceImpl.class, MineLagredeChipsRepository.class, MineChipsController.class})
+        UnleashService.class, OverblikkVisningServiceImpl.class, OverblikkVisningRepository.class, OverblikkVisningController.class})
 public class AppConfig {
     @MockBean
     public InfluxClient metricsClient;

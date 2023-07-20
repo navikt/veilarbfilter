@@ -4,15 +4,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import no.nav.pto.veilarbfilter.AbstractTest;
-import no.nav.pto.veilarbfilter.domene.ChipsModel;
-import no.nav.pto.veilarbfilter.domene.MineLagredeFilterModel;
-import no.nav.pto.veilarbfilter.domene.NyttChipsModel;
-import no.nav.pto.veilarbfilter.service.ChipsService;
+import no.nav.pto.veilarbfilter.domene.OverblikkVisningModel;
+import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,19 +20,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.http.RequestEntity.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-@WebMvcTest(controllers = MineChipsController.class)
+@WebMvcTest(controllers = OverblikkVisningController.class)
 @ActiveProfiles({"test"})
-public class OverblikkFilterTest extends AbstractTest {
+public class OverblikkVisningTest extends AbstractTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -50,7 +43,7 @@ public class OverblikkFilterTest extends AbstractTest {
     }
 
     @MockBean
-    private ChipsService chipsService;
+    private OverblikkVisningService overblikkVisningService;
 
     @Test
     public void testInit() {
@@ -59,14 +52,41 @@ public class OverblikkFilterTest extends AbstractTest {
 
     @Test
     public void testSlettVisning() throws Exception {
-        String veilederId = "someVeilederId";
-        doNothing().when(chipsService).slettVisning(eq(veilederId));
+        String veilederId = "VeilederId";
+        doNothing().when(overblikkVisningService).slettVisning(eq(veilederId));
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete("/api/overblikkvisning"))
                 .andReturn();
         Assertions.assertEquals(HttpStatus.OK.value(), mvcResult.getResponse().getStatus());
+
+        val visningResponse = hentVisningTest();
+        if (visningResponse == null) {
+            fail();
+        }
+
+        val responseCode = slettVisningTest(veilederId);
+        assertFalse(responseCode.equals(200));
+    }
+
+    @Test
+    public void testLagreOgOppdaterVisning() throws Exception {
+        OverblikkVisningModel overblikkVisningModel = new OverblikkVisningModel();
+
+        val visningRespons = hentVisningTest();
+        lagreEllerOppdaterVisninger("someVeilederID", List.of("CV", "personalia"), LocalDateTime.now());
+
+        val nyVisningResponse = hentVisningTest();
+
+        if (nyVisningResponse.getContent() == null) {
+            fail();
+        }
+
+        assertTrue(visningRespons.getContent() == nyVisningResponse.getContent());
+
+
     }
 
     //Hjelpefunskjoner
+
     private String slettVisningTest(String veilederId) {
         try {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/overblikkvisning/" + veilederId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
@@ -77,7 +97,7 @@ public class OverblikkFilterTest extends AbstractTest {
         }
     }
 
-    private ApiResponse<Optional<ChipsModel>> hentVisningTest() {
+    private ApiResponse<Optional<OverblikkVisningModel>> hentVisningTest() {
         try {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/overblikkvisning").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
@@ -94,6 +114,21 @@ public class OverblikkFilterTest extends AbstractTest {
         }
     }
 
+    private ApiResponse<OverblikkVisningModel> lagreEllerOppdaterVisninger (String veilederId, List<String> overblikkVisning, LocalDateTime opprettet) throws Exception {
+        try {
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/overblikkvisning").content(objectMapper.writeValueAsString(veilederId)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+            if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), OverblikkVisningModel.class), "");
+            } else {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
+            }
+
+        } catch (Exception e){
+            Assertions.fail();
+            return null;
+        }
+    }
 
 
 }

@@ -5,9 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.List;
-
 import static java.util.Collections.emptyList;
 
 @Getter
@@ -15,16 +13,16 @@ import static java.util.Collections.emptyList;
 @AllArgsConstructor
 @JsonPropertyOrder(alphabetic = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Chips {
+public class OverblikkVisning {
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     @Setter
-    private List<String> detaljerVisning = emptyList();
+    private List<String> overblikkVisning = emptyList();
     private String veilederID = "";
 
     @JsonIgnore
     public Boolean isNotEmpty() {
         return  (veilederID != null && !veilederID.isEmpty()) ||
-                (detaljerVisning != null && !detaljerVisning.isEmpty());
+                (overblikkVisning != null && !overblikkVisning.isEmpty());
     }
 }

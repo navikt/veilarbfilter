@@ -2,9 +2,9 @@ package no.nav.pto.veilarbfilter.rest;
 
 import lombok.RequiredArgsConstructor;
 import no.nav.pto.veilarbfilter.auth.AuthUtils;
-import no.nav.pto.veilarbfilter.domene.ChipsModel;
-import no.nav.pto.veilarbfilter.domene.NyttChipsModel;
-import no.nav.pto.veilarbfilter.service.ChipsService;
+import no.nav.pto.veilarbfilter.domene.NyOverblikkVisningModel;
+import no.nav.pto.veilarbfilter.domene.OverblikkVisningModel;
+import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,24 +16,24 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping(value = "/api/overblikkvisning", produces = APPLICATION_JSON_VALUE)
 
-public class MineChipsController {
+public class OverblikkVisningController {
 
-    private final ChipsService chipsService;
+    private final OverblikkVisningService overblikkVisningService;
 
 
-@PostMapping
-    public ResponseEntity lagreOgOppdater(@RequestBody NyttChipsModel nyttChipsModel) throws Exception {
+    @PostMapping
+    public ResponseEntity lagreOgOppdater(@RequestBody NyOverblikkVisningModel nyOverblikkVisningModel) throws Exception {
         String veilederId = AuthUtils.getInnloggetVeilederIdent().toString();
 
-        chipsService.lagreOgOppdater(veilederId, nyttChipsModel.getDetaljerVisning());
+        overblikkVisningService.lagreOgOppdater(veilederId, nyOverblikkVisningModel.getOverblikkVisning());
         return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    public ResponseEntity<Optional<ChipsModel>> hentVisning() {
+    public ResponseEntity<Optional<OverblikkVisningModel>> hentVisning() {
         String veilederId = AuthUtils.getInnloggetVeilederIdent().toString();
 
-        Optional<ChipsModel> visningsListe = chipsService.hentVisning(veilederId);
+        Optional<OverblikkVisningModel> visningsListe = overblikkVisningService.hentVisning(veilederId);
         return ResponseEntity.ok().body(visningsListe);
 
     }
@@ -42,7 +42,7 @@ public class MineChipsController {
     public ResponseEntity slettVisning() {
         String veilederId = AuthUtils.getInnloggetVeilederIdent().toString();
 
-        chipsService.slettVisning(veilederId);
+        overblikkVisningService.slettVisning(veilederId);
         return ResponseEntity.ok().build();
     }
 }

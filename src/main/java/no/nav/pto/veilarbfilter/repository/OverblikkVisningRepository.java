@@ -11,22 +11,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static no.nav.pto.veilarbfilter.database.Table.DetaljerVisning;
+import static no.nav.pto.veilarbfilter.database.Table.OverblikkVisning;
 import static no.nav.pto.veilarbfilter.util.DateUtils.fromLocalDateTimeToTimestamp;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class MineLagredeChipsRepository {
+public class OverblikkVisningRepository {
     private final JdbcTemplate db;
     private final ObjectMapper objectMapper;
 
-    public Optional<ChipsModel> hentVisning(String veilederId) {
+    public Optional<OverblikkVisningModel> hentVisning(String veilederId) {
         try {
-            String selectSql = String.format("SELECT * FROM %s where %s = ?", DetaljerVisning.TABLE_NAME, DetaljerVisning.VEILEDER_ID);
-            ChipsModel minLagretDetaljerVisning = db.queryForObject(selectSql, (rs, rowNum) -> {
+            String selectSql = String.format("SELECT * FROM %s where %s = ?", OverblikkVisning.TABLE_NAME, OverblikkVisning.VEILEDER_ID);
+            OverblikkVisningModel minLagretDetaljerVisning = db.queryForObject(selectSql, (rs, rowNum) -> {
                         try {
-                            return new ChipsModel(rs.getString(DetaljerVisning.VEILEDER_ID), rs.getString(DetaljerVisning.DETALJER_VISNING), null);
+                            return new OverblikkVisningModel(rs.getString(OverblikkVisning.VEILEDER_ID), rs.getString(OverblikkVisning.OVERBLIKK_VISNING), null);
                         } catch (Exception e) {
                             log.error("Error ved å hente visningen " + e, e);
                             throw new RuntimeException(e);
@@ -43,7 +43,7 @@ public class MineLagredeChipsRepository {
     public void lagreVisning(String veilederId, List<String> detaljerVisning) throws IllegalArgumentException {
         try {
             String insertSql = String.format("INSERT INTO %s (%s, to_json(?::JSON), %s) VALUES (?, ?, ?)",
-                    DetaljerVisning.TABLE_NAME, DetaljerVisning.VEILEDER_ID, DetaljerVisning.DETALJER_VISNING, DetaljerVisning.OPPRETTET);
+                    OverblikkVisning.TABLE_NAME, OverblikkVisning.VEILEDER_ID, OverblikkVisning.OVERBLIKK_VISNING, OverblikkVisning.OPPRETTET);
             db.update(insertSql, veilederId, objectMapper.writeValueAsString(detaljerVisning), fromLocalDateTimeToTimestamp(LocalDateTime.now()));
         } catch (IllegalArgumentException e) {
             throw e;
@@ -55,7 +55,7 @@ public class MineLagredeChipsRepository {
     public void oppdaterVisning(String veilederId, List<String> detaljerVisning) throws IllegalArgumentException {
         try {
 
-            String updateSql = String.format("UPDATE %s, %s = to_json(?::JSON) WHERE %s = ?", DetaljerVisning.TABLE_NAME, DetaljerVisning.DETALJER_VISNING, DetaljerVisning.VEILEDER_ID);
+            String updateSql = String.format("UPDATE %s, %s = to_json(?::JSON) WHERE %s = ?", OverblikkVisning.TABLE_NAME, OverblikkVisning.OVERBLIKK_VISNING, OverblikkVisning.VEILEDER_ID);
             db.update(updateSql, objectMapper.writeValueAsString(detaljerVisning), veilederId);
 
         } catch (IllegalArgumentException e) {
@@ -68,7 +68,7 @@ public class MineLagredeChipsRepository {
     public void slettVisning(String veilederId) throws IllegalArgumentException {
         try {
         String deleteSql = String.format("DELETE FROM %s WHERE %s = ?",
-                DetaljerVisning.TABLE_NAME, DetaljerVisning.VEILEDER_ID);
+                OverblikkVisning.TABLE_NAME, OverblikkVisning.VEILEDER_ID);
 
        db.update(deleteSql, veilederId);
 
