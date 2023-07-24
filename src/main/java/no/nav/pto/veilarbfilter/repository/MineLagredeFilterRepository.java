@@ -40,6 +40,7 @@ public class MineLagredeFilterRepository implements FilterService {
             String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?, to_json(?::JSON), ?)",
                     Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET);
             int affectedRows = db.update(insertSql, nyttFilterModel.getFilterNavn(), objectMapper.writeValueAsString(nyttFilterModel.getFilterValg()), fromLocalDateTimeToTimestamp(LocalDateTime.now()));
+            log.info("Det gikk å lagre i filter!! {}", affectedRows);
 
             if (affectedRows > 0) {
                 String lastId = String.format("SELECT MAX(%s) FROM %s",

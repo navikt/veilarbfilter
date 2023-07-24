@@ -24,10 +24,13 @@ public class OverblikkVisningServiceImpl implements OverblikkVisningService {
     public void lagreOgOppdater(String veilederId, List<String> detaljerVisning) {
         try{
             Optional<OverblikkVisningModel> lagretVisning = overblikkVisningRepository.hentVisning(veilederId);
+            log.info("er i service!");
             if (lagretVisning.isEmpty()) {
                 overblikkVisningRepository.lagreVisning(veilederId, detaljerVisning);
+                log.info("er tom!");
             } else {
                 overblikkVisningRepository.oppdaterVisning(veilederId, detaljerVisning);
+                log.info("er ikke tom!");
             }
         }
         catch (Exception e) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import no.nav.pto.veilarbfilter.AbstractTest;
+import no.nav.pto.veilarbfilter.domene.NyOverblikkVisningModel;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningModel;
 import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
 import org.junit.jupiter.api.Assertions;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,62 +44,65 @@ public class OverblikkVisningTest extends AbstractTest {
     public void beforeEach() {
     }
 
-    @MockBean
-    private OverblikkVisningService overblikkVisningService;
-
     @Test
     public void testInit() {
         Assertions.assertNotNull(mockMvc);
     }
 
-    @Test
-    public void testSlettVisning() throws Exception {
-        String veilederId = "VeilederId";
-        doNothing().when(overblikkVisningService).slettVisning(eq(veilederId));
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete("/api/overblikkvisning"))
-                .andReturn();
-        Assertions.assertEquals(HttpStatus.OK.value(), mvcResult.getResponse().getStatus());
 
-        val visningResponse = hentVisningTest();
-        if (visningResponse == null) {
-            fail();
-        }
-
-        val responseCode = slettVisningTest(veilederId);
-        assertFalse(responseCode.equals(200));
-    }
 
     @Test
     public void testLagreOgOppdaterVisning() throws Exception {
-        OverblikkVisningModel overblikkVisningModel = new OverblikkVisningModel();
+        //lagre en ny visning med 2 elementer
+        val listeAvVisninger = new ArrayList<String>();
+        listeAvVisninger.add("CV");
+        listeAvVisninger.add("Personalia");
+        val lagreVisning = lagreEllerOppdaterVisninger(new NyOverblikkVisningModel(listeAvVisninger));
+        Assertions.assertEquals(HttpStatus.OK.value(), lagreVisning.getStatus());
 
-        val visningRespons = hentVisningTest();
-        lagreEllerOppdaterVisninger("someVeilederID", List.of("CV", "personalia"), LocalDateTime.now());
+        //hente visningen med 2
+        val hentVisning = hentVisningTest();
+        Assertions.assertEquals(HttpStatus.OK.value(), hentVisning.getStatus());
+        Assertions.assertEquals(hentVisning.getContent().size(), 2);
 
-        val nyVisningResponse = hentVisningTest();
+        //oppdatere visningen til å ha 3 elementer
+        val listeAvOppdaterteVisninger = new ArrayList<String>(listeAvVisninger);
+        listeAvOppdaterteVisninger.add("Registrering");
+        val oppdatereVisning = lagreEllerOppdaterVisninger(new NyOverblikkVisningModel(listeAvOppdaterteVisninger));
+        Assertions.assertEquals(HttpStatus.OK.value(), oppdatereVisning.getStatus());
 
-        if (nyVisningResponse.getContent() == null) {
-            fail();
-        }
-
-        assertTrue(visningRespons.getContent() == nyVisningResponse.getContent());
-
+        //hent oppdatert visning
+        val hentOppdatertVisning = hentVisningTest();
+        Assertions.assertEquals(HttpStatus.OK.value(), hentOppdatertVisning.getStatus());
+        Assertions.assertEquals(3, hentOppdatertVisning.getContent().size());
 
     }
 
+    @Test
+    public void testSlettVisning() throws Exception {
+        //lagre en ny visning
+        val listeAvVisninger = new ArrayList<String>();
+        listeAvVisninger.add("CV");
+        listeAvVisninger.add("Personalia");
+        val lagreVisning = lagreEllerOppdaterVisninger(new NyOverblikkVisningModel(listeAvVisninger));
+        Assertions.assertEquals(HttpStatus.OK.value(), lagreVisning.getStatus());
+
+        //hente visningen
+        val hentVisning = hentVisningTest();
+        Assertions.assertEquals(HttpStatus.OK.value(), hentVisning.getStatus());
+        Assertions.assertEquals(hentVisning.getContent().size(), 2);
+
+        //slett visningen
+        val slettVisning = slettVisningTest();
+        val hentVisningEtterSletting = hentVisningTest();
+        Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), slettVisning.getStatus());
+        Assertions.assertEquals(HttpStatus.OK.value(), hentVisningEtterSletting.getStatus());
+        Assertions.assertEquals(hentVisningEtterSletting.getContent(), null);
+
+    }
     //Hjelpefunskjoner
 
-    private String slettVisningTest(String veilederId) {
-        try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/overblikkvisning/" + veilederId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
-            return mvcResult.getResponse().getContentAsString();
-        } catch (Exception e) {
-            Assertions.fail();
-            return null;
-        }
-    }
-
-    private ApiResponse<Optional<OverblikkVisningModel>> hentVisningTest() {
+    private ApiResponse<List<String>> hentVisningTest() {
         try {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/overblikkvisning").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
@@ -114,17 +119,33 @@ public class OverblikkVisningTest extends AbstractTest {
         }
     }
 
-    private ApiResponse<OverblikkVisningModel> lagreEllerOppdaterVisninger (String veilederId, List<String> overblikkVisning, LocalDateTime opprettet) throws Exception {
+    private ApiResponse<OverblikkVisningModel> lagreEllerOppdaterVisninger (NyOverblikkVisningModel nyOverblikkVisningModel) throws Exception {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/overblikkvisning").content(objectMapper.writeValueAsString(veilederId)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/overblikkvisning").content(objectMapper.writeValueAsString(nyOverblikkVisningModel)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), OverblikkVisningModel.class), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
 
         } catch (Exception e){
+            Assertions.fail();
+            return null;
+        }
+    }
+
+    private ApiResponse<OverblikkVisningModel> slettVisningTest() throws Exception {
+        try {
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/overblikkvisning").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+            if (mvcResult.getResponse().getStatus() == HttpStatus.NO_CONTENT.value()) {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, "");
+            } else {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
+            }
+
+        } catch (Exception e) {
             Assertions.fail();
             return null;
         }

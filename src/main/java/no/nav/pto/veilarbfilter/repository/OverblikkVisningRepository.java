@@ -42,9 +42,10 @@ public class OverblikkVisningRepository {
 
     public void lagreVisning(String veilederId, List<String> detaljerVisning) throws IllegalArgumentException {
         try {
-            String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?,  to_json(?::JSON), ?)",
+            String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?, to_json(?::JSON), ?)",
                     OverblikkVisning.TABLE_NAME, OverblikkVisning.VEILEDER_ID, OverblikkVisning.OVERBLIKK_VISNING, OverblikkVisning.OPPRETTET);
-            db.update(insertSql, veilederId, objectMapper.writeValueAsString(detaljerVisning), fromLocalDateTimeToTimestamp(LocalDateTime.now()));
+            int numberOfRowsAffected = db.update(insertSql, veilederId, objectMapper.writeValueAsString(detaljerVisning), fromLocalDateTimeToTimestamp(LocalDateTime.now()));
+            log.info("Det gikk å lagre repository!! {}", numberOfRowsAffected);
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
@@ -56,7 +57,8 @@ public class OverblikkVisningRepository {
         try {
 
             String updateSql = String.format("UPDATE %s, %s = to_json(?::JSON) WHERE %s = ?", OverblikkVisning.TABLE_NAME, OverblikkVisning.OVERBLIKK_VISNING, OverblikkVisning.VEILEDER_ID);
-            db.update(updateSql, objectMapper.writeValueAsString(detaljerVisning), veilederId);
+            int numerOfAffctedRows = db.update(updateSql, objectMapper.writeValueAsString(detaljerVisning), veilederId);
+            log.info("Det gikk å oppdatere i repo!! {}", numerOfAffctedRows);
 
         } catch (IllegalArgumentException e) {
             throw e;

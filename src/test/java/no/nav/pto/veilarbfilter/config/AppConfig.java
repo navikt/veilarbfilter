@@ -36,7 +36,10 @@ import static org.mockito.Mockito.mock;
         MineLagredeFilterService.class,
         MineLagredeFilterController.class,
         VeilederGruppeController.class,
-        UnleashService.class, OverblikkVisningServiceImpl.class, OverblikkVisningRepository.class, OverblikkVisningController.class})
+        UnleashService.class,
+        OverblikkVisningServiceImpl.class,
+        OverblikkVisningRepository.class,
+        OverblikkVisningController.class})
 public class AppConfig {
     @MockBean
     public InfluxClient metricsClient;
