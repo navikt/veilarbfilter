@@ -1,6 +1,10 @@
 package no.nav.pto.veilarbfilter.database;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class Table {
+
     public static class Filter {
         public static String TABLE_NAME = "Filter";
         public static String FILTER_ID = "filter_id";
@@ -37,6 +41,7 @@ public class Table {
         public static String VEILEDER_ID = "veileder_id";
         public static String OPPRETTET = "opprettet";
         public static String OVERBLIKK_VISNING = "overblikk_visning";
+
     }
 }
 
