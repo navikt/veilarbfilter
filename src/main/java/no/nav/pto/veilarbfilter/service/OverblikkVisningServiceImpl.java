@@ -21,26 +21,17 @@ public class OverblikkVisningServiceImpl implements OverblikkVisningService {
         return overblikkVisningRepository.hentVisning(veilederId);
     }
 
-    public void lagreOgOppdater(String veilederId, List<String> detaljerVisning) {
-        try{
+    public void lagreOgOppdater(String veilederId, List<String> detaljerVisning) throws Exception {
             Optional<OverblikkVisningModel> lagretVisning = overblikkVisningRepository.hentVisning(veilederId);
-            log.info("er i service!");
             if (lagretVisning.isEmpty()) {
                 overblikkVisningRepository.lagreVisning(veilederId, detaljerVisning);
-                log.info("er tom!");
             } else {
                 overblikkVisningRepository.oppdaterVisning(veilederId, detaljerVisning);
-                log.info("er ikke tom!");
             }
-        }
-        catch (Exception e) {
-            log.error("Kan ikke lagre og oppdatere visning " + e, e);
-            throw e;
-        }
     }
 
     @Override
-    public void slettVisning(String veilederId) {
+    public void slettVisning(String veilederId) throws Exception {
         overblikkVisningRepository.slettVisning(veilederId);
     }
 

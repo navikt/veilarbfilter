@@ -6,7 +6,6 @@ import no.nav.pto.veilarbfilter.auth.AuthUtils;
 import no.nav.pto.veilarbfilter.domene.NyOverblikkVisningModel;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningModel;
 import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
-import no.nav.pto.veilarbfilter.service.OverblikkVisningServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,8 +53,13 @@ public class OverblikkVisningController {
     @DeleteMapping
     public ResponseEntity slettVisning() {
         String veilederId = AuthUtils.getInnloggetVeilederIdent().toString();
-
-        overblikkVisningService.slettVisning(veilederId);
-        return ResponseEntity.noContent().build();
+        try {
+            overblikkVisningService.slettVisning(veilederId);
+            return ResponseEntity.noContent().build();
+        }
+        catch (Exception e) {
+            log.error("Klarte ikke slette visningen", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

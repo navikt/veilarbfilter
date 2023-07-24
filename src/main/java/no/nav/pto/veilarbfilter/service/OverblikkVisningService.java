@@ -9,5 +9,5 @@ public interface OverblikkVisningService {
     Optional<OverblikkVisningModel> hentVisning(String veilederId);
     void lagreOgOppdater(String veilederId, List<String> detaljerVisning) throws Exception;
 
-    void slettVisning(String veilederId);
+    void slettVisning(String veilederId) throws Exception;
 }

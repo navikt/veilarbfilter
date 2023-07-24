@@ -6,13 +6,11 @@ import lombok.val;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.NyOverblikkVisningModel;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningModel;
-import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,14 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @WebMvcTest(controllers = OverblikkVisningController.class)
 @ActiveProfiles({"test"})
@@ -48,8 +40,6 @@ public class OverblikkVisningTest extends AbstractTest {
     public void testInit() {
         Assertions.assertNotNull(mockMvc);
     }
-
-
 
     @Test
     public void testLagreOgOppdaterVisning() throws Exception {
@@ -100,8 +90,9 @@ public class OverblikkVisningTest extends AbstractTest {
         Assertions.assertEquals(hentVisningEtterSletting.getContent(), null);
 
     }
-    //Hjelpefunskjoner
 
+
+    //Hjelpefunskjoner
     private ApiResponse<List<String>> hentVisningTest() {
         try {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/overblikkvisning").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
