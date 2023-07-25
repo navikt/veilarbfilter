@@ -37,7 +37,7 @@ import static org.mockito.Mockito.mock;
         MineLagredeFilterController.class,
         VeilederGruppeController.class,
         UnleashService.class,
-        OverblikkVisningServiceImpl.class,
+        OverblikkVisningService.class,
         OverblikkVisningRepository.class,
         OverblikkVisningController.class})
 public class AppConfig {
