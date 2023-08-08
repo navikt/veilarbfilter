@@ -36,10 +36,10 @@ public class OverblikkVisningController {
             overblikkVisningService.lagreOverblikkVisning(veilederId, overblikkVisningRequest.overblikkVisning());
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
-            secureLog.error("Klarte ikke å lagre overblikk visning for veilederId: {}. Grunn: ulovlige verdier i request.", veilederId, e);
+            secureLog.error(String.format("Klarte ikke å lagre overblikk visning for veilederId: %s. Grunn: ulovlige verdier i request.", veilederId), e);
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
-            secureLog.error("Klarte ikke å lagre overblikk visning for veilederId: {}", veilederId, e);
+            secureLog.error(String.format("Klarte ikke å lagre overblikk visning for veilederId: %s.", veilederId), e);
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -54,7 +54,7 @@ public class OverblikkVisningController {
                     .map(overblikkVisning -> ResponseEntity.ok().body(overblikkVisning.visning()))
                     .orElseGet(() -> ResponseEntity.ok().body(Collections.emptyList()));
         } catch (Exception e) {
-            secureLog.error("Klarte ikke å hente overblikk visning for veilederId: {}", veilederId, e);
+            secureLog.error(String.format("Klarte ikke å hente overblikk visning for veilederId: %s", veilederId), e);
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -67,7 +67,7 @@ public class OverblikkVisningController {
             overblikkVisningService.slettOverblikkVisning(veilederId);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            secureLog.error("Klarte ikke å slette overblikk visning for veilederId: {}", veilederId, e);
+            secureLog.error(String.format("Klarte ikke å slette overblikk visning for veilederId: %s", veilederId), e);
             return ResponseEntity.internalServerError().build();
         }
     }
