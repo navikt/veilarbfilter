@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record OverblikkVisning(
-        UUID overblikkVisningId,
+        UUID id,
         List<String> visning
 ) {
 }

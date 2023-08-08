@@ -22,7 +22,12 @@ public class OverblikkVisningService {
     }
 
     public void lagreOverblikkVisning(VeilederId veilederId, List<String> overblikkVisning) {
-        overblikkVisningRepository.lagre(veilederId, overblikkVisning);
+        Optional<OverblikkVisning> maybeEksisterendeOverblikkVisning = overblikkVisningRepository.hent(veilederId);
+
+        maybeEksisterendeOverblikkVisning.ifPresentOrElse(
+                (eksisterendeOverblikkVisning) -> overblikkVisningRepository.oppdater(eksisterendeOverblikkVisning.id(), overblikkVisning),
+                () -> overblikkVisningRepository.opprett(veilederId, overblikkVisning)
+        );
     }
 
     public void slettOverblikkVisning(VeilederId veilederId) {
