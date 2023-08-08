@@ -31,7 +31,6 @@ public class OverblikkVisningController {
     public ResponseEntity<Object> lagreOverblikkvisningForInnloggetVeileder(@RequestBody OverblikkVisningRequest overblikkVisningRequest) {
         VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
 
-
         try {
             validerRequest(overblikkVisningRequest);
             overblikkVisningService.lagreOverblikkVisning(veilederId, overblikkVisningRequest.overblikkVisning());
