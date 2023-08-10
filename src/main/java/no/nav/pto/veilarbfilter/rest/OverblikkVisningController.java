@@ -6,6 +6,7 @@ import no.nav.pto.veilarbfilter.auth.AuthUtils;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisning;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningAlternativer;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningRequest;
+import no.nav.pto.veilarbfilter.domene.OverblikkVisningResponse;
 import no.nav.pto.veilarbfilter.domene.value.VeilederId;
 import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static no.nav.pto.veilarbfilter.util.SecureLogUtils.secureLog;
@@ -45,14 +45,14 @@ public class OverblikkVisningController {
     }
 
     @GetMapping
-    public ResponseEntity<List<String>> hentOverblikkvisningForInnloggetVeileder() {
+    public ResponseEntity<OverblikkVisningResponse> hentOverblikkvisningForInnloggetVeileder() {
         VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
 
         try {
             Optional<OverblikkVisning> visningsListe = overblikkVisningService.hentOverblikkVisning(veilederId);
             return visningsListe
-                    .map(overblikkVisning -> ResponseEntity.ok().body(overblikkVisning.visning()))
-                    .orElseGet(() -> ResponseEntity.ok().body(Collections.emptyList()));
+                    .map(overblikkVisning -> ResponseEntity.ok().body(new OverblikkVisningResponse(overblikkVisning.visning())))
+                    .orElseGet(() -> ResponseEntity.ok().body(new OverblikkVisningResponse(Collections.emptyList())));
         } catch (Exception e) {
             secureLog.error(String.format("Klarte ikke å hente overblikk visning for veilederId: %s", veilederId), e);
             return ResponseEntity.internalServerError().build();

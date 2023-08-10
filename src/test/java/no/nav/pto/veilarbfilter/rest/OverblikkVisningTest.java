@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.database.Table;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisning;
+import no.nav.pto.veilarbfilter.domene.OverblikkVisningResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ public class OverblikkVisningTest extends AbstractTest {
         forventetTilstand.add("CV");
         forventetTilstand.add("Personalia");
         assertThat(faktiskTilstand.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(faktiskTilstand.getContent()).containsExactlyInAnyOrderElementsOf(forventetTilstand);
+        assertThat(faktiskTilstand.getContent().overblikkVisning()).containsExactlyInAnyOrderElementsOf(forventetTilstand);
     }
 
     @Test
@@ -68,7 +69,7 @@ public class OverblikkVisningTest extends AbstractTest {
         var hentVisningRespons = hentOverblikkVisning();
 
         assertThat(hentVisningRespons.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(hentVisningRespons.getContent()).isEqualTo(Collections.emptyList());
+        assertThat(hentVisningRespons.getContent().overblikkVisning()).isEqualTo(Collections.emptyList());
     }
 
     @Test
@@ -82,7 +83,7 @@ public class OverblikkVisningTest extends AbstractTest {
         forventetTilstand.add("CV");
         forventetTilstand.add("Personalia");
         assertThat(lagreVisningRespons.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(lagretTilstand.getContent()).containsExactlyInAnyOrderElementsOf(forventetTilstand);
+        assertThat(lagretTilstand.getContent().overblikkVisning()).containsExactlyInAnyOrderElementsOf(forventetTilstand);
     }
 
     @Test
@@ -97,7 +98,7 @@ public class OverblikkVisningTest extends AbstractTest {
         var forventetTilstand = new ArrayList<String>();
         forventetTilstand.add("CV");
         assertThat(faktiskTilstand.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(faktiskTilstand.getContent()).containsExactlyInAnyOrderElementsOf(forventetTilstand);
+        assertThat(faktiskTilstand.getContent().overblikkVisning()).containsExactlyInAnyOrderElementsOf(forventetTilstand);
     }
 
     @Test
@@ -110,7 +111,7 @@ public class OverblikkVisningTest extends AbstractTest {
 
         List<String> forventetTilstand = Collections.emptyList();
         assertThat(slettOverblikkvisningRespons.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(faktiskTilstand.getContent()).containsExactlyInAnyOrderElementsOf(forventetTilstand);
+        assertThat(faktiskTilstand.getContent().overblikkVisning()).containsExactlyInAnyOrderElementsOf(forventetTilstand);
     }
 
     @Test
@@ -129,7 +130,7 @@ public class OverblikkVisningTest extends AbstractTest {
         assertThat(lagreVisningRespons.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    private ApiResponse<List<String>> hentOverblikkVisning() {
+    private ApiResponse<OverblikkVisningResponse> hentOverblikkVisning() {
         try {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/overblikkvisning").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
@@ -146,7 +147,7 @@ public class OverblikkVisningTest extends AbstractTest {
         }
     }
 
-    private ApiResponse<OverblikkVisning> lagreOverblikkVisning(String json) {
+    private ApiResponse<Object> lagreOverblikkVisning(String json) {
         try {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/overblikkvisning").content(json).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
@@ -162,7 +163,7 @@ public class OverblikkVisningTest extends AbstractTest {
         }
     }
 
-    private ApiResponse<OverblikkVisning> slettVisningTest() {
+    private ApiResponse<Object> slettVisningTest() {
         try {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/overblikkvisning").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
