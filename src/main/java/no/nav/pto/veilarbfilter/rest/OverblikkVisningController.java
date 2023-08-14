@@ -76,11 +76,11 @@ public class OverblikkVisningController {
 
         boolean alleValgteAlternativerErLovlige = overblikkVisningRequest.overblikkVisning().stream()
                 .map(String::toUpperCase)
-                .allMatch(valgtAlternativ -> {
-                    return Arrays.stream(OverblikkVisningAlternativer.values())
-                            .map(Enum::name)
-                            .anyMatch(lovligAlternativ -> lovligAlternativ.equals(valgtAlternativ));
-                });
+                .allMatch(valgtAlternativ ->
+                        Arrays.stream(OverblikkVisningAlternativer.values())
+                                .map(Enum::name)
+                                .anyMatch(lovligAlternativ -> lovligAlternativ.equals(valgtAlternativ))
+                );
 
         if (!alleValgteAlternativerErLovlige) {
             throw new IllegalArgumentException();

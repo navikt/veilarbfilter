@@ -42,11 +42,11 @@ public class OverblikkVisningRepository {
     }
 
     public void oppdater(UUID overblikkVisningId, List<String> overblikkVisning) {
-        MapSqlParameterSource paramSource = new MapSqlParameterSource().addValues(Map.ofEntries(
-                Map.entry("overblikkvisningid", overblikkVisningId),
-                Map.entry("visning", mapTilPostgresqlArray(overblikkVisning)),
-                Map.entry("sistendret", fromLocalDateTimeToTimestamp(LocalDateTime.now()))
-        ));
+        MapSqlParameterSource paramSource = new MapSqlParameterSource()
+                .addValue("overblikkvisningid", overblikkVisningId)
+                .addValue("visning", mapTilPostgresqlArray(overblikkVisning))
+                .addValue("sistendret", fromLocalDateTimeToTimestamp(LocalDateTime.now()));
+
         String query = String.format("""
                         UPDATE %s SET %s = :visning::varchar[], %s = :sistendret
                         WHERE %s = :overblikkvisningid
