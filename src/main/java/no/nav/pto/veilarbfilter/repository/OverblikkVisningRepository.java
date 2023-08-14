@@ -16,7 +16,7 @@ import static no.nav.pto.veilarbfilter.database.Table.OverblikkVisning.*;
 import static no.nav.pto.veilarbfilter.util.DateUtils.fromLocalDateTimeToTimestamp;
 import static no.nav.pto.veilarbfilter.util.PostgresqlUtils.mapTilPostgresqlArray;
 
-@Service
+@Repository
 @Slf4j
 @RequiredArgsConstructor
 public class OverblikkVisningRepository {
