@@ -1,0 +1,10 @@
+CREATE TABLE OverblikkVisning
+(
+    OVERBLIKK_VISNING_ID UUID          NOT NULL,
+    VEILEDER_ID          VARCHAR(32)   NOT NULL,
+    SIST_ENDRET          TIMESTAMP     NOT NULL,
+    VISNING              VARCHAR(32)[] NOT NULL,
+    PRIMARY KEY (OVERBLIKK_VISNING_ID)
+);
+
+CREATE UNIQUE INDEX overblikk_visning_veileder_id_index ON OverblikkVisning (VEILEDER_ID, OVERBLIKK_VISNING_ID);
