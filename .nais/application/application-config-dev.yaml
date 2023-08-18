@@ -50,6 +50,9 @@ spec:
         - application: veilarbportefoljeflatefs
           namespace: obo
           cluster: dev-gcp
+        - application: veilarbdetaljerfs
+          namespace: obo
+          cluster: dev-gcp
   resources:
     limits:
       cpu: "1"
