@@ -36,6 +36,9 @@ spec:
         - application: veilarbportefoljeflatefs
           namespace: obo
           cluster: prod-gcp
+        - application: veilarbdetaljerfs
+          namespace: obo
+          cluster: prod-gcp
   resources:
     limits:
       cpu: 1500m
