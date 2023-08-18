@@ -36,8 +36,8 @@ spec:
         - application: veilarbportefoljeflatefs
           namespace: obo
           cluster: prod-gcp
-        - application: veilarbdetaljerfs
-          namespace: obo
+        - application: veilarbpersonflate
+          namespace: poao
           cluster: prod-gcp
   resources:
     limits:
