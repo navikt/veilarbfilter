@@ -5,7 +5,8 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}/veilarbfilter
   PRINT_PAYLOAD: true
 permissions: 
-  packages: write 
+  packages: write
+  contents: write
 jobs:
   test:
     name: Run tests
