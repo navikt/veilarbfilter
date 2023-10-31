@@ -3,7 +3,6 @@ package no.nav.pto.veilarbfilter.config;
 import no.nav.common.abac.Pep;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
-import no.nav.common.featuretoggle.UnleashClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.poao_tilgang.client.Decision;
@@ -68,10 +67,4 @@ public class AppConfig {
         return mockVeilarbVeilederClient;
     }
 
-    @Bean
-    public UnleashClient unleashClient() {
-        UnleashClient mockUnleashClient = mock(UnleashClient.class);
-        Mockito.when(mockUnleashClient.isEnabled(any())).thenReturn(true);
-        return mockUnleashClient;
-    }
 }
