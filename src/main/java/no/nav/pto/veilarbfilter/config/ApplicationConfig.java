@@ -6,9 +6,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
-import no.nav.common.abac.Pep;
-import no.nav.common.abac.VeilarbPepFactory;
-import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.job.leader_election.LeaderElectionClient;
@@ -59,15 +56,6 @@ public class ApplicationConfig {
     @Bean
     public AuthContextHolder authContextHolder() {
         return AuthContextHolderThreadLocal.instance();
-    }
-
-    @Bean
-    public Pep veilarbPep(EnvironmentProperties properties) {
-        Credentials serviceUserCredentials = getCredentials("service_user");
-        return VeilarbPepFactory.get(
-                properties.getAbacUrl(), serviceUserCredentials.username,
-                serviceUserCredentials.password, new SpringAuditRequestInfoSupplier()
-        );
     }
 
     @Bean

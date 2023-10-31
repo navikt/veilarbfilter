@@ -1,6 +1,5 @@
 package no.nav.pto.veilarbfilter.config;
 
-import no.nav.common.abac.Pep;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.metrics.InfluxClient;
@@ -35,7 +34,6 @@ import static org.mockito.Mockito.mock;
         MineLagredeFilterService.class,
         MineLagredeFilterController.class,
         VeilederGruppeController.class,
-        UnleashService.class,
         OverblikkVisningService.class,
         OverblikkVisningRepository.class,
         OverblikkVisningController.class})
@@ -48,12 +46,6 @@ public class AppConfig {
         return AuthContextHolderThreadLocal.instance();
     }
 
-    @Bean
-    public Pep pep() {
-        Pep mockPep = mock(Pep.class);
-        Mockito.when(mockPep.harVeilederTilgangTilEnhet(any(), any())).thenReturn(true);
-        return mockPep;
-    }
     @Bean
     public PoaoTilgangClient poaoTilgangClient() {
         PoaoTilgangClient mockPoaoTilgangClient = mock(PoaoTilgangClient.class);

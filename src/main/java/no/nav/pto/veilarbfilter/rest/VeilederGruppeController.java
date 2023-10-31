@@ -2,7 +2,6 @@ package no.nav.pto.veilarbfilter.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.common.abac.Pep;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.NavAnsattTilgangTilNavEnhetPolicyInput;
@@ -25,7 +24,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class VeilederGruppeController {
     private final VeilederGrupperService veilederGrupperService;
-    private final Pep veilarbPep;
     private final PoaoTilgangClient poaoTilgangClient;
 
     private final AuthContextHolder authContextHolder;
