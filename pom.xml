@@ -115,11 +115,6 @@
         <!-- Common -->
         <dependency>
             <groupId>com.github.navikt.common-java-modules</groupId>
-            <artifactId>abac</artifactId>
-            <version>${common.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>rest</artifactId>
             <version>${common.version}</version>
         </dependency>
@@ -136,11 +131,6 @@
         <dependency>
             <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>metrics</artifactId>
-            <version>${common.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
-            <artifactId>feature-toggle</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
