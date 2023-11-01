@@ -6,13 +6,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
-import no.nav.common.abac.Pep;
-import no.nav.common.abac.VeilarbPepFactory;
-import no.nav.common.abac.audit.SpringAuditRequestInfoSupplier;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
-import no.nav.common.featuretoggle.UnleashClient;
-import no.nav.common.featuretoggle.UnleashClientImpl;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.job.leader_election.LeaderElectionHttpClient;
 import no.nav.common.metrics.InfluxClient;
@@ -64,15 +59,6 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public Pep veilarbPep(EnvironmentProperties properties) {
-        Credentials serviceUserCredentials = getCredentials("service_user");
-        return VeilarbPepFactory.get(
-                properties.getAbacUrl(), serviceUserCredentials.username,
-                serviceUserCredentials.password, new SpringAuditRequestInfoSupplier()
-        );
-    }
-
-    @Bean
     public AzureAdMachineToMachineTokenClient azureAdMachineToMachineTokenClient() {
         return AzureAdTokenClientBuilder.builder()
                 .withNaisDefaults()
@@ -114,8 +100,4 @@ public class ApplicationConfig {
         );
     }
 
-    @Bean
-    public UnleashClient unleashClient(EnvironmentProperties properties) {
-        return new UnleashClientImpl(properties.getUnleashUrl(), APPLICATION_NAME);
-    }
 }

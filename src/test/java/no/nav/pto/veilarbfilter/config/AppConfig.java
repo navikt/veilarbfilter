@@ -1,9 +1,7 @@
 package no.nav.pto.veilarbfilter.config;
 
-import no.nav.common.abac.Pep;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
-import no.nav.common.featuretoggle.UnleashClient;
 import no.nav.common.metrics.InfluxClient;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.poao_tilgang.client.Decision;
@@ -36,7 +34,6 @@ import static org.mockito.Mockito.mock;
         MineLagredeFilterService.class,
         MineLagredeFilterController.class,
         VeilederGruppeController.class,
-        UnleashService.class,
         OverblikkVisningService.class,
         OverblikkVisningRepository.class,
         OverblikkVisningController.class})
@@ -50,12 +47,6 @@ public class AppConfig {
     }
 
     @Bean
-    public Pep pep() {
-        Pep mockPep = mock(Pep.class);
-        Mockito.when(mockPep.harVeilederTilgangTilEnhet(any(), any())).thenReturn(true);
-        return mockPep;
-    }
-    @Bean
     public PoaoTilgangClient poaoTilgangClient() {
         PoaoTilgangClient mockPoaoTilgangClient = mock(PoaoTilgangClient.class);
         Mockito.when(mockPoaoTilgangClient.evaluatePolicy(any())).thenReturn(new ApiResult<>(null, Decision.Permit.INSTANCE));
@@ -68,10 +59,4 @@ public class AppConfig {
         return mockVeilarbVeilederClient;
     }
 
-    @Bean
-    public UnleashClient unleashClient() {
-        UnleashClient mockUnleashClient = mock(UnleashClient.class);
-        Mockito.when(mockUnleashClient.isEnabled(any())).thenReturn(true);
-        return mockUnleashClient;
-    }
 }

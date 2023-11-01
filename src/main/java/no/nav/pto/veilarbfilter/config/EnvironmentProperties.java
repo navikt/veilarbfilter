@@ -9,10 +9,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "app.env")
 public class EnvironmentProperties {
     private String dbUrl;
-    private String abacUrl;
     private String naisAadDiscoveryUrl;
     private String naisAadClientId;
     private String poaoTilgangUrl;
     private String poaoTilgangScope;
-    private String unleashUrl;
 }

@@ -115,11 +115,6 @@
         <!-- Common -->
         <dependency>
             <groupId>com.github.navikt.common-java-modules</groupId>
-            <artifactId>abac</artifactId>
-            <version>${common.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>rest</artifactId>
             <version>${common.version}</version>
         </dependency>
@@ -136,11 +131,6 @@
         <dependency>
             <groupId>com.github.navikt.common-java-modules</groupId>
             <artifactId>metrics</artifactId>
-            <version>${common.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.common-java-modules</groupId>
-            <artifactId>feature-toggle</artifactId>
             <version>${common.version}</version>
         </dependency>
         <dependency>
@@ -194,7 +184,7 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>5.6.0</version>
+            <version>5.7.0</version>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -217,7 +207,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.11.3</version>
+            <version>1.11.4</version>
         </dependency>
 
         <!--TEST-->
