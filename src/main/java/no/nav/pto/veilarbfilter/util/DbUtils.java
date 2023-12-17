@@ -33,11 +33,13 @@ public class DbUtils {
     }
 
     public static String getSqlAdminRole() {
-        return "veilarbfilter-admin";
+        boolean isProd = isProduction().orElse(false);
+        return (isProd) ? "veilarbfilter-fss13-admin" :  "veilarbfilter-fss15-admin";
     }
 
     public static String getSqlReadOnlyRole() {
-        return "veilarbfilter-user";
+        boolean isProd = isProduction().orElse(false);
+        return (isProd) ? "veilarbfilter-fss13-user" :  "veilarbfilter-fss15-user";
     }
 
     @SneakyThrows
