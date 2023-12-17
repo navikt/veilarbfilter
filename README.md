@@ -20,11 +20,11 @@ Last ned VAULT CLI og kjør føljande kommandosar
 
 Preprod credentials:
 
-`vault read postgresql/preprod-fss/creds/veilarbfilter-admin`
+`vault read postgresql/preprod-fss/creds/veilarbfilter-fss15-admin`
 
 Prod credentials:
 
-`vault read postgresql/prod-fss/creds/veilarbfilter-admin`
+`vault read postgresql/prod-fss/creds/veilarbfilter-fss13-admin`
 
 ## Kontakt og spørsmål
 
