@@ -25,15 +25,14 @@ spec:
         mountPath: /var/run/secrets/nais.io/service_user
       - kvPath: /kv/preprod/fss/veilarbfilter/q1
         mountPath: /var/run/secrets/nais.io/vault
-  healthcheck:
-    liveness:
-      path: veilarbfilter/internal/health/liveness
-      initialDelay: 60
-      timeout: 10
-    readiness:
-      path: veilarbfilter/internal/health/readiness
-      initialDelay: 60
-      timeout: 10
+  liveness:
+    path: veilarbfilter/internal/health/liveness
+    initialDelay: 60
+    timeout: 10
+  readiness:
+    path: veilarbfilter/internal/health/readiness
+    initialDelay: 60
+    timeout: 10
   prometheus:
     enabled: true
     path: veilarbfilter/internal/prometheus
