@@ -6,7 +6,7 @@ metadata:
   labels:
     team: pto
 spec:
-  image: ghcr.io/navikt/veilarbfilter/veilarbfilter:{{version}}
+  image: {{image}}
   replicas:
     min: 1
     max: 1
