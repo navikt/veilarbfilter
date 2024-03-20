@@ -18,14 +18,17 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Build maven artifacts
+        run: mvn -B package -D skipTests
 
       - name: Build and push Docker image
         uses: nais/docker-build-push@v0
@@ -38,15 +41,16 @@ jobs:
   deploy-dev:
     name: Deploy application to dev
     needs: build-and-push
+    permissions:
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy application
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: .nais/application/application-config-dev.yaml
           VAR: image=${{ needs.build-and-push.outputs.image }}
