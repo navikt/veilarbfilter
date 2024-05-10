@@ -31,3 +31,7 @@ Prod credentials:
 Opprett en issue i GitHub for eventuelle spørsmål.s
 
 Er du ansatt i NAV kan du stille spørsmål på Slack i kanalen #team-obo-poao.
+
+## Kode generert av GitHub Copilot
+
+Dette repoet bruker GitHub Copilot til å generere kode.
