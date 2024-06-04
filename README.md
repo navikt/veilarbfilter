@@ -24,7 +24,7 @@ Preprod credentials:
 
 Prod credentials:
 
-`vault read postgresql/prod-fss/creds/veilarbfilter-fss13-admin`
+`vault read postgresql/prod-fss/creds/veilarbfilter-fss13-readonly`
 
 ## Kontakt og spørsmål
 
