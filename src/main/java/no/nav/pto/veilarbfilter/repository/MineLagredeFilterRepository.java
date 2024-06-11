@@ -97,6 +97,8 @@ public class MineLagredeFilterRepository implements FilterService {
             FilterModel mineLagredeFilterModel = db.queryForObject(sql, (rs, rowNum) -> {
                         try {
                             PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
+                            List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
+                            portefoljeFilter.setRegistreringstype(registreringstyper);
                             return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                                     rs.getString(Filter.FILTER_NAVN),
                                     portefoljeFilter,
@@ -125,9 +127,12 @@ public class MineLagredeFilterRepository implements FilterService {
 
         return db.query(sql, (rs, rowNum) -> {
             try {
+                PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
+                List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
+                portefoljeFilter.setRegistreringstype(registreringstyper);
                 return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                         rs.getString(Filter.FILTER_NAVN),
-                        objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class),
+                        portefoljeFilter,
                         DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                         rs.getInt(Filter.FILTER_CLEANUP),
                         rs.getString(MineLagredeFilter.VEILEDER_ID),
@@ -148,9 +153,12 @@ public class MineLagredeFilterRepository implements FilterService {
 
             return db.query(sql, (rs, rowNum) -> {
                 try {
+                    PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
+                    List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
+                    portefoljeFilter.setRegistreringstype(registreringstyper);
                     return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
-                            objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class),
+                            portefoljeFilter,
                             DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                             rs.getInt(Filter.FILTER_CLEANUP),
                             rs.getString(MineLagredeFilter.VEILEDER_ID),
@@ -282,5 +290,17 @@ public class MineLagredeFilterRepository implements FilterService {
     private void validerUnikhet(Boolean navn, Boolean valg) {
         Assert.isTrue(!navn, LagredeFilterFeilmeldinger.NAVN_EKSISTERER.message);
         Assert.isTrue(!valg, LagredeFilterFeilmeldinger.FILTERVALG_EKSISTERER.message);
+    }
+
+    private String mapSituasjonTilBeskrivelse(String situasjon) {
+        return switch (situasjon) {
+            case "MISTET_JOBBEN", "OPPSIGELSE" -> "HAR_BLITT_SAGT_OPP";
+            case "JOBB_OVER_2_AAR" -> "IKKE_VAERT_I_JOBB_SISTE_2_AAR";
+            case "VIL_FORTSETTE_I_JOBB" -> "ANNET";
+            case "INGEN_SVAR", "INGEN_VERDI" -> "UDEFINERT";
+            case "ENDRET_PERMITTERINGSPROSENT", "TILBAKE_TIL_JOBB" -> "ER_PERMITTERT";
+            case "SAGT_OPP" -> "HAR_SAGT_OPP";
+            default -> situasjon;
+        };
     }
 }

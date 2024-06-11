@@ -62,6 +62,7 @@ public class PortefoljeFilter {
     private String ytelse = "";
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
+    @Setter
     private List<String> registreringstype = emptyList();
 
     private String cvJobbprofil = "";
