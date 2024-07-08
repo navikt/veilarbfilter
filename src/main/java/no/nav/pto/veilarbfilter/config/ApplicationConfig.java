@@ -15,7 +15,8 @@ import no.nav.common.metrics.MetricsClient;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
-import no.nav.common.utils.Credentials;
+import no.nav.common.utils.EnvironmentUtils;
+import no.nav.common.utils.UrlUtils;
 import no.nav.poao_tilgang.client.*;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
@@ -38,7 +39,6 @@ import static no.nav.common.utils.NaisUtils.getCredentials;
 @Import(DbConfigPostgres.class)
 @EnableConfigurationProperties({EnvironmentProperties.class})
 public class ApplicationConfig {
-    public static final String APPLICATION_NAME = "veilarbfilter";
     private final Cache<PolicyInput, Decision> policyInputToDecisionCache = Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofMinutes(30))
             .build();

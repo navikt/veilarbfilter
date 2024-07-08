@@ -2,9 +2,9 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: veilarbfilter
-  namespace: pto
+  namespace: obo
   labels:
-    team: pto
+    team: obo
 spec:
   image: {{image}}
   replicas:
@@ -13,18 +13,16 @@ spec:
     cpuThresholdPercentage: 50
   port: 8080
   ingresses:
-    - https://veilarbfilter.dev-fss-pub.nais.io
-    - https://veilarbfilter.dev.intern.nav.no
+    - https://veilarbfilter.intern.dev.nav.no
   webproxy: true
   secureLogs:
     enabled: true
-  vault:
-    enabled: true
-    paths:
-      - kvPath: serviceuser/data/dev/srvveilarbfilter
-        mountPath: /var/run/secrets/nais.io/service_user
-      - kvPath: /kv/preprod/fss/veilarbfilter/q1
-        mountPath: /var/run/secrets/nais.io/vault
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_15
+        databases:
+          - name: veilarbfilter
+            envVarPrefix: DB
   liveness:
     path: veilarbfilter/internal/health/liveness
     initialDelay: 60
@@ -42,19 +40,22 @@ spec:
       enabled: true
       claims:
         extra:
-          - NAVident
+          - "NAVident"
   accessPolicy:
     inbound:
       rules:
         - application: veilarbportefoljeflatefs
           namespace: obo
-          cluster: dev-gcp
         - application: veilarbpersonflate
           namespace: poao
-          cluster: dev-gcp
         - application: azure-token-generator
           namespace: aura
-          cluster: dev-gcp
+    outbound:
+      rules:
+        - application: poao-tilgang
+          namespace: poao
+      external:
+        - host: veilarbveileder.dev-fss-pub.nais.io
   resources:
     limits:
       cpu: "1"
@@ -66,9 +67,9 @@ spec:
   envFrom:
     - configmap: pto-config
   env:
-    - name: VEILARBFILTER_DB_URL
-      value: jdbc:postgresql://b27dbvl008.preprod.local:5432/veilarbfilter
     - name: POAO_TILGANG_URL
-      value: http://poao-tilgang.poao.svc.nais.local
+      value: http://poao-tilgang.poao
     - name: POAO_TILGANG_SCOPE
-      value: api://dev-fss.poao.poao-tilgang/.default
+      value: api://dev-gcp.poao.poao-tilgang/.default
+    - name: VEILARBVEILEDER_URL
+      value: https://veilarbveileder.dev-fss-pub.nais.io
