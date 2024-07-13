@@ -64,8 +64,6 @@ spec:
       cpu: 500m
       memory: 128Mi
   leaderElection: true
-  envFrom:
-    - configmap: pto-config
   env:
     - name: POAO_TILGANG_URL
       value: http://poao-tilgang.poao
