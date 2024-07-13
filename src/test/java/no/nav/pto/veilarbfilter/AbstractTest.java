@@ -32,7 +32,7 @@ public abstract class AbstractTest {
         postgreDBContainer.start();
 
         MockedStatic<AuthUtils> authUtilsMockedStatic = Mockito.mockStatic(AuthUtils.class);
-        authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederIdent())
+        authUtilsMockedStatic.when(AuthUtils::getInnloggetVeilederIdent)
                 .thenReturn(VeilederId.of("1"));
         authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederUUID(any()))
                 .thenReturn(UUID.randomUUID());

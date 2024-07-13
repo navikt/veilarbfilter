@@ -9,7 +9,7 @@ import no.nav.common.rest.client.RestUtils;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.common.utils.EnvironmentUtils;
-import no.nav.common.utils.UrlUtils;
+import no.nav.pto.veilarbfilter.config.EnvironmentProperties;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -33,12 +33,13 @@ public class VeilarbveilederClient {
     private final Supplier<String> systemUserTokenProvider;
 
     @Autowired
-    public VeilarbveilederClient(AzureAdMachineToMachineTokenClient tokenClient) {
+    public VeilarbveilederClient(EnvironmentProperties properties, AzureAdMachineToMachineTokenClient tokenClient) {
         final String appName = "veilarbveileder";
         final String namespace = "pto";
-        this.veilarbveilederBaseUrl = UrlUtils.createServiceUrl(appName, namespace, true);
+        this.veilarbveilederBaseUrl = properties.getVeilarbveilederUrl() + "/veilarbveileder";
         this.client = RestClient.baseClient();
         systemUserTokenProvider = () ->
+
                 tokenClient.createMachineToMachineToken(String.format("api://%s-fss.%s.%s/.default",
                         (EnvironmentUtils.isProduction().orElseThrow()) ? "prod" : "dev", namespace, appName)
                 );
