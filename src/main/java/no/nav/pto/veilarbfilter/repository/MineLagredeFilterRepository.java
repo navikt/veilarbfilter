@@ -153,8 +153,8 @@ public class MineLagredeFilterRepository implements FilterService {
 
     public List<FilterModel> finnFilterForFilterBruker(String veilederId) {
         try {
-            String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s AND ml.%s = '%s'",
-                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, veilederId);
+            String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s AND ml.%s = ?",
+                    MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID);
 
             return db.query(sql, (rs, rowNum) -> {
                 try {
@@ -174,7 +174,7 @@ public class MineLagredeFilterRepository implements FilterService {
                     log.error("Can't load filter " + e, e);
                     throw new RuntimeException(e);
                 }
-            });
+            }, veilederId);
         } catch (Exception e) {
             log.error("Can't load filters " + e, e);
             return Collections.emptyList();
