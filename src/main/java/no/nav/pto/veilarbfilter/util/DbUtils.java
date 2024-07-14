@@ -1,9 +1,8 @@
 package no.nav.pto.veilarbfilter.util;
 
 import com.zaxxer.hikari.HikariConfig;
-import lombok.SneakyThrows;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil;
 
 import javax.sql.DataSource;
 
@@ -16,12 +15,9 @@ public class DbUtils {
         READONLY,
     }
 
-    public static DataSource createDataSource(String dbUrl, boolean admin) {
-        HikariConfig config = createDataSourceConfig(dbUrl);
-        if (admin) {
-            return createVaultRefreshDataSource(config, DbRole.ADMIN);
-        }
-        return createVaultRefreshDataSource(config, DbRole.READONLY);
+    public static DataSource createDataSource(String dbUrl) {
+        HikariConfig hikariConfig = createDataSourceConfig(dbUrl);
+        return new HikariDataSource(hikariConfig);
     }
 
     public static HikariConfig createDataSourceConfig(String dbUrl) {
@@ -30,28 +26,5 @@ public class DbUtils {
         config.setMaximumPoolSize(5);
         config.setMinimumIdle(1);
         return config;
-    }
-
-    public static String getSqlAdminRole() {
-        boolean isProd = isProduction().orElse(false);
-        return (isProd) ? "veilarbfilter-fss13-admin" :  "veilarbfilter-fss15-admin";
-    }
-
-    public static String getSqlReadOnlyRole() {
-        boolean isProd = isProduction().orElse(false);
-        return (isProd) ? "veilarbfilter-fss13-user" :  "veilarbfilter-fss15-user";
-    }
-
-    @SneakyThrows
-    private static DataSource createVaultRefreshDataSource(HikariConfig config, DbRole role) {
-        if (role.equals(DbRole.READONLY)) {
-            return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, getMountPath(), getSqlReadOnlyRole());
-        }
-        return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, getMountPath(), getSqlAdminRole());
-    }
-
-    private static String getMountPath() {
-        boolean isProd = isProduction().orElse(false);
-        return "postgresql/" + (isProd ? "prod-fss" : "preprod-fss");
     }
 }

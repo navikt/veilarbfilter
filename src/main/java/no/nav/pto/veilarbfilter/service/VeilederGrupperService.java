@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
@@ -38,21 +39,25 @@ public class VeilederGrupperService implements FilterService {
     }
 
     @Override
+    @SneakyThrows
     public Optional<FilterModel> hentFilter(Integer filterId) {
         return veilederGruppeFilterRepository.hentFilter(filterId);
     }
 
     @Override
+    @SneakyThrows
     public List<FilterModel> finnFilterForFilterBruker(String enhetId) {
         return veilederGruppeFilterRepository.finnFilterForFilterBruker(enhetId);
     }
 
     @Override
+    @SneakyThrows
     public Integer slettFilter(Integer filterId, String enhetId) {
         return veilederGruppeFilterRepository.slettFilter(filterId, enhetId);
     }
 
     @Override
+    @SneakyThrows
     public List<FilterModel> lagreSortering(String enhetId, List<SortOrder> sortOrder) {
         return veilederGruppeFilterRepository.lagreSortering(enhetId, sortOrder);
     }
@@ -68,7 +73,7 @@ public class VeilederGrupperService implements FilterService {
 
         filterForBruker.forEach(filter -> {
             List<String> alleVeiledere = filter.getFilterValg().getVeiledere();
-            List<String> aktiveVeileder = alleVeiledere.stream().filter(veilederIdent -> veilederePaEnheten.contains(veilederIdent)).collect(Collectors.toList());
+            List<String> aktiveVeileder = alleVeiledere.stream().filter(veilederePaEnheten::contains).collect(Collectors.toList());
 
             String removedVeileder = getRemovedVeiledere(alleVeiledere, aktiveVeileder);
 

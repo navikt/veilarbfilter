@@ -123,8 +123,8 @@ public class VeilederGruppeFilterRepository implements FilterService {
 
     public List<FilterModel> finnFilterForFilterBruker(String enhetId) {
         try {
-            String sql = String.format("SELECT * FROM %s AS ml, %s AS f WHERE ml.%s = f.%s AND ml.%s = \'%s\'",
-                    VeilederGrupperFilter.TABLE_NAME, Filter.TABLE_NAME, VeilederGrupperFilter.FILTER_ID, Filter.FILTER_ID, VeilederGrupperFilter.ENHET_ID, enhetId);
+            String sql = String.format("SELECT * FROM %s AS ml, %s AS f WHERE ml.%s = f.%s AND ml.%s = ?",
+                    VeilederGrupperFilter.TABLE_NAME, Filter.TABLE_NAME, VeilederGrupperFilter.FILTER_ID, Filter.FILTER_ID, VeilederGrupperFilter.ENHET_ID);
 
             return db.query(sql, (rs, rowNum) -> {
                 try {
@@ -138,7 +138,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
                     log.error("Can't load filter " + e, e);
                     throw new RuntimeException(e);
                 }
-            });
+            }, enhetId);
         } catch (Exception e) {
             log.error("Can't load filters " + e, e);
             return Collections.emptyList();

@@ -55,4 +55,16 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return handleExceptionInternal(ex, bodyOfResponse,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
+
+    @ExceptionHandler(value
+            = {RuntimeException.class})
+    protected ResponseEntity<Object> handleRuntimeException(
+            RuntimeException ex, WebRequest request) {
+        String bodyOfResponse = ex.getMessage() == null ? "An internal error occurred during routing" : ex.getMessage();
+        log.error(ex.getMessage(), ex);
+        return handleExceptionInternal(ex, bodyOfResponse,
+                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+
 }

@@ -85,9 +85,8 @@ public class VeilederGruppeController {
     }
 
     public boolean harVeilederTilgangTilEnhet(UUID innloggetVeilederUUID, String enhetId) {
-        Decision desicion = poaoTilgangClient.evaluatePolicy(new NavAnsattTilgangTilNavEnhetPolicyInput(innloggetVeilederUUID, enhetId
-        )).getOrThrow();
-        return desicion.isPermit();
+        Decision decision = poaoTilgangClient.evaluatePolicy(new NavAnsattTilgangTilNavEnhetPolicyInput(innloggetVeilederUUID, enhetId)).getOrThrow();
+        return decision.isPermit();
     }
 
 }

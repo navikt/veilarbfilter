@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.auth;
 
 import com.nimbusds.jwt.JWTClaimsSet;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.pto.veilarbfilter.domene.value.VeilederId;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
+@Slf4j
 public class AuthUtils {
     public static VeilederId getInnloggetVeilederIdent() {
         return AuthContextHolderThreadLocal

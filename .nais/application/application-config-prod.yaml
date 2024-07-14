@@ -2,19 +2,12 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: veilarbfilter
-  namespace: pto
+  namespace: obo
   labels:
-    team: pto
+    team: obo
 spec:
   image: {{image}}
   port: 8080
-  vault:
-    enabled: true
-    paths:
-      - kvPath: serviceuser/data/prod/srvveilarbfilter
-        mountPath: /var/run/secrets/nais.io/service_user
-      - kvPath: /kv/prod/fss/veilarbfilter/default
-        mountPath: /var/run/secrets/nais.io/vault
   liveness:
     path: /veilarbfilter/internal/health/liveness
     initialDelay: 60
@@ -23,6 +16,12 @@ spec:
     path: /veilarbfilter/internal/health/readiness
     initialDelay: 60
     timeout: 10
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_15
+        databases:
+          - name: veilarbfilter
+            envVarPrefix: DB
   azure:
     application:
       allowAllUsers: true
@@ -35,10 +34,14 @@ spec:
       rules:
         - application: veilarbportefoljeflatefs
           namespace: obo
-          cluster: prod-gcp
         - application: veilarbpersonflate
           namespace: poao
-          cluster: prod-gcp
+    outbound:
+      rules:
+        - application: poao-tilgang
+          namespace: poao
+      external:
+        - host: veilarbveileder.prod-fss-pub.nais.io
   resources:
     limits:
       cpu: 1500m
@@ -47,7 +50,6 @@ spec:
       cpu: 500m
       memory: 1Gi
   ingresses:
-    - https://veilarbfilter.prod-fss-pub.nais.io
     - https://veilarbfilter.intern.nav.no
   webproxy: true
   replicas:
@@ -58,12 +60,10 @@ spec:
     enabled: true
     path: /veilarbfilter/internal/prometheus
   leaderElection: true
-  envFrom:
-    - configmap: pto-config
   env:
-    - name: VEILARBFILTER_DB_URL
-      value: jdbc:postgresql://A01DBVL010.adeo.no:5432/veilarbfilter
     - name: POAO_TILGANG_URL
-      value: http://poao-tilgang.poao.svc.nais.local
+      value: http://poao-tilgang.poao
     - name: POAO_TILGANG_SCOPE
-      value: api://prod-fss.poao.poao-tilgang/.default
+      value: api://prod-gcp.poao.poao-tilgang/.default
+    - name: VEILARBVEILEDER_URL
+      value: https://veilarbveileder.prod-fss-pub.nais.io
