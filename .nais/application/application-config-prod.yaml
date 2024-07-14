@@ -52,6 +52,8 @@ spec:
   ingresses:
     - https://veilarbfilter.intern.nav.no
   webproxy: true
+  secureLogs:
+    enabled: true
   replicas:
     min: 1
     max: 2
