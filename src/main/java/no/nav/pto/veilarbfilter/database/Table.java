@@ -31,13 +31,6 @@ public class Table {
         private VeilederGrupperFilter() { throw new UnsupportedOperationException(); }
     }
 
-    public static class MetricsReporterInfo {
-        public static final String TABLE_NAME = "MetricsReporterInfo";
-        public static final String REPORTER_ID = "reporter_id";
-        public static final String OPPRETTET = "opprettet";
-        private MetricsReporterInfo() { throw new UnsupportedOperationException(); }
-    }
-
     public static class OverblikkVisning {
         public static final String TABLE_NAME = "OverblikkVisning";
         public static final String OVERBLIKK_VISNING_ID = "overblikk_visning_id";

@@ -10,11 +10,6 @@ import static no.nav.common.utils.EnvironmentUtils.isProduction;
 
 @Slf4j
 public class DbUtils {
-    private enum DbRole {
-        ADMIN,
-        READONLY,
-    }
-
     public static DataSource createDataSource(String dbUrl) {
         HikariConfig hikariConfig = createDataSourceConfig(dbUrl);
         return new HikariDataSource(hikariConfig);
