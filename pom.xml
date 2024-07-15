@@ -88,21 +88,10 @@
             <artifactId>HikariCP</artifactId>
             <version>5.1.0</version>
         </dependency>
-
         <dependency>
-            <groupId>no.nav</groupId>
-            <artifactId>vault-jdbc</artifactId>
-            <version>1.3.10</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.3</version>
         </dependency>
 
         <!-- Funksjonell programmering-->
