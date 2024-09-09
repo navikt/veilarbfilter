@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MetricsReporter implements MeterBinder {
     private final MineLagredeFilterService mineLagredeFilterService;
-    private final LeaderElectionClient leaderElection;
 
     private MultiGauge lagredeFilterStats;
 
