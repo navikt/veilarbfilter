@@ -10,13 +10,9 @@ import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.job.leader_election.LeaderElectionHttpClient;
-import no.nav.common.metrics.InfluxClient;
-import no.nav.common.metrics.MetricsClient;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
-import no.nav.common.utils.EnvironmentUtils;
-import no.nav.common.utils.UrlUtils;
 import no.nav.poao_tilgang.client.*;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
@@ -74,11 +70,6 @@ public class ApplicationConfig {
         module.addSerializer(LocalDateTime.class, new DateSerializer());
         mapper.registerModule(module);
         return mapper;
-    }
-
-    @Bean
-    public MetricsClient metricsClient() {
-        return new InfluxClient();
     }
 
     @Bean
