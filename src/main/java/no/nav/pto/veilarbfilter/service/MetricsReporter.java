@@ -6,7 +6,6 @@ import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -44,42 +43,42 @@ public class MetricsReporter implements MeterBinder {
                 if (filterValg.getAktiviteter() != null) {
                     incrementFilterStats(stats, "aktiviteter");
                     if (!"NA".equals(filterValg.getAktiviteter().getBEHANDLING())) {
-                        incrementFilterStats(stats, "BEHANDLING");
+                        incrementFilterStats(stats, "behandling");
                     }
                     if (!"NA".equals(filterValg.getAktiviteter().getEGEN())) {
-                        incrementFilterStats(stats, "EGEN");
+                        incrementFilterStats(stats, "egen");
                     }
                     if (!"NA".equals(filterValg.getAktiviteter().getGRUPPEAKTIVITET())) {
-                        incrementFilterStats(stats, "GRUPPEAKTIVITET");
+                        incrementFilterStats(stats, "gruppeaktivitet");
                     }
                     if (!"NA".equals(filterValg.getAktiviteter().getIJOBB())) {
-                        incrementFilterStats(stats, "IJOBB");
+                        incrementFilterStats(stats, "ijobb");
                     }
                     if (!"NA".equals(filterValg.getAktiviteter().getMOTE())) {
-                        incrementFilterStats(stats, "MOTE");
+                        incrementFilterStats(stats, "mote");
                     }
                     if (!"NA".equals(filterValg.getAktiviteter().getSOKEAVTALE())) {
-                        incrementFilterStats(stats, "SOKEAVTALE");
+                        incrementFilterStats(stats, "sokeavtale");
                     }
                     if (!"NA".equals(filterValg.getAktiviteter().getSTILLING())) {
-                        incrementFilterStats(stats, "STILLING");
+                        incrementFilterStats(stats, "stilling");
                     }
                     if (!"NA".equals(filterValg.getAktiviteter().getTILTAK())) {
-                        incrementFilterStats(stats, "TILTAK");
+                        incrementFilterStats(stats, "tiltak");
                     }
                     if (!"NA".equals(filterValg.getAktiviteter().getUTDANNINGAKTIVITET())) {
-                        incrementFilterStats(stats, "UTDANNINGAKTIVITET");
+                        incrementFilterStats(stats, "utdanningaktivitet");
                     }
                 }
                 if (filterValg.getAlder() != null && !filterValg.getAlder().isEmpty()) {
                     incrementFilterStats(stats, "alder");
                 }
                 if (filterValg.getFerdigfilterListe() != null && !filterValg.getFerdigfilterListe().isEmpty()) {
-                    incrementFilterStats(stats, "ferdigfilterListe");
+                    incrementFilterStats(stats, "ferdigfilterliste");
                     filterValg.getFerdigfilterListe().forEach(x -> incrementFilterStats(stats, x));
                 }
                 if (filterValg.getFodselsdagIMnd() != null && !filterValg.getFodselsdagIMnd().isEmpty()) {
-                    incrementFilterStats(stats, "fodselsdagIMnd");
+                    incrementFilterStats(stats, "fodselsdagimnd");
                 }
                 if (filterValg.getFormidlingsgruppe() != null && !filterValg.getFormidlingsgruppe().isEmpty()) {
                     incrementFilterStats(stats, "formidlingsgruppe");
@@ -94,7 +93,7 @@ public class MetricsReporter implements MeterBinder {
                     incrementFilterStats(stats, "kjonn");
                 }
                 if (filterValg.getManuellBrukerStatus() != null && !filterValg.getManuellBrukerStatus().isEmpty()) {
-                    incrementFilterStats(stats, "manuellBrukerStatus");
+                    incrementFilterStats(stats, "manuellbrukerstatus");
                 }
                 if (filterValg.getRettighetsgruppe() != null && !filterValg.getRettighetsgruppe().isEmpty()) {
                     incrementFilterStats(stats, "rettighetsgruppe");
@@ -106,7 +105,7 @@ public class MetricsReporter implements MeterBinder {
                     incrementFilterStats(stats, "tiltakstyper");
                 }
                 if (filterValg.getVeilederNavnQuery() != null && !filterValg.getVeilederNavnQuery().isEmpty()) {
-                    incrementFilterStats(stats, "veilederNavnQuery");
+                    incrementFilterStats(stats, "veiledernavnquery");
                 }
                 if (filterValg.getVeiledere() != null && !filterValg.getVeiledere().isEmpty()) {
                     incrementFilterStats(stats, "veiledere");
@@ -118,10 +117,10 @@ public class MetricsReporter implements MeterBinder {
                     incrementFilterStats(stats, "registreringstype");
                 }
                 if (filterValg.getCvJobbprofil() != null && !filterValg.getCvJobbprofil().isEmpty()) {
-                    incrementFilterStats(stats, "cvJobbprofil");
+                    incrementFilterStats(stats, "cvjobbprofil");
                 }
                 if (filterValg.getArbeidslisteKategori() != null && !filterValg.getArbeidslisteKategori().isEmpty()) {
-                    incrementFilterStats(stats, "arbeidslisteKategori");
+                    incrementFilterStats(stats, "arbeidslistekategori");
                 }
                 if (filterValg.getLandgruppe() != null && !filterValg.getLandgruppe().isEmpty()) {
                     incrementFilterStats(stats, "landgruppe");
@@ -130,13 +129,13 @@ public class MetricsReporter implements MeterBinder {
                     incrementFilterStats(stats, "foedeland");
                 }
                 if (filterValg.getBarnUnder18Aar() != null && !filterValg.getBarnUnder18Aar().isEmpty()) {
-                    incrementFilterStats(stats, "barnUnder18Aar");
+                    incrementFilterStats(stats, "barnunder18aar");
                 }
                 if (filterValg.getTolkebehov() != null && !filterValg.getTolkebehov().isEmpty()) {
                     incrementFilterStats(stats, "tolkbehov");
                 }
                 if (filterValg.getEnsligeForsorgere() != null && !filterValg.getEnsligeForsorgere().isEmpty()) {
-                    incrementFilterStats(stats, "ensligeForsorgere");
+                    incrementFilterStats(stats, "ensligeforsorgere");
                 }
                 if (filterValg.getFargekategorier() != null && !filterValg.getFargekategorier().isEmpty()) {
                     incrementFilterStats(stats, "fargekategorier");
