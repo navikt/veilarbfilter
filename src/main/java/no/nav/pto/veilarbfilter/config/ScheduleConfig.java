@@ -35,7 +35,7 @@ public class ScheduleConfig {
         }
     }
 
-    @Scheduled(fixedDelay = 2, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedDelay = 60, timeUnit = TimeUnit.MINUTES)
     public void reportLagradeFilter() {
         try {
             if (leaderElectionClient.isLeader()) {
