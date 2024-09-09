@@ -1,174 +1,157 @@
 package no.nav.pto.veilarbfilter.service;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.MultiGauge;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.binder.MeterBinder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.common.metrics.Event;
-import no.nav.common.metrics.MetricsClient;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
-import org.apache.commons.codec.digest.DigestUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MetricsReporter {
+public class MetricsReporter implements MeterBinder {
     private final MineLagredeFilterService mineLagredeFilterService;
-    private final MetricsClient metricsClient;
+
+    private MultiGauge lagredeFilterStats;
+
+    @Override
+    public void bindTo(@NotNull MeterRegistry meterRegistry) {
+        if (lagredeFilterStats == null) {
+            lagredeFilterStats = MultiGauge.builder("portefolje_lagredefilter")
+                    .description("Stats for lagrede filter")
+                    .register(meterRegistry);
+        }
+    }
 
     public void reportLagradeFilter() {
-        log.info("Reporting metrics...");
+        try {
+            Map<String, Integer> stats = new HashMap<>();
 
-        mineLagredeFilterService.hentAllLagredeFilter().forEach(filterModel -> {
-            Event metrikk = new Event("portefolje.metrikker.lagredefilter.veileder-filter-counter");
-            metrikk.addFieldToReport("navn-lengde", filterModel.getFilterNavn().length());
-            metrikk.addTagToReport("id", getHash(filterModel.getVeilederId()));
-            metrikk.addFieldToReport("filterId", filterModel.getFilterId());
-            PortefoljeFilter filterValg = filterModel.getFilterValg();
-            var antallFiltre = 0;
+            log.info("Reporting metrics...");
 
-            if (filterValg.getAktiviteter() != null) {
-                metrikk.addTagToReport("aktiviteter", "1");
-                if (!"NA".equals(filterValg.getAktiviteter().getBEHANDLING())) {
-                    metrikk.addTagToReport("BEHANDLING", "1");
-                    antallFiltre++;
-                }
-                if (!"NA".equals(filterValg.getAktiviteter().getEGEN())) {
-                    metrikk.addTagToReport("EGEN", "1");
-                    antallFiltre++;
-                }
-                if (!"NA".equals(filterValg.getAktiviteter().getGRUPPEAKTIVITET())) {
-                    metrikk.addTagToReport("GRUPPEAKTIVITET", "1");
-                    antallFiltre++;
-                }
-                if (!"NA".equals(filterValg.getAktiviteter().getIJOBB())) {
-                    metrikk.addTagToReport("IJOBB", "1");
-                    antallFiltre++;
-                }
-                if (!"NA".equals(filterValg.getAktiviteter().getMOTE())) {
-                    metrikk.addTagToReport("MOTE", "1");
-                    antallFiltre++;
-                }
-                if (!"NA".equals(filterValg.getAktiviteter().getSOKEAVTALE())) {
-                    metrikk.addTagToReport("SOKEAVTALE", "1");
-                    antallFiltre++;
-                }
-                if (!"NA".equals(filterValg.getAktiviteter().getSTILLING())) {
-                    metrikk.addTagToReport("STILLING", "1");
-                    antallFiltre++;
-                }
-                if (!"NA".equals(filterValg.getAktiviteter().getTILTAK())) {
-                    metrikk.addTagToReport("TILTAK", "1");
-                    antallFiltre++;
-                }
-                if (!"NA".equals(filterValg.getAktiviteter().getUTDANNINGAKTIVITET())) {
-                    metrikk.addTagToReport("UTDANNINGAKTIVITET", "1");
-                    antallFiltre++;
-                }
-            }
-            if (filterValg.getAlder() != null && !filterValg.getAlder().isEmpty()) {
-                metrikk.addTagToReport("alder", "1");
-                addValuesAsTags(metrikk, filterValg.getAlder());
-                antallFiltre += filterValg.getAlder().size();
-            }
-            if (filterValg.getFerdigfilterListe() != null && !filterValg.getFerdigfilterListe().isEmpty()) {
-                metrikk.addTagToReport("ferdigfilterListe", "1");
-                addValuesAsTags(metrikk, filterValg.getFerdigfilterListe());
-                antallFiltre += filterValg.getFerdigfilterListe().size();
-            }
-            if (filterValg.getFodselsdagIMnd() != null && !filterValg.getFodselsdagIMnd().isEmpty()) {
-                metrikk.addTagToReport("fodselsdagIMnd", "1");
-                antallFiltre += filterValg.getFodselsdagIMnd().size();
-            }
-            if (filterValg.getFormidlingsgruppe() != null && !filterValg.getFormidlingsgruppe().isEmpty()) {
-                metrikk.addTagToReport("formidlingsgruppe", "1");
-                addValuesAsTags(metrikk, filterValg.getFormidlingsgruppe());
-                antallFiltre += filterValg.getFormidlingsgruppe().size();
-            }
-            if (filterValg.getHovedmal() != null && !filterValg.getHovedmal().isEmpty()) {
-                metrikk.addTagToReport("hovedmal", "1");
-                addValuesAsTags(metrikk, filterValg.getHovedmal());
-                antallFiltre += filterValg.getHovedmal().size();
-            }
-            if (filterValg.getInnsatsgruppe() != null && !filterValg.getInnsatsgruppe().isEmpty()) {
-                metrikk.addTagToReport("innsatsgruppe", "1");
-                addValuesAsTags(metrikk, filterValg.getInnsatsgruppe());
-                antallFiltre += filterValg.getInnsatsgruppe().size();
-            }
-            if (filterValg.getKjonn() != null && !filterValg.getKjonn().isEmpty()) {
-                metrikk.addTagToReport("kjonn", "1");
-                metrikk.addTagToReport(filterValg.getKjonn(), "1");
-                antallFiltre++;
-            }
-            if (filterValg.getManuellBrukerStatus() != null && !filterValg.getManuellBrukerStatus().isEmpty()) {
-                metrikk.addTagToReport("manuellBrukerStatus", "1");
-                addValuesAsTags(metrikk, filterValg.getManuellBrukerStatus());
-                antallFiltre += filterValg.getManuellBrukerStatus().size();
-            }
-            if (filterValg.getRettighetsgruppe() != null && !filterValg.getRettighetsgruppe().isEmpty()) {
-                metrikk.addTagToReport("rettighetsgruppe", "1");
-                addValuesAsTags(metrikk, filterValg.getRettighetsgruppe());
-                antallFiltre += filterValg.getRettighetsgruppe().size();
-            }
-            if (filterValg.getServicegruppe() != null && !filterValg.getServicegruppe().isEmpty()) {
-                metrikk.addTagToReport("servicegruppe", "1");
-                addValuesAsTags(metrikk, filterValg.getServicegruppe());
-                antallFiltre += filterValg.getServicegruppe().size();
-            }
-            if (filterValg.getTiltakstyper() != null && !filterValg.getTiltakstyper().isEmpty()) {
-                metrikk.addTagToReport("tiltakstyper", "1");
-                addValuesAsTags(metrikk, filterValg.getTiltakstyper());
-                antallFiltre += filterValg.getTiltakstyper().size();
-            }
-            if (filterValg.getVeilederNavnQuery() != null && !filterValg.getVeilederNavnQuery().isEmpty()) {
-                metrikk.addTagToReport("veilederNavnQuery", "1");
-                antallFiltre++;
-            }
-            if (filterValg.getVeiledere() != null && !filterValg.getVeiledere().isEmpty()) {
-                metrikk.addTagToReport("veiledere", "1");
-                antallFiltre += filterValg.getVeiledere().size();
-            }
-            if (filterValg.getYtelse() != null && !filterValg.getYtelse().isEmpty()) {
-                metrikk.addTagToReport("ytelse", "1");
-                metrikk.addTagToReport(filterValg.getYtelse(), "1");
-                antallFiltre++;
-            }
-            if (filterValg.getRegistreringstype() != null && !filterValg.getRegistreringstype().isEmpty()) {
-                metrikk.addTagToReport("registreringstype", "1");
-                addValuesAsTags(metrikk, filterValg.getRegistreringstype());
-                antallFiltre += filterValg.getRegistreringstype().size();
-            }
-            if (filterValg.getCvJobbprofil() != null && !filterValg.getCvJobbprofil().isEmpty()) {
-                metrikk.addTagToReport("cvJobbprofil", "1");
-                metrikk.addTagToReport(filterValg.getCvJobbprofil(), "1");
-                antallFiltre++;
-            }
-            if (filterValg.getArbeidslisteKategori() != null && !filterValg.getArbeidslisteKategori().isEmpty()) {
-                metrikk.addTagToReport("arbeidslisteKategori", "1");
-                antallFiltre += filterValg.getArbeidslisteKategori().size();
-            }
-            if (filterValg.getLandgruppe() != null && !filterValg.getLandgruppe().isEmpty()) {
-                metrikk.addTagToReport("landgruppe", "1");
-                addValuesAsTags(metrikk, filterValg.getLandgruppe());
-                antallFiltre += filterValg.getLandgruppe().size();
-            }
-            if (filterValg.getTolkebehov() != null && !filterValg.getTolkebehov().isEmpty()) {
-                metrikk.addTagToReport("tolkbehov", "1");
-                addValuesAsTags(metrikk, filterValg.getTolkebehov());
-                antallFiltre += filterValg.getTolkebehov().size();
-            }
-            metrikk.addFieldToReport("antallFiltre", antallFiltre);
-            metricsClient.report(metrikk);
+            mineLagredeFilterService.hentAllLagredeFilter().forEach(filterModel -> {
 
-        });
+                PortefoljeFilter filterValg = filterModel.getFilterValg();
+                if (filterValg.getAktiviteter() != null) {
+                    incrementFilterStats(stats, "aktiviteter");
+                    if (!"NA".equals(filterValg.getAktiviteter().getBEHANDLING())) {
+                        incrementFilterStats(stats, "behandling");
+                    }
+                    if (!"NA".equals(filterValg.getAktiviteter().getEGEN())) {
+                        incrementFilterStats(stats, "egen");
+                    }
+                    if (!"NA".equals(filterValg.getAktiviteter().getGRUPPEAKTIVITET())) {
+                        incrementFilterStats(stats, "gruppeaktivitet");
+                    }
+                    if (!"NA".equals(filterValg.getAktiviteter().getIJOBB())) {
+                        incrementFilterStats(stats, "ijobb");
+                    }
+                    if (!"NA".equals(filterValg.getAktiviteter().getMOTE())) {
+                        incrementFilterStats(stats, "mote");
+                    }
+                    if (!"NA".equals(filterValg.getAktiviteter().getSOKEAVTALE())) {
+                        incrementFilterStats(stats, "sokeavtale");
+                    }
+                    if (!"NA".equals(filterValg.getAktiviteter().getSTILLING())) {
+                        incrementFilterStats(stats, "stilling");
+                    }
+                    if (!"NA".equals(filterValg.getAktiviteter().getTILTAK())) {
+                        incrementFilterStats(stats, "tiltak");
+                    }
+                    if (!"NA".equals(filterValg.getAktiviteter().getUTDANNINGAKTIVITET())) {
+                        incrementFilterStats(stats, "utdanningaktivitet");
+                    }
+                }
+                if (filterValg.getAlder() != null && !filterValg.getAlder().isEmpty()) {
+                    incrementFilterStats(stats, "alder");
+                }
+                if (filterValg.getFerdigfilterListe() != null && !filterValg.getFerdigfilterListe().isEmpty()) {
+                    incrementFilterStats(stats, "ferdigfilterliste");
+                    filterValg.getFerdigfilterListe().forEach(x -> incrementFilterStats(stats, x));
+                }
+                if (filterValg.getFodselsdagIMnd() != null && !filterValg.getFodselsdagIMnd().isEmpty()) {
+                    incrementFilterStats(stats, "fodselsdagimnd");
+                }
+                if (filterValg.getFormidlingsgruppe() != null && !filterValg.getFormidlingsgruppe().isEmpty()) {
+                    incrementFilterStats(stats, "formidlingsgruppe");
+                }
+                if (filterValg.getHovedmal() != null && !filterValg.getHovedmal().isEmpty()) {
+                    incrementFilterStats(stats, "hovedmal");
+                }
+                if (filterValg.getInnsatsgruppe() != null && !filterValg.getInnsatsgruppe().isEmpty()) {
+                    incrementFilterStats(stats, "innsatsgruppe");
+                }
+                if (filterValg.getKjonn() != null && !filterValg.getKjonn().isEmpty()) {
+                    incrementFilterStats(stats, "kjonn");
+                }
+                if (filterValg.getManuellBrukerStatus() != null && !filterValg.getManuellBrukerStatus().isEmpty()) {
+                    incrementFilterStats(stats, "manuellbrukerstatus");
+                }
+                if (filterValg.getRettighetsgruppe() != null && !filterValg.getRettighetsgruppe().isEmpty()) {
+                    incrementFilterStats(stats, "rettighetsgruppe");
+                }
+                if (filterValg.getServicegruppe() != null && !filterValg.getServicegruppe().isEmpty()) {
+                    incrementFilterStats(stats, "servicegruppe");
+                }
+                if (filterValg.getTiltakstyper() != null && !filterValg.getTiltakstyper().isEmpty()) {
+                    incrementFilterStats(stats, "tiltakstyper");
+                }
+                if (filterValg.getVeilederNavnQuery() != null && !filterValg.getVeilederNavnQuery().isEmpty()) {
+                    incrementFilterStats(stats, "veiledernavnquery");
+                }
+                if (filterValg.getVeiledere() != null && !filterValg.getVeiledere().isEmpty()) {
+                    incrementFilterStats(stats, "veiledere");
+                }
+                if (filterValg.getYtelse() != null && !filterValg.getYtelse().isEmpty()) {
+                    incrementFilterStats(stats, "ytelse");
+                }
+                if (filterValg.getRegistreringstype() != null && !filterValg.getRegistreringstype().isEmpty()) {
+                    incrementFilterStats(stats, "registreringstype");
+                }
+                if (filterValg.getCvJobbprofil() != null && !filterValg.getCvJobbprofil().isEmpty()) {
+                    incrementFilterStats(stats, "cvjobbprofil");
+                }
+                if (filterValg.getArbeidslisteKategori() != null && !filterValg.getArbeidslisteKategori().isEmpty()) {
+                    incrementFilterStats(stats, "arbeidslistekategori");
+                }
+                if (filterValg.getLandgruppe() != null && !filterValg.getLandgruppe().isEmpty()) {
+                    incrementFilterStats(stats, "landgruppe");
+                }
+                if (filterValg.getFoedeland() != null && !filterValg.getFoedeland().isEmpty()) {
+                    incrementFilterStats(stats, "foedeland");
+                }
+                if (filterValg.getBarnUnder18Aar() != null && !filterValg.getBarnUnder18Aar().isEmpty()) {
+                    incrementFilterStats(stats, "barnunder18aar");
+                }
+                if (filterValg.getTolkebehov() != null && !filterValg.getTolkebehov().isEmpty()) {
+                    incrementFilterStats(stats, "tolkbehov");
+                }
+                if (filterValg.getEnsligeForsorgere() != null && !filterValg.getEnsligeForsorgere().isEmpty()) {
+                    incrementFilterStats(stats, "ensligeforsorgere");
+                }
+                if (filterValg.getFargekategorier() != null && !filterValg.getFargekategorier().isEmpty()) {
+                    incrementFilterStats(stats, "fargekategorier");
+                }
+            });
+            lagredeFilterStats.register(stats.entrySet().stream().map(entry -> MultiGauge.Row.of(Tags.of("filterNavn", entry.getKey()), entry.getValue())).collect(Collectors.toList()), true);
+        } catch (Exception e) {
+            log.error("Can not report metrics " + e, e);
+        }
     }
 
-    private void addValuesAsTags(Event metrikk, List<String> listValues) {
-        listValues.forEach(x -> metrikk.addTagToReport(x, "1"));
-    }
-
-    private String getHash(String veilederId) {
-        return DigestUtils.md5Hex(veilederId);
+    private void incrementFilterStats(Map<String, Integer> stats, String statName) {
+        if (stats.containsKey(statName)) {
+            stats.put(statName, stats.get(statName) + 1);
+        } else {
+            stats.put(statName, 1);
+        }
     }
 }
