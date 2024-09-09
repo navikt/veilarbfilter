@@ -2,7 +2,6 @@ package no.nav.pto.veilarbfilter.config;
 
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
-import no.nav.common.metrics.InfluxClient;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.PoaoTilgangClient;
@@ -38,8 +37,6 @@ import static org.mockito.Mockito.mock;
         OverblikkVisningRepository.class,
         OverblikkVisningController.class})
 public class AppConfig {
-    @MockBean
-    public InfluxClient metricsClient;
 
     @Bean
     public AuthContextHolder authContextHolder() {
