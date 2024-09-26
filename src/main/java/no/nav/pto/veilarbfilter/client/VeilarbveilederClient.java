@@ -35,12 +35,12 @@ public class VeilarbveilederClient {
     @Autowired
     public VeilarbveilederClient(EnvironmentProperties properties, AzureAdMachineToMachineTokenClient tokenClient) {
         final String appName = "veilarbveileder";
-        final String namespace = "pto";
+        final String namespace = "obo";
         this.veilarbveilederBaseUrl = properties.getVeilarbveilederUrl() + "/veilarbveileder";
         this.client = RestClient.baseClient();
         systemUserTokenProvider = () ->
 
-                tokenClient.createMachineToMachineToken(String.format("api://%s-fss.%s.%s/.default",
+                tokenClient.createMachineToMachineToken(String.format("api://%s-gcp.%s.%s/.default",
                         (EnvironmentUtils.isProduction().orElseThrow()) ? "prod" : "dev", namespace, appName)
                 );
 
