@@ -41,8 +41,8 @@ spec:
       rules:
         - application: poao-tilgang
           namespace: poao
-      external:
-        - host: veilarbveileder.prod-fss-pub.nais.io
+        - application: veilarbveileder
+          namespace: obo
   resources:
     limits:
       cpu: 1500m
@@ -69,4 +69,4 @@ spec:
     - name: POAO_TILGANG_SCOPE
       value: api://prod-gcp.poao.poao-tilgang/.default
     - name: VEILARBVEILEDER_URL
-      value: https://veilarbveileder.prod-fss-pub.nais.io
+      value: http://veilarbveileder.obo
