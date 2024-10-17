@@ -25,7 +25,6 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.release>21</maven.compiler.release>
-        <junit.platform.reflection.search.useLegacySemantics>true</junit.platform.reflection.search.useLegacySemantics>
     </properties>
 
     <build>
@@ -223,15 +222,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
+            <groupId>org.junit</groupId>
+            <artifactId>junit-bom</artifactId>
             <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
+            <type>pom</type>
+            <scope>import</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
