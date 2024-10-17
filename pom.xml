@@ -25,6 +25,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.release>21</maven.compiler.release>
+        <junit.platform.reflection.search.useLegacySemantics>true</junit.platform.reflection.search.useLegacySemantics>
     </properties>
 
     <build>
