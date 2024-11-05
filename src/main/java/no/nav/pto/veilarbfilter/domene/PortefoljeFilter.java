@@ -123,6 +123,9 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> fargekategorier = emptyList();
 
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> gjeldendeVedtak14a = emptyList();
+
     @JsonIgnore
     public Boolean isNotEmpty() {
         return (kjonn != null && !kjonn.isEmpty()) ||
@@ -157,8 +160,9 @@ public class PortefoljeFilter {
                 (geografiskBosted != null && !geografiskBosted.isEmpty()) ||
                 (avvik14aVedtak != null && !avvik14aVedtak.isEmpty()) ||
                 (ensligeForsorgere != null && !ensligeForsorgere.isEmpty()) ||
-                (barnUnder18Aar != null && !barnUnder18Aar.isEmpty() ||
-                (barnUnder18AarAlder != null && !barnUnder18AarAlder.isEmpty() ||
-                (fargekategorier != null && !fargekategorier.isEmpty())));
+                (barnUnder18Aar != null && !barnUnder18Aar.isEmpty()) ||
+                (barnUnder18AarAlder != null && !barnUnder18AarAlder.isEmpty()) ||
+                (fargekategorier != null && !fargekategorier.isEmpty()) ||
+                (gjeldendeVedtak14a != null && !gjeldendeVedtak14a.isEmpty());
     }
 }
