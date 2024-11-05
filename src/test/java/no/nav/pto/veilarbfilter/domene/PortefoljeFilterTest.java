@@ -7,7 +7,6 @@ import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -99,7 +98,7 @@ class PortefoljeFilterTest {
     @Test
     public void testSerializationOfEmptyFilter() throws JsonProcessingException {
         String correctOutput = """
-                {"aktiviteter":null,"aktiviteterForenklet":[],"alder":[],"arbeidslisteKategori":[],"avvik14aVedtak":[],"barnUnder18Aar":[],"barnUnder18AarAlder":[],"cvJobbprofil":"","ensligeForsorgere":[],"fargekategorier":[],"ferdigfilterListe":[],"fodselsdagIMnd":[],"foedeland":[],"formidlingsgruppe":[],"geografiskBosted":[],"hovedmal":[],"innsatsgruppe":[],"kjonn":"","landgruppe":[],"manuellBrukerStatus":[],"navnEllerFnrQuery":"","registreringstype":[],"rettighetsgruppe":[],"servicegruppe":[],"sisteEndringKategori":[],"stillingFraNavFilter":[],"tiltakstyper":[],"tolkBehovSpraak":[],"tolkebehov":[],"ulesteEndringer":"","utdanning":[],"utdanningBestatt":[],"utdanningGodkjent":[],"veilederNavnQuery":"","veiledere":[],"visGeografiskBosted":[],"ytelse":""}""";
+                {"aktiviteter":null,"aktiviteterForenklet":[],"alder":[],"arbeidslisteKategori":[],"avvik14aVedtak":[],"barnUnder18Aar":[],"barnUnder18AarAlder":[],"cvJobbprofil":"","ensligeForsorgere":[],"fargekategorier":[],"ferdigfilterListe":[],"fodselsdagIMnd":[],"foedeland":[],"formidlingsgruppe":[],"geografiskBosted":[],"gjeldendeVedtak14a":[],"hovedmal":[],"innsatsgruppe":[],"kjonn":"","landgruppe":[],"manuellBrukerStatus":[],"navnEllerFnrQuery":"","registreringstype":[],"rettighetsgruppe":[],"servicegruppe":[],"sisteEndringKategori":[],"stillingFraNavFilter":[],"tiltakstyper":[],"tolkBehovSpraak":[],"tolkebehov":[],"ulesteEndringer":"","utdanning":[],"utdanningBestatt":[],"utdanningGodkjent":[],"veilederNavnQuery":"","veiledere":[],"visGeografiskBosted":[],"ytelse":""}""";
         PortefoljeFilter portefoljeFilter = new PortefoljeFilter();
         String jsonString = objectMapper.writeValueAsString(portefoljeFilter);
         Assertions.assertEquals(jsonString, correctOutput);
@@ -108,10 +107,10 @@ class PortefoljeFilterTest {
     @Test
     public void testSerializationOfVeiledere() throws JsonProcessingException {
         String correctOutput = """
-                {"aktiviteter":null,"aktiviteterForenklet":null,"alder":null,"arbeidslisteKategori":null,"avvik14aVedtak":null,"barnUnder18Aar":null,"barnUnder18AarAlder":null,"cvJobbprofil":null,"ensligeForsorgere":null,"fargekategorier":null,"ferdigfilterListe":null,"fodselsdagIMnd":null,"foedeland":null,"formidlingsgruppe":null,"geografiskBosted":null,"hovedmal":null,"innsatsgruppe":null,"kjonn":null,"landgruppe":null,"manuellBrukerStatus":null,"navnEllerFnrQuery":null,"registreringstype":null,"rettighetsgruppe":null,"servicegruppe":null,"sisteEndringKategori":null,"stillingFraNavFilter":null,"tiltakstyper":null,"tolkBehovSpraak":null,"tolkebehov":null,"ulesteEndringer":null,"utdanning":null,"utdanningBestatt":null,"utdanningGodkjent":null,"veilederNavnQuery":null,"veiledere":["A123","B123"],"visGeografiskBosted":null,"ytelse":null}""";
+                {"aktiviteter":null,"aktiviteterForenklet":null,"alder":null,"arbeidslisteKategori":null,"avvik14aVedtak":null,"barnUnder18Aar":null,"barnUnder18AarAlder":null,"cvJobbprofil":null,"ensligeForsorgere":null,"fargekategorier":null,"ferdigfilterListe":null,"fodselsdagIMnd":null,"foedeland":null,"formidlingsgruppe":null,"geografiskBosted":null,"gjeldendeVedtak14a":null,"hovedmal":null,"innsatsgruppe":null,"kjonn":null,"landgruppe":null,"manuellBrukerStatus":null,"navnEllerFnrQuery":null,"registreringstype":null,"rettighetsgruppe":null,"servicegruppe":null,"sisteEndringKategori":null,"stillingFraNavFilter":null,"tiltakstyper":null,"tolkBehovSpraak":null,"tolkebehov":null,"ulesteEndringer":null,"utdanning":null,"utdanningBestatt":null,"utdanningGodkjent":null,"veilederNavnQuery":null,"veiledere":["A123","B123"],"visGeografiskBosted":null,"ytelse":null}""";
         PortefoljeFilter portefoljeFilter = new PortefoljeFilter(null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null, List.of("A123", "B123"), null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null,null, null, null, null, null, null, null);
+                null, null, null, null, null,null, null, null, null, null, null, null, null);
         String jsonString = objectMapper.writeValueAsString(portefoljeFilter);
         Assertions.assertEquals(jsonString, correctOutput);
     }
