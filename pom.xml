@@ -106,7 +106,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>6.1.0</version>
+            <version>6.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -118,7 +118,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
+            <version>1.18.36</version>
         </dependency>
 
         <!-- Common -->
@@ -208,7 +208,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.13.6</version>
+            <version>1.14.1</version>
         </dependency>
 
         <!--TEST-->
