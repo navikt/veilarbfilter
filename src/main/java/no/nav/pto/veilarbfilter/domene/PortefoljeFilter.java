@@ -129,6 +129,9 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> innsatsgruppeGjeldendeVedtak14a = emptyList();
 
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> hovedmalGjeldendeVedtak14a = emptyList();
+
     @JsonIgnore
     public Boolean isNotEmpty() {
         return (kjonn != null && !kjonn.isEmpty()) ||
@@ -167,6 +170,7 @@ public class PortefoljeFilter {
                 (barnUnder18AarAlder != null && !barnUnder18AarAlder.isEmpty()) ||
                 (fargekategorier != null && !fargekategorier.isEmpty()) ||
                 (gjeldendeVedtak14a != null && !gjeldendeVedtak14a.isEmpty()) ||
-                (innsatsgruppeGjeldendeVedtak14a != null && !innsatsgruppeGjeldendeVedtak14a.isEmpty());
+                (innsatsgruppeGjeldendeVedtak14a != null && !innsatsgruppeGjeldendeVedtak14a.isEmpty()) ||
+                (hovedmalGjeldendeVedtak14a != null && !hovedmalGjeldendeVedtak14a.isEmpty());
     }
 }
