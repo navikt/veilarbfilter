@@ -31,9 +31,11 @@ public class PortefoljeFilter {
     private List<String> formidlingsgruppe = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
+    @Setter
     private List<String> hovedmal = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
+    @Setter
     private List<String> innsatsgruppe = emptyList();
 
     private String kjonn = "";
@@ -127,9 +129,11 @@ public class PortefoljeFilter {
     private List<String> gjeldendeVedtak14a = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
+    @Setter
     private List<String> innsatsgruppeGjeldendeVedtak14a = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
+    @Setter
     private List<String> hovedmalGjeldendeVedtak14a = emptyList();
 
     @JsonIgnore
