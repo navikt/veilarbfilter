@@ -46,4 +46,28 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         Assertions.assertTrue(hovedmalfilter.size() == 3);
         Assertions.assertTrue(hovedmalfilter.containsAll(alleHovedmalfilter));
     }
+
+    @Test
+    public void kanTelleAlleFilterMedEnFiltertype() {
+        Integer antallFilterForInserts = repository.tellMineFilterSomInneholderEnBestemtFiltertype();
+        Assertions.assertEquals(0, antallFilterForInserts);
+
+        String veilederId = "11223312345";
+        List<String> alleHovedmalfilter = List.of(ArenaHovedmal.OKEDELT.name(), ArenaHovedmal.BEHOLDEA.name(), ArenaHovedmal.SKAFFEA.name());
+        PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
+        filterMedHovedmal.setHovedmal(alleHovedmalfilter);
+
+        repository.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal));
+
+        Integer antallFilterEtterInsertAvHovedmalfilter = repository.tellMineFilterSomInneholderEnBestemtFiltertype();
+        Assertions.assertEquals(1, antallFilterEtterInsertAvHovedmalfilter);
+
+        PortefoljeFilter filterUtenHovedmal = new PortefoljeFilter();
+        filterUtenHovedmal.setVeiledere(List.of("Z123456", "Y123456", "X123456"));
+
+        repository.lagreFilter(veilederId, new NyttFilterModel("filter uten hovedmal", filterUtenHovedmal));
+
+        Integer antallFilterEtterInsertAvIkkehovedmalfilter = repository.tellMineFilterSomInneholderEnBestemtFiltertype();
+        Assertions.assertEquals(1, antallFilterEtterInsertAvIkkehovedmalfilter);
+    }
 }

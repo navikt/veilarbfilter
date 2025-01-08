@@ -223,6 +223,15 @@ public class MineLagredeFilterRepository implements FilterService {
         });
     }
 
+    public Integer tellMineFilterSomInneholderEnBestemtFiltertype() {
+        String sql = String.format("SELECT count(filter_som_skal_telles) " +
+                                   "FROM (" +
+                                        "SELECT valgte_filter ->> 'hovedmal' AS liste_for_filtertype FROM filter" +
+                                   ") AS filter_som_skal_telles " +
+                                   "WHERE liste_for_filtertype != '[]';");
+        return db.queryForObject(sql, Integer.class);
+    }
+
     private void deactiveMineFilter(Integer filterId, String note) {
         try {
             String sql = String.format("UPDATE %s SET %s = 0, %s = ? WHERE %s = ?", MineLagredeFilter.TABLE_NAME, MineLagredeFilter.AKTIV, MineLagredeFilter.NOTE, MineLagredeFilter.FILTER_ID);
