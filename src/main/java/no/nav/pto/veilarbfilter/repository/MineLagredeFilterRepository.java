@@ -223,13 +223,16 @@ public class MineLagredeFilterRepository implements FilterService {
         });
     }
 
-    public Integer tellMineFilterSomInneholderEnBestemtFiltertype() {
+    // TODO kan vi typesikre input her på nokon måte?
+    public Integer tellMineFilterSomInneholderEnBestemtFiltertype(String filtervalg) {
+        // TODO feilhåndtering ved ugyldig filtervalg i input
+
         String sql = String.format("SELECT count(filter_som_skal_telles) " +
                                    "FROM (" +
                                         "SELECT %s ->> ? AS liste_for_filtertype FROM %s" +
                                    ") AS filter_som_skal_telles " +
                                    "WHERE liste_for_filtertype != '[]';", Filter.VALGTE_FILTER, Filter.TABLE_NAME);
-        return db.queryForObject(sql, Integer.class, "hovedmal");
+        return db.queryForObject(sql, Integer.class, filtervalg);
     }
 
     private void deactiveMineFilter(Integer filterId, String note) {
