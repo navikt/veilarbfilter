@@ -5,10 +5,6 @@ import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
-import no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal;
-import no.nav.pto.veilarbfilter.domene.value.ArenaInnsatsgruppe;
-import no.nav.pto.veilarbfilter.domene.value.Hovedmal;
-import no.nav.pto.veilarbfilter.domene.value.Innsatsgruppe;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +14,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+
+import static no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal.*;
+import static no.nav.pto.veilarbfilter.domene.value.ArenaInnsatsgruppe.BATT;
+import static no.nav.pto.veilarbfilter.domene.value.Hovedmal.SKAFFE_ARBEID;
+import static no.nav.pto.veilarbfilter.domene.value.Innsatsgruppe.STANDARD_INNSATS;
 
 @WebMvcTest
 @ActiveProfiles({"test"})
@@ -41,7 +42,7 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
     public void kanLagreOgHenteUtFilterForVeileder() {
         String veilederId = "11223312345";
         PortefoljeFilter portefoljeFilter = new PortefoljeFilter();
-        List<String> alleHovedmalfilter = List.of(ArenaHovedmal.OKEDELT.name(), ArenaHovedmal.BEHOLDEA.name(), ArenaHovedmal.SKAFFEA.name());
+        List<String> alleHovedmalfilter = List.of(OKEDELT.name(), BEHOLDEA.name(), SKAFFEA.name());
         portefoljeFilter.setHovedmal(alleHovedmalfilter);
         NyttFilterModel nyttFilter = new NyttFilterModel("Navn på nytt filter", portefoljeFilter);
 
@@ -62,7 +63,7 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
 
         // Får rett ved eitt lagra filter med filtervalet vi ser etter
         String veilederId = "11223312345";
-        List<String> alleHovedmalfilter = List.of(ArenaHovedmal.OKEDELT.name(), ArenaHovedmal.BEHOLDEA.name(), ArenaHovedmal.SKAFFEA.name());
+        List<String> alleHovedmalfilter = List.of(OKEDELT.name(), BEHOLDEA.name(), SKAFFEA.name());
         PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
         filterMedHovedmal.setHovedmal(alleHovedmalfilter);
 
@@ -87,10 +88,10 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         String veilederId = "11223312345";
 
         PortefoljeFilter filterMedAlleMigreringsfiltervalg = new PortefoljeFilter();
-        filterMedAlleMigreringsfiltervalg.setHovedmal(List.of(ArenaHovedmal.SKAFFEA.name()));
-        filterMedAlleMigreringsfiltervalg.setHovedmalGjeldendeVedtak14a(List.of(Hovedmal.SKAFFE_ARBEID.name()));
-        filterMedAlleMigreringsfiltervalg.setInnsatsgruppe(List.of(ArenaInnsatsgruppe.BATT.name()));
-        filterMedAlleMigreringsfiltervalg.setInnsatsgruppeGjeldendeVedtak14a(List.of(Innsatsgruppe.STANDARD_INNSATS.name()));
+        filterMedAlleMigreringsfiltervalg.setHovedmal(List.of(SKAFFEA.name()));
+        filterMedAlleMigreringsfiltervalg.setHovedmalGjeldendeVedtak14a(List.of(SKAFFE_ARBEID.name()));
+        filterMedAlleMigreringsfiltervalg.setInnsatsgruppe(List.of(BATT.name()));
+        filterMedAlleMigreringsfiltervalg.setInnsatsgruppeGjeldendeVedtak14a(List.of(STANDARD_INNSATS.name()));
 
         repository.lagreFilter(veilederId, new NyttFilterModel("filter", filterMedAlleMigreringsfiltervalg));
 
@@ -107,7 +108,7 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         String veilederId1 = "01010111111";
         String veilederId2 = "02020222222";
         PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
-        filterMedHovedmal.setHovedmal(List.of(ArenaHovedmal.SKAFFEA.name()));
+        filterMedHovedmal.setHovedmal(List.of(SKAFFEA.name()));
 
         repository.lagreFilter(veilederId1, new NyttFilterModel("filter", filterMedHovedmal));
         repository.lagreFilter(veilederId2, new NyttFilterModel("filter", filterMedHovedmal));
@@ -118,4 +119,40 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         // Then
         Assertions.assertEquals(2, antallFilter);
     }
+
+    @Test
+    public void kanHenteUtFilterSomInneholderFiltervalg() {
+        // Given
+        String veilederId1 = "01010111111";
+        String veilederId2 = "02020222222";
+
+        PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
+        filterMedHovedmal.setHovedmal(List.of(SKAFFEA.name()));
+
+        PortefoljeFilter filterUtenHovedmal = new PortefoljeFilter();
+        filterUtenHovedmal.setInnsatsgruppe(List.of(BATT.name()));
+
+        PortefoljeFilter filterMedMangeHovedmal = new PortefoljeFilter();
+        filterMedMangeHovedmal.setHovedmal(List.of(SKAFFEA.name(), BEHOLDEA.name(), OKEDELT.name()));
+
+        repository.lagreFilter(veilederId1, new NyttFilterModel("filter", filterMedHovedmal));
+        repository.lagreFilter(veilederId1, new NyttFilterModel("filter uten hovedmål", filterUtenHovedmal));
+        repository.lagreFilter(veilederId1, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal));
+        repository.lagreFilter(veilederId2, new NyttFilterModel("filter", filterMedHovedmal));
+        repository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal));
+
+
+        // when
+        List<FilterModel> result = repository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
+        List<PortefoljeFilter> portefoljeFilterMedHovedmal = result.stream().map(it -> it.getFilterValg()).toList();
+
+        // then
+        Assertions.assertEquals(4, portefoljeFilterMedHovedmal.size());
+        Assertions.assertEquals(repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena), portefoljeFilterMedHovedmal.size());
+        Assertions.assertEquals(filterMedHovedmal.getHovedmal(), portefoljeFilterMedHovedmal.getFirst().getHovedmal());
+    }
+
+    // Test: bytte ut gamalt hovedmål med nytt
+
+    // Test: bytte ut gamalt hovedmål med nytt – også når det finst nye hovedmål i filteret frå før
 }
