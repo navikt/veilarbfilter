@@ -226,10 +226,10 @@ public class MineLagredeFilterRepository implements FilterService {
     public Integer tellMineFilterSomInneholderEnBestemtFiltertype() {
         String sql = String.format("SELECT count(filter_som_skal_telles) " +
                                    "FROM (" +
-                                        "SELECT valgte_filter ->> 'hovedmal' AS liste_for_filtertype FROM filter" +
+                                        "SELECT %s ->> ? AS liste_for_filtertype FROM %s" +
                                    ") AS filter_som_skal_telles " +
-                                   "WHERE liste_for_filtertype != '[]';");
-        return db.queryForObject(sql, Integer.class);
+                                   "WHERE liste_for_filtertype != '[]';", Filter.VALGTE_FILTER, Filter.TABLE_NAME);
+        return db.queryForObject(sql, Integer.class, "hovedmal");
     }
 
     private void deactiveMineFilter(Integer filterId, String note) {
