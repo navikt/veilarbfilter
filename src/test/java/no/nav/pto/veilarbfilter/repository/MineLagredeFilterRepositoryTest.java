@@ -151,8 +151,4 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         Assertions.assertEquals(repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena), portefoljeFilterMedHovedmal.size());
         Assertions.assertEquals(filterMedHovedmal.getHovedmal(), portefoljeFilterMedHovedmal.getFirst().getHovedmal());
     }
-
-    // Test: bytte ut gamalt hovedmål med nytt
-
-    // Test: bytte ut gamalt hovedmål med nytt – også når det finst nye hovedmål i filteret frå før
 }
