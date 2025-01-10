@@ -7,9 +7,7 @@ import no.nav.pto.veilarbfilter.domene.value.Hovedmal;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -59,22 +57,23 @@ public class MineLagredeFilterService implements FilterService {
     }
 
 
-    public void erstattArenahovedmalfiltervalgMedHovedmalGjeldendeVedtak14aFiltervalg(String veilederId, Integer filterId) {
+    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(String veilederId, Integer filterId) {
         try {
             FilterModel filterSomSkalOppdateres = mineLagredeFilterRepository.hentFilter(filterId).orElseThrow(); // todo handter feil ved henting
 
             // Lag liste over migrerte hovedmål
-            List<ArenaHovedmal> arenahovedmal = filterSomSkalOppdateres.getFilterValg().getHovedmal().stream().map(ArenaHovedmal::valueOf).toList();
-            List<Hovedmal> hovedmalGjeldendeVedtak = arenahovedmal.stream()
-                    .map(ArenaHovedmal::mapTilHovedmalGjeldendeVedtak14a)
-                    .toList();
-            List<String> hovedmalGjeldendeVedtakSomStreng = hovedmalGjeldendeVedtak.stream().map(it -> it.name()).toList();
+            List<String> hovedmalFraArenahovedmal = lagGjeldendeVedtakHovedmalFraArenahovedmal(filterSomSkalOppdateres.getFilterValg().getHovedmal());
 
-            // Todo slå saman nye og gamle HovedmalGjeldendeVedtak-filter
+            // Slå saman nye og gamle HovedmalGjeldendeVedtak-filter
+            List<String> hovedmalFraGjeldendeVedtak14a = filterSomSkalOppdateres.getFilterValg().getHovedmalGjeldendeVedtak14a();
+            Set<String> alleUnikeHovedmal = new HashSet<>(hovedmalFraGjeldendeVedtak14a);
+            alleUnikeHovedmal.addAll(hovedmalFraArenahovedmal);
+
+            List<String> unikeSorterteHovedmal = alleUnikeHovedmal.stream().sorted().toList();
 
             // Lag oppdatert porteføljefilter
             PortefoljeFilter portefoljeFilterSomSkalOppdateres = filterSomSkalOppdateres.getFilterValg();
-            portefoljeFilterSomSkalOppdateres.setHovedmalGjeldendeVedtak14a(hovedmalGjeldendeVedtakSomStreng);
+            portefoljeFilterSomSkalOppdateres.setHovedmalGjeldendeVedtak14a(unikeSorterteHovedmal);
             portefoljeFilterSomSkalOppdateres.setHovedmal(Collections.emptyList());
 
             // Lag klart oppdatert filtermodell og skriv tilbake til databasen
@@ -84,5 +83,15 @@ public class MineLagredeFilterService implements FilterService {
             // todo feilhåndtering her
             throw e;
         }
+    }
+
+    private List<String> lagGjeldendeVedtakHovedmalFraArenahovedmal(List<String> arenahovedmal) {
+        List<Hovedmal> hovedmalGjeldendeVedtak = arenahovedmal.stream()
+                .map(ArenaHovedmal::valueOf)
+                .map(ArenaHovedmal::mapTilHovedmalGjeldendeVedtak14a)
+                .toList();
+
+
+        return hovedmalGjeldendeVedtak.stream().map(Hovedmal::name).toList();
     }
 }
