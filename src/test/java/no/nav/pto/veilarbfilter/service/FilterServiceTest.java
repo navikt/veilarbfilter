@@ -53,7 +53,7 @@ public class FilterServiceTest extends AbstractTest {
         FilterModel lagretFilter = mineLagredeFilterService.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
 
         // when
-        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(lagretFilter.getFilterId());
+        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(lagretFilter);
 
         // then
         List<String> forventHovedmalGjeldendeVedtakListeSortertAlfabetisk = List.of(BEHOLDE_ARBEID.name(), OKE_DELTAKELSE.name(), SKAFFE_ARBEID.name());
@@ -82,7 +82,7 @@ public class FilterServiceTest extends AbstractTest {
         FilterModel lagretFilter = mineLagredeFilterService.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
 
         // when
-        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(lagretFilter.getFilterId());
+        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(lagretFilter);
 
         // then
         List<String> forventHovedmalGjeldendeVedtakListe = List.of(BEHOLDE_ARBEID.name(), SKAFFE_ARBEID.name());
@@ -110,7 +110,7 @@ public class FilterServiceTest extends AbstractTest {
         FilterModel lagretFilter = mineLagredeFilterService.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
 
         // when
-        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(lagretFilter.getFilterId());
+        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(lagretFilter);
 
         // then
         List<String> forventHovedmalGjeldendeVedtakListe = List.of(BEHOLDE_ARBEID.name(), SKAFFE_ARBEID.name());

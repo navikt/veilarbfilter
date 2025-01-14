@@ -23,9 +23,7 @@ public class MigrerFilterService {
     private final FilterRepository filterRepository;
 
 
-    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(Integer filterId) throws JsonProcessingException {
-        FilterModel filterSomSkalOppdateres = mineLagredeFilterRepository.hentFilter(filterId).orElseThrow(); // todo handter feil ved henting
-
+    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(FilterModel filterSomSkalOppdateres) throws JsonProcessingException {
         // Lag liste over migrerte hovedmål
         List<String> hovedmalFraArenahovedmal = lagGjeldendeVedtakHovedmalFraArenahovedmal(filterSomSkalOppdateres.getFilterValg().getHovedmal());
 
