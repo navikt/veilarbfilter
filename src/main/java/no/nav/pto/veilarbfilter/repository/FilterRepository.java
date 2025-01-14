@@ -8,16 +8,23 @@ import no.nav.pto.veilarbfilter.database.Table.Filter;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import no.nav.pto.veilarbfilter.util.DateUtils;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
 public class FilterRepository {
+    public static final String HOVEDMAL_FILTERVALG_JSON_KEY = "hovedmal";
+
     private final JdbcTemplate db;
     private final ObjectMapper objectMapper;
 
@@ -31,6 +38,30 @@ public class FilterRepository {
                 """, Filter.TABLE_NAME, Filter.VALGTE_FILTER, Filter.FILTER_ID);
 
         db.update(sql, objectMapper.writeValueAsString(filterValg), filterId);
+    }
+
+    public void oppdaterFilterValgBatch(List<FilterIdOgFilterValgPar> filterBatch) throws JsonProcessingException {
+        //language=postgresql
+        String sql = String.format("""
+                UPDATE %s SET %s = to_json(?::JSON)
+                WHERE %s = ?
+                """, Filter.TABLE_NAME, Filter.VALGTE_FILTER, Filter.FILTER_ID);
+
+        db.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
+                Integer filterID = filterBatch.get(i).filterId;
+                String filterValg = filterBatch.get(i).filterValg;
+
+                ps.setString(1, filterValg);
+                ps.setInt(2, filterID);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return filterBatch.size();
+            }
+        });
     }
 
     public Integer tellMineFilterSomInneholderEnBestemtFiltertype(String filtervalg) {
@@ -108,4 +139,6 @@ public class FilterRepository {
             throw new RuntimeException(e);
         }
     }
+
+    public record FilterIdOgFilterValgPar(Integer filterId, String filterValg) {}
 }
