@@ -53,14 +53,14 @@ public class MineLagredeFilterServiceTest extends AbstractTest {
         service.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(veilederId, lagretFilter.getFilterId());
 
         // then
-        List<String> forventHovedmalGjeldendeVedtakListe = List.of(OKE_DELTAKELSE.name(), BEHOLDE_ARBEID.name(), SKAFFE_ARBEID.name());
+        List<String> forventHovedmalGjeldendeVedtakListeSortertAlfabetisk = List.of(BEHOLDE_ARBEID.name(), OKE_DELTAKELSE.name(), SKAFFE_ARBEID.name());
 
         // TODO burde vi bruke service til å sjekke desse tinga i staden for repo?
         List<FilterModel> filterMedHovedmalGjeldendeVedtak14a = repository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterGjeldendeVedtak);
         Assertions.assertEquals(1, filterMedHovedmalGjeldendeVedtak14a.size());
 
         List<String> gjeldendeVedtakFiltervalg = filterMedHovedmalGjeldendeVedtak14a.getFirst().getFilterValg().getHovedmalGjeldendeVedtak14a();
-        Assertions.assertEquals(forventHovedmalGjeldendeVedtakListe, gjeldendeVedtakFiltervalg);
+        Assertions.assertEquals(forventHovedmalGjeldendeVedtakListeSortertAlfabetisk, gjeldendeVedtakFiltervalg);
 
         Assertions.assertEquals(0, repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena));
     }
