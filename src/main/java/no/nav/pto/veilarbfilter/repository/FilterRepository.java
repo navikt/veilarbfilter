@@ -1,10 +1,12 @@
 package no.nav.pto.veilarbfilter.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.pto.veilarbfilter.database.Table;
+import no.nav.pto.veilarbfilter.database.Table.Filter;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
+import no.nav.pto.veilarbfilter.domene.MineLagredeFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import no.nav.pto.veilarbfilter.util.DateUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,6 +21,16 @@ public class FilterRepository {
     private final JdbcTemplate db;
     private final ObjectMapper objectMapper;
 
+    public void oppdaterFilterValg(String filterId, PortefoljeFilter filterValg) throws JsonProcessingException {
+        //language=postgresql
+        String sql = String.format("""
+                UPDATE %s SET %s = to_json(?::JSON)
+                WHERE %s = ?
+                """, Filter.TABLE_NAME, Filter.VALGTE_FILTER, Filter.FILTER_ID);
+
+        db.update(sql, objectMapper.writeValueAsString(filterValg), filterId);
+    }
+
     public Integer tellMineFilterSomInneholderEnBestemtFiltertype(String filtervalg) {
         // TODO feilhåndtering ved ugyldig filtervalg i input, evt betre typesikring
 
@@ -26,7 +38,7 @@ public class FilterRepository {
                 "FROM (" +
                 "SELECT %s ->> ? AS liste_for_filtertype FROM %s" +
                 ") AS filter_som_skal_telles " +
-                "WHERE liste_for_filtertype != '[]';", Table.Filter.VALGTE_FILTER, Table.Filter.TABLE_NAME);
+                "WHERE liste_for_filtertype != '[]';", Filter.VALGTE_FILTER, Filter.TABLE_NAME);
         return db.queryForObject(sql, Integer.class, filtervalg);
     }
 
@@ -37,23 +49,23 @@ public class FilterRepository {
                         "FROM (SELECT *, %s ->> ? AS liste_for_filtertype\n" +
                         "      FROM %s) AS filter_som_skal_telles\n" +
                         "WHERE liste_for_filtertype != '[]';",
-                Table.Filter.FILTER_ID, Table.Filter.FILTER_NAVN, Table.Filter.VALGTE_FILTER, Table.Filter.OPPRETTET, Table.Filter.FILTER_CLEANUP,
-                Table.Filter.VALGTE_FILTER, Table.Filter.TABLE_NAME);
+                Filter.FILTER_ID, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET, Filter.FILTER_CLEANUP,
+                Filter.VALGTE_FILTER, Filter.TABLE_NAME);
 
         // TODO vurder å skrive denne litt ryddigare, for eksempel med å lage ein mapFromResultSet-funksjon.
         return db.query(sql, (rs, rowNum) -> {
                     try {
-                        PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Table.Filter.VALGTE_FILTER), PortefoljeFilter.class);
+                        PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
                         // Treng vi registreringstyper? Koden her er kopiert frå finnFilterForFilterBruker.
                         List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
                         portefoljeFilter.setRegistreringstype(registreringstyper);
 
                         return new FilterModel(
-                                rs.getInt(Table.Filter.FILTER_ID),
-                                rs.getString(Table.Filter.FILTER_NAVN),
+                                rs.getInt(Filter.FILTER_ID),
+                                rs.getString(Filter.FILTER_NAVN),
                                 portefoljeFilter,
-                                DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Table.Filter.OPPRETTET)),
-                                rs.getInt(Table.Filter.FILTER_CLEANUP));
+                                DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
+                                rs.getInt(Filter.FILTER_CLEANUP));
                     } catch (Exception e) {
                         log.error("Can't load filter " + e, e);
                         throw new RuntimeException(e);
