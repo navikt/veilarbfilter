@@ -6,12 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.pto.veilarbfilter.database.Table.Filter;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
-import no.nav.pto.veilarbfilter.domene.MineLagredeFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import no.nav.pto.veilarbfilter.util.DateUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
 import java.util.List;
 
 @Repository
@@ -53,24 +53,7 @@ public class FilterRepository {
                 Filter.VALGTE_FILTER, Filter.TABLE_NAME);
 
         // TODO vurder å skrive denne litt ryddigare, for eksempel med å lage ein mapFromResultSet-funksjon.
-        return db.query(sql, (rs, rowNum) -> {
-                    try {
-                        PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
-                        // Treng vi registreringstyper? Koden her er kopiert frå finnFilterForFilterBruker.
-                        List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
-                        portefoljeFilter.setRegistreringstype(registreringstyper);
-
-                        return new FilterModel(
-                                rs.getInt(Filter.FILTER_ID),
-                                rs.getString(Filter.FILTER_NAVN),
-                                portefoljeFilter,
-                                DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
-                                rs.getInt(Filter.FILTER_CLEANUP));
-                    } catch (Exception e) {
-                        log.error("Can't load filter " + e, e);
-                        throw new RuntimeException(e);
-                    }
-                }, filtervalg
+        return db.query(sql, this::mapTilFilterModel, filtervalg
         );
     }
 
@@ -84,5 +67,24 @@ public class FilterRepository {
             case "SAGT_OPP" -> "HAR_SAGT_OPP";
             default -> situasjon;
         };
+    }
+
+    private FilterModel mapTilFilterModel(ResultSet rs, int rowNum) {
+        try {
+            PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
+            // Treng vi registreringstyper? Koden her er kopiert frå finnFilterForFilterBruker.
+            List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
+            portefoljeFilter.setRegistreringstype(registreringstyper);
+
+            return new FilterModel(
+                    rs.getInt(Filter.FILTER_ID),
+                    rs.getString(Filter.FILTER_NAVN),
+                    portefoljeFilter,
+                    DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
+                    rs.getInt(Filter.FILTER_CLEANUP));
+        } catch (Exception e) {
+            log.error("Can't load filter " + e, e);
+            throw new RuntimeException(e);
+        }
     }
 }
