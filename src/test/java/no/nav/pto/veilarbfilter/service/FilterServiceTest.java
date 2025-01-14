@@ -6,7 +6,6 @@ import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import no.nav.pto.veilarbfilter.repository.FilterRepository;
-import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,11 +21,11 @@ import static no.nav.pto.veilarbfilter.domene.value.Hovedmal.*;
 
 @WebMvcTest
 @ActiveProfiles({"test"})
-public class MineLagredeFilterServiceTest extends AbstractTest {
+public class FilterServiceTest extends AbstractTest {
     @Autowired
-    private MineLagredeFilterService service;
+    private MineLagredeFilterService mineLagredeFilterService;
     @Autowired
-    private MineLagredeFilterRepository mineLagredeFilterRepository;
+    private MigrerFilterService migrerFilterService;
     @Autowired
     private FilterRepository filterRepository;
     @Autowired
@@ -50,10 +49,10 @@ public class MineLagredeFilterServiceTest extends AbstractTest {
         PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
         filterMedHovedmal.setHovedmal(arenaHovedmaFilter);
 
-        FilterModel lagretFilter = service.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
+        FilterModel lagretFilter = mineLagredeFilterService.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
 
         // when
-        service.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(veilederId, lagretFilter.getFilterId());
+        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(veilederId, lagretFilter.getFilterId());
 
         // then
         List<String> forventHovedmalGjeldendeVedtakListeSortertAlfabetisk = List.of(BEHOLDE_ARBEID.name(), OKE_DELTAKELSE.name(), SKAFFE_ARBEID.name());
@@ -79,10 +78,10 @@ public class MineLagredeFilterServiceTest extends AbstractTest {
         filterMedHovedmal.setHovedmal(arenaHovedmaFilter);
         filterMedHovedmal.setHovedmalGjeldendeVedtak14a(gjeldendeVedtak14aHovedmaFilter);
 
-        FilterModel lagretFilter = service.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
+        FilterModel lagretFilter = mineLagredeFilterService.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
 
         // when
-        service.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(veilederId, lagretFilter.getFilterId());
+        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(veilederId, lagretFilter.getFilterId());
 
         // then
         List<String> forventHovedmalGjeldendeVedtakListe = List.of(BEHOLDE_ARBEID.name(), SKAFFE_ARBEID.name());
@@ -107,10 +106,10 @@ public class MineLagredeFilterServiceTest extends AbstractTest {
         filterMedHovedmal.setHovedmal(arenaHovedmaFilter);
         filterMedHovedmal.setHovedmalGjeldendeVedtak14a(gjeldendeVedtak14aHovedmaFilter);
 
-        FilterModel lagretFilter = service.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
+        FilterModel lagretFilter = mineLagredeFilterService.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
 
         // when
-        service.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(veilederId, lagretFilter.getFilterId());
+        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(veilederId, lagretFilter.getFilterId());
 
         // then
         List<String> forventHovedmalGjeldendeVedtakListe = List.of(BEHOLDE_ARBEID.name(), SKAFFE_ARBEID.name());

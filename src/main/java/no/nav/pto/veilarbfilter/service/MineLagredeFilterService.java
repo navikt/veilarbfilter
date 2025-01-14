@@ -55,43 +55,4 @@ public class MineLagredeFilterService implements FilterService {
     public List<MineLagredeFilterModel> hentAllLagredeFilter() {
         return mineLagredeFilterRepository.hentAllLagredeFilter();
     }
-
-
-    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(String veilederId, Integer filterId) {
-        try {
-            FilterModel filterSomSkalOppdateres = mineLagredeFilterRepository.hentFilter(filterId).orElseThrow(); // todo handter feil ved henting
-
-            // Lag liste over migrerte hovedmål
-            List<String> hovedmalFraArenahovedmal = lagGjeldendeVedtakHovedmalFraArenahovedmal(filterSomSkalOppdateres.getFilterValg().getHovedmal());
-
-            // Slå saman nye og gamle HovedmalGjeldendeVedtak-filter
-            List<String> hovedmalFraGjeldendeVedtak14a = filterSomSkalOppdateres.getFilterValg().getHovedmalGjeldendeVedtak14a();
-            Set<String> alleUnikeHovedmal = new HashSet<>(hovedmalFraGjeldendeVedtak14a);
-            alleUnikeHovedmal.addAll(hovedmalFraArenahovedmal);
-
-            List<String> unikeSorterteHovedmal = alleUnikeHovedmal.stream().sorted().toList();
-
-            // Lag oppdatert porteføljefilter
-            PortefoljeFilter portefoljeFilterSomSkalOppdateres = filterSomSkalOppdateres.getFilterValg();
-            portefoljeFilterSomSkalOppdateres.setHovedmalGjeldendeVedtak14a(unikeSorterteHovedmal);
-            portefoljeFilterSomSkalOppdateres.setHovedmal(Collections.emptyList());
-
-            // Lag klart oppdatert filtermodell og skriv tilbake til databasen
-            filterSomSkalOppdateres.setFilterValg(portefoljeFilterSomSkalOppdateres);
-            mineLagredeFilterRepository.oppdaterFilter(veilederId, filterSomSkalOppdateres); // todo handter feil ved skriving
-        } catch (Exception e) {
-            // todo feilhåndtering her
-            throw e;
-        }
-    }
-
-    private List<String> lagGjeldendeVedtakHovedmalFraArenahovedmal(List<String> arenahovedmal) {
-        List<Hovedmal> hovedmalGjeldendeVedtak = arenahovedmal.stream()
-                .map(ArenaHovedmal::valueOf)
-                .map(ArenaHovedmal::mapTilHovedmalGjeldendeVedtak14a)
-                .toList();
-
-
-        return hovedmalGjeldendeVedtak.stream().map(Hovedmal::name).toList();
-    }
 }

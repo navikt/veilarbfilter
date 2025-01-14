@@ -42,7 +42,9 @@ import static org.mockito.Mockito.when;
         OverblikkVisningService.class,
         OverblikkVisningRepository.class,
         OverblikkVisningController.class,
-        FilterRepository.class})
+        FilterRepository.class,
+        MigrerFilterService.class
+})
 public class AppConfig {
 
     @Bean
