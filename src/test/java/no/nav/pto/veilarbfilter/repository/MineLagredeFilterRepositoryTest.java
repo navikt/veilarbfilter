@@ -24,7 +24,9 @@ import static no.nav.pto.veilarbfilter.domene.value.Innsatsgruppe.STANDARD_INNSA
 @ActiveProfiles({"test"})
 public class MineLagredeFilterRepositoryTest extends AbstractTest {
     @Autowired
-    private MineLagredeFilterRepository repository;
+    private MineLagredeFilterRepository mineLagredeFilterRepository;
+    @Autowired
+    private FilterRepository filterRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -46,9 +48,9 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         portefoljeFilter.setHovedmal(alleHovedmalfilter);
         NyttFilterModel nyttFilter = new NyttFilterModel("Navn på nytt filter", portefoljeFilter);
 
-        repository.lagreFilter(veilederId, nyttFilter);
+        mineLagredeFilterRepository.lagreFilter(veilederId, nyttFilter);
 
-        List<FilterModel> result = repository.finnFilterForFilterBruker(veilederId);
+        List<FilterModel> result = mineLagredeFilterRepository.finnFilterForFilterBruker(veilederId);
         List<String> hovedmalfilter = result.getFirst().getFilterValg().getHovedmal();
         Assertions.assertEquals(1, result.size());
         Assertions.assertTrue(hovedmalfilter.size() == 3);
@@ -58,7 +60,7 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
     @Test
     public void kanTelleAlleFilterMedGammeltHovedmalfiltervalg() {
         // Får rett når ingen filter er lagra
-        Integer antallFilterForInserts = repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
+        Integer antallFilterForInserts = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
         Assertions.assertEquals(0, antallFilterForInserts);
 
         // Får rett ved eitt lagra filter med filtervalet vi ser etter
@@ -67,18 +69,18 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
         filterMedHovedmal.setHovedmal(alleHovedmalfilter);
 
-        repository.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal));
 
-        Integer antallFilterEtterInsertAvHovedmalfilter = repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
+        Integer antallFilterEtterInsertAvHovedmalfilter = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
         Assertions.assertEquals(1, antallFilterEtterInsertAvHovedmalfilter);
 
         // Får rett når to lagra filter, der berre det eine inneheld filtervalet vi ser etter
         PortefoljeFilter filterUtenHovedmal = new PortefoljeFilter();
         filterUtenHovedmal.setVeiledere(List.of("Z123456", "Y123456", "X123456"));
 
-        repository.lagreFilter(veilederId, new NyttFilterModel("filter uten hovedmal", filterUtenHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("filter uten hovedmal", filterUtenHovedmal));
 
-        Integer antallFilterEtterInsertAvIkkehovedmalfilter = repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
+        Integer antallFilterEtterInsertAvIkkehovedmalfilter = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
         Assertions.assertEquals(1, antallFilterEtterInsertAvIkkehovedmalfilter);
     }
 
@@ -93,13 +95,13 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         filterMedAlleMigreringsfiltervalg.setInnsatsgruppe(List.of(BATT.name()));
         filterMedAlleMigreringsfiltervalg.setInnsatsgruppeGjeldendeVedtak14a(List.of(STANDARD_INNSATS.name()));
 
-        repository.lagreFilter(veilederId, new NyttFilterModel("filter", filterMedAlleMigreringsfiltervalg));
+        mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("filter", filterMedAlleMigreringsfiltervalg));
 
         // When/Then
-        Assertions.assertEquals(1, repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena));
-        Assertions.assertEquals(1, repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterGjeldendeVedtak));
-        Assertions.assertEquals(1, repository.tellMineFilterSomInneholderEnBestemtFiltertype(innsatsgruppefilterArena));
-        Assertions.assertEquals(1, repository.tellMineFilterSomInneholderEnBestemtFiltertype(innsatsgruppefilterGjeldendeVedtak));
+        Assertions.assertEquals(1, filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena));
+        Assertions.assertEquals(1, filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterGjeldendeVedtak));
+        Assertions.assertEquals(1, filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(innsatsgruppefilterArena));
+        Assertions.assertEquals(1, filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(innsatsgruppefilterGjeldendeVedtak));
     }
 
     @Test
@@ -110,11 +112,11 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
         filterMedHovedmal.setHovedmal(List.of(SKAFFEA.name()));
 
-        repository.lagreFilter(veilederId1, new NyttFilterModel("filter", filterMedHovedmal));
-        repository.lagreFilter(veilederId2, new NyttFilterModel("filter", filterMedHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter", filterMedHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter", filterMedHovedmal));
 
         // When
-        Integer antallFilter = repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
+        Integer antallFilter = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
 
         // Then
         Assertions.assertEquals(2, antallFilter);
@@ -135,20 +137,20 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         PortefoljeFilter filterMedMangeHovedmal = new PortefoljeFilter();
         filterMedMangeHovedmal.setHovedmal(List.of(SKAFFEA.name(), BEHOLDEA.name(), OKEDELT.name()));
 
-        repository.lagreFilter(veilederId1, new NyttFilterModel("filter", filterMedHovedmal));
-        repository.lagreFilter(veilederId1, new NyttFilterModel("filter uten hovedmål", filterUtenHovedmal));
-        repository.lagreFilter(veilederId1, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal));
-        repository.lagreFilter(veilederId2, new NyttFilterModel("filter", filterMedHovedmal));
-        repository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter", filterMedHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter uten hovedmål", filterUtenHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter", filterMedHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal));
 
 
         // when
-        List<FilterModel> result = repository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
+        List<FilterModel> result = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
         List<PortefoljeFilter> portefoljeFilterMedHovedmal = result.stream().map(it -> it.getFilterValg()).toList();
 
         // then
         Assertions.assertEquals(4, portefoljeFilterMedHovedmal.size());
-        Assertions.assertEquals(repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena), portefoljeFilterMedHovedmal.size());
+        Assertions.assertEquals(filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena), portefoljeFilterMedHovedmal.size());
         Assertions.assertEquals(filterMedHovedmal.getHovedmal(), portefoljeFilterMedHovedmal.getFirst().getHovedmal());
     }
 }

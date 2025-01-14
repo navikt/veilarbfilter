@@ -8,6 +8,7 @@ import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.PoaoTilgangClient;
 import no.nav.poao_tilgang.client.api.ApiResult;
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
+import no.nav.pto.veilarbfilter.repository.FilterRepository;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import no.nav.pto.veilarbfilter.repository.OverblikkVisningRepository;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
@@ -40,7 +41,8 @@ import static org.mockito.Mockito.when;
         VeilederGruppeController.class,
         OverblikkVisningService.class,
         OverblikkVisningRepository.class,
-        OverblikkVisningController.class})
+        OverblikkVisningController.class,
+        FilterRepository.class})
 public class AppConfig {
 
     @Bean

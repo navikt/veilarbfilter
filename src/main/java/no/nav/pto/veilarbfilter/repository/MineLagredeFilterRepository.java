@@ -223,49 +223,6 @@ public class MineLagredeFilterRepository implements FilterService {
         });
     }
 
-    public Integer tellMineFilterSomInneholderEnBestemtFiltertype(String filtervalg) {
-        // TODO feilhåndtering ved ugyldig filtervalg i input, evt betre typesikring
-
-        String sql = String.format("SELECT count(filter_som_skal_telles) " +
-                                   "FROM (" +
-                                   "SELECT %s ->> ? AS liste_for_filtertype FROM %s" +
-                                   ") AS filter_som_skal_telles " +
-                                   "WHERE liste_for_filtertype != '[]';", Filter.VALGTE_FILTER, Filter.TABLE_NAME);
-        return db.queryForObject(sql, Integer.class, filtervalg);
-    }
-
-    public List<FilterModel> hentMineFilterSomInneholderEnBestemtFiltertype(String filtervalg) {
-        // TODO feilhåndtering ved ugyldig filtervalg i input, evt betre typesikring
-
-        String sql = String.format("SELECT %s, %s, %s, %s, %s\n" +
-                                   "FROM (SELECT *, %s ->> ? AS liste_for_filtertype\n" +
-                                   "      FROM %s) AS filter_som_skal_telles\n" +
-                                   "WHERE liste_for_filtertype != '[]';",
-                Filter.FILTER_ID, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET, Filter.FILTER_CLEANUP,
-                Filter.VALGTE_FILTER, Filter.TABLE_NAME);
-
-        // TODO vurder å skrive denne litt ryddigare, for eksempel med å lage ein mapFromResultSet-funksjon.
-        return db.query(sql, (rs, rowNum) -> {
-                    try {
-                        PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
-                        // Treng vi registreringstyper? Koden her er kopiert frå finnFilterForFilterBruker.
-                        List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
-                        portefoljeFilter.setRegistreringstype(registreringstyper);
-
-                        return new FilterModel(
-                                rs.getInt(Filter.FILTER_ID),
-                                rs.getString(Filter.FILTER_NAVN),
-                                portefoljeFilter,
-                                DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
-                                rs.getInt(Filter.FILTER_CLEANUP));
-                    } catch (Exception e) {
-                        log.error("Can't load filter " + e, e);
-                        throw new RuntimeException(e);
-                    }
-                }, filtervalg
-        );
-    }
-
     private void deactiveMineFilter(Integer filterId, String note) {
         try {
             String sql = String.format("UPDATE %s SET %s = 0, %s = ? WHERE %s = ?", MineLagredeFilter.TABLE_NAME, MineLagredeFilter.AKTIV, MineLagredeFilter.NOTE, MineLagredeFilter.FILTER_ID);

@@ -5,6 +5,7 @@ import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
+import no.nav.pto.veilarbfilter.repository.FilterRepository;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,9 @@ public class MineLagredeFilterServiceTest extends AbstractTest {
     @Autowired
     private MineLagredeFilterService service;
     @Autowired
-    private MineLagredeFilterRepository repository;
+    private MineLagredeFilterRepository mineLagredeFilterRepository;
+    @Autowired
+    private FilterRepository filterRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -56,13 +59,13 @@ public class MineLagredeFilterServiceTest extends AbstractTest {
         List<String> forventHovedmalGjeldendeVedtakListeSortertAlfabetisk = List.of(BEHOLDE_ARBEID.name(), OKE_DELTAKELSE.name(), SKAFFE_ARBEID.name());
 
         // TODO burde vi bruke service til å sjekke desse tinga i staden for repo?
-        List<FilterModel> filterMedHovedmalGjeldendeVedtak14a = repository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterGjeldendeVedtak);
+        List<FilterModel> filterMedHovedmalGjeldendeVedtak14a = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterGjeldendeVedtak);
         Assertions.assertEquals(1, filterMedHovedmalGjeldendeVedtak14a.size());
 
         List<String> gjeldendeVedtakFiltervalg = filterMedHovedmalGjeldendeVedtak14a.getFirst().getFilterValg().getHovedmalGjeldendeVedtak14a();
         Assertions.assertEquals(forventHovedmalGjeldendeVedtakListeSortertAlfabetisk, gjeldendeVedtakFiltervalg);
 
-        Assertions.assertEquals(0, repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena));
+        Assertions.assertEquals(0, filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena));
     }
 
 
@@ -85,13 +88,13 @@ public class MineLagredeFilterServiceTest extends AbstractTest {
         List<String> forventHovedmalGjeldendeVedtakListe = List.of(BEHOLDE_ARBEID.name(), SKAFFE_ARBEID.name());
 
         // TODO burde vi bruke service til å sjekke desse tinga i staden for repo?
-        List<FilterModel> filterMedHovedmalGjeldendeVedtak14a = repository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterGjeldendeVedtak);
+        List<FilterModel> filterMedHovedmalGjeldendeVedtak14a = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterGjeldendeVedtak);
         Assertions.assertEquals(1, filterMedHovedmalGjeldendeVedtak14a.size());
 
         List<String> gjeldendeVedtakFiltervalg = filterMedHovedmalGjeldendeVedtak14a.getFirst().getFilterValg().getHovedmalGjeldendeVedtak14a();
         Assertions.assertEquals(forventHovedmalGjeldendeVedtakListe, gjeldendeVedtakFiltervalg);
 
-        Assertions.assertEquals(0, repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena));
+        Assertions.assertEquals(0, filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena));
     }
 
     @Test
@@ -113,12 +116,12 @@ public class MineLagredeFilterServiceTest extends AbstractTest {
         List<String> forventHovedmalGjeldendeVedtakListe = List.of(BEHOLDE_ARBEID.name(), SKAFFE_ARBEID.name());
 
         // TODO burde vi bruke service til å sjekke desse tinga i staden for repo?
-        List<FilterModel> filterMedHovedmalGjeldendeVedtak14a = repository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterGjeldendeVedtak);
+        List<FilterModel> filterMedHovedmalGjeldendeVedtak14a = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterGjeldendeVedtak);
         Assertions.assertEquals(1, filterMedHovedmalGjeldendeVedtak14a.size());
 
         List<String> gjeldendeVedtakFiltervalg = filterMedHovedmalGjeldendeVedtak14a.getFirst().getFilterValg().getHovedmalGjeldendeVedtak14a();
         Assertions.assertEquals(forventHovedmalGjeldendeVedtakListe, gjeldendeVedtakFiltervalg);
 
-        Assertions.assertEquals(0, repository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena));
+        Assertions.assertEquals(0, filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena));
     }
 }
