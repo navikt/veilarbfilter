@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
@@ -22,32 +23,27 @@ public class MigrerFilterService {
     private final FilterRepository filterRepository;
 
 
-    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(String veilederId, Integer filterId) {
-        try {
-            FilterModel filterSomSkalOppdateres = mineLagredeFilterRepository.hentFilter(filterId).orElseThrow(); // todo handter feil ved henting
+    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(Integer filterId) throws JsonProcessingException {
+        FilterModel filterSomSkalOppdateres = mineLagredeFilterRepository.hentFilter(filterId).orElseThrow(); // todo handter feil ved henting
 
-            // Lag liste over migrerte hovedmål
-            List<String> hovedmalFraArenahovedmal = lagGjeldendeVedtakHovedmalFraArenahovedmal(filterSomSkalOppdateres.getFilterValg().getHovedmal());
+        // Lag liste over migrerte hovedmål
+        List<String> hovedmalFraArenahovedmal = lagGjeldendeVedtakHovedmalFraArenahovedmal(filterSomSkalOppdateres.getFilterValg().getHovedmal());
 
-            // Slå saman nye og gamle HovedmalGjeldendeVedtak-filter
-            List<String> hovedmalFraGjeldendeVedtak14a = filterSomSkalOppdateres.getFilterValg().getHovedmalGjeldendeVedtak14a();
-            Set<String> alleUnikeHovedmal = new HashSet<>(hovedmalFraGjeldendeVedtak14a);
-            alleUnikeHovedmal.addAll(hovedmalFraArenahovedmal);
+        // Slå saman nye og gamle HovedmalGjeldendeVedtak-filter
+        List<String> hovedmalFraGjeldendeVedtak14a = filterSomSkalOppdateres.getFilterValg().getHovedmalGjeldendeVedtak14a();
+        Set<String> alleUnikeHovedmal = new HashSet<>(hovedmalFraGjeldendeVedtak14a);
+        alleUnikeHovedmal.addAll(hovedmalFraArenahovedmal);
 
-            List<String> unikeSorterteHovedmal = alleUnikeHovedmal.stream().sorted().toList();
+        List<String> unikeSorterteHovedmal = alleUnikeHovedmal.stream().sorted().toList();
 
-            // Lag oppdatert porteføljefilter
-            PortefoljeFilter portefoljeFilterSomSkalOppdateres = filterSomSkalOppdateres.getFilterValg();
-            portefoljeFilterSomSkalOppdateres.setHovedmalGjeldendeVedtak14a(unikeSorterteHovedmal);
-            portefoljeFilterSomSkalOppdateres.setHovedmal(Collections.emptyList());
+        // Lag oppdatert porteføljefilter
+        PortefoljeFilter portefoljeFilterSomSkalOppdateres = filterSomSkalOppdateres.getFilterValg();
+        portefoljeFilterSomSkalOppdateres.setHovedmalGjeldendeVedtak14a(unikeSorterteHovedmal);
+        portefoljeFilterSomSkalOppdateres.setHovedmal(Collections.emptyList());
 
-            // Lag klart oppdatert filtermodell og skriv tilbake til databasen
-            filterSomSkalOppdateres.setFilterValg(portefoljeFilterSomSkalOppdateres);
-            mineLagredeFilterRepository.oppdaterFilter(veilederId, filterSomSkalOppdateres); // todo handter feil ved skriving
-        } catch (Exception e) {
-            // todo feilhåndtering her
-            throw e;
-        }
+        // Lag klart oppdatert filtermodell og skriv tilbake til databasen
+        filterSomSkalOppdateres.setFilterValg(portefoljeFilterSomSkalOppdateres);
+        filterRepository.oppdaterFilterValg(filterSomSkalOppdateres.getFilterId(), filterSomSkalOppdateres.getFilterValg()); // todo handter feil ved skriving
     }
 
     private List<String> lagGjeldendeVedtakHovedmalFraArenahovedmal(List<String> arenahovedmal) {

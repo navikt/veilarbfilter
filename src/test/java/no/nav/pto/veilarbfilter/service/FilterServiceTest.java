@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
@@ -42,7 +43,7 @@ public class FilterServiceTest extends AbstractTest {
     }
 
     @Test
-    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14a() {
+    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14a() throws JsonProcessingException {
         // given
         String veilederId = "01010111111";
         List<String> arenaHovedmaFilter = List.of(OKEDELT.name(), BEHOLDEA.name(), SKAFFEA.name());
@@ -52,7 +53,7 @@ public class FilterServiceTest extends AbstractTest {
         FilterModel lagretFilter = mineLagredeFilterService.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
 
         // when
-        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(veilederId, lagretFilter.getFilterId());
+        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(lagretFilter.getFilterId());
 
         // then
         List<String> forventHovedmalGjeldendeVedtakListeSortertAlfabetisk = List.of(BEHOLDE_ARBEID.name(), OKE_DELTAKELSE.name(), SKAFFE_ARBEID.name());
@@ -69,7 +70,7 @@ public class FilterServiceTest extends AbstractTest {
 
 
     @Test
-    public void erstattingAvHovedmalSkalTaMedSegEksisterendeFilterForHovdemalGjeldendeVedtak14a() {
+    public void erstattingAvHovedmalSkalTaMedSegEksisterendeFilterForHovdemalGjeldendeVedtak14a() throws JsonProcessingException {
         // given
         String veilederId = "01010111111";
         List<String> arenaHovedmaFilter = List.of(BEHOLDEA.name());
@@ -81,7 +82,7 @@ public class FilterServiceTest extends AbstractTest {
         FilterModel lagretFilter = mineLagredeFilterService.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
 
         // when
-        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(veilederId, lagretFilter.getFilterId());
+        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(lagretFilter.getFilterId());
 
         // then
         List<String> forventHovedmalGjeldendeVedtakListe = List.of(BEHOLDE_ARBEID.name(), SKAFFE_ARBEID.name());
@@ -97,7 +98,7 @@ public class FilterServiceTest extends AbstractTest {
     }
 
     @Test
-    public void erstattingAvHovedmalSkalFungereVedOverlapp() {
+    public void erstattingAvHovedmalSkalFungereVedOverlapp() throws JsonProcessingException {
         // given
         String veilederId = "01010111111";
         List<String> arenaHovedmaFilter = List.of(BEHOLDEA.name());
@@ -109,7 +110,7 @@ public class FilterServiceTest extends AbstractTest {
         FilterModel lagretFilter = mineLagredeFilterService.lagreFilter(veilederId, new NyttFilterModel("filter med hovedmal", filterMedHovedmal)).orElseThrow();
 
         // when
-        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(veilederId, lagretFilter.getFilterId());
+        migrerFilterService.erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(lagretFilter.getFilterId());
 
         // then
         List<String> forventHovedmalGjeldendeVedtakListe = List.of(BEHOLDE_ARBEID.name(), SKAFFE_ARBEID.name());

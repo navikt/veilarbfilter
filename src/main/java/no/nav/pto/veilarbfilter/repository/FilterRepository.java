@@ -21,7 +21,7 @@ public class FilterRepository {
     private final JdbcTemplate db;
     private final ObjectMapper objectMapper;
 
-    public void oppdaterFilterValg(String filterId, PortefoljeFilter filterValg) throws JsonProcessingException {
+    public void oppdaterFilterValg(Integer filterId, PortefoljeFilter filterValg) throws JsonProcessingException {
         //language=postgresql
         String sql = String.format("""
                 UPDATE %s SET %s = to_json(?::JSON)
