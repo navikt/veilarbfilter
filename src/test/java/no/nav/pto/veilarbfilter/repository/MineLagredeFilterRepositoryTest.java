@@ -123,6 +123,46 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
     }
 
     @Test
+    public void kanHenteUtEtBestemtAntallFilterSomInneholderFiltervalg() {
+        // Given
+        String veilederId1 = "01010111111";
+        String veilederId2 = "02020222222";
+
+        PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
+        filterMedHovedmal.setHovedmal(List.of(SKAFFEA.name()));
+
+        PortefoljeFilter filterMedMangeHovedmal = new PortefoljeFilter();
+        filterMedMangeHovedmal.setHovedmal(List.of(SKAFFEA.name(), BEHOLDEA.name(), OKEDELT.name()));
+
+        PortefoljeFilter filterUtenHovedmal = new PortefoljeFilter();
+        filterUtenHovedmal.setInnsatsgruppe(List.of(BATT.name()));
+
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter uten hovedmål", filterUtenHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter uten hovedmål", filterUtenHovedmal));
+
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter 1", filterMedHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter 2", filterMedMangeHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter 3", filterMedHovedmal));
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter 4", filterMedMangeHovedmal));
+
+        // when
+        List<FilterModel> resultHent1 = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena, 1);
+        List<FilterModel> resultHent4 = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena, 4);
+        List<FilterModel> resultHent100 = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena, 100);
+        List<FilterModel> resultHentAlle = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena);
+
+        // then
+        Assertions.assertEquals(1, resultHent1.size());
+        Assertions.assertEquals(4, resultHent4.size());
+        Assertions.assertEquals(4, resultHent100.size());
+        Assertions.assertEquals(4, resultHentAlle.size());
+
+        // also when/then
+        Assertions.assertThrows(IllegalArgumentException.class, () -> filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena, 0));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena, -100));
+    }
+
+    @Test
     public void kanHenteUtFilterSomInneholderFiltervalg() {
         // Given
         String veilederId1 = "01010111111";

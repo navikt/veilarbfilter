@@ -21,6 +21,8 @@ public class FilterRepository {
     private final JdbcTemplate db;
     private final ObjectMapper objectMapper;
 
+    private final int HENT_ALLE = -1;
+
     public void oppdaterFilterValg(Integer filterId, PortefoljeFilter filterValg) throws JsonProcessingException {
         //language=postgresql
         String sql = String.format("""
@@ -43,18 +45,37 @@ public class FilterRepository {
     }
 
     public List<FilterModel> hentMineFilterSomInneholderEnBestemtFiltertype(String filtervalg) {
+        return hentMineFilterSomInneholderEnBestemtFiltertype(filtervalg, HENT_ALLE);
+    }
+
+    public List<FilterModel> hentMineFilterSomInneholderEnBestemtFiltertype(String filtervalg, int antallSomSkalHentes) {
+        if (antallSomSkalHentes != HENT_ALLE && antallSomSkalHentes <= 0) throw new IllegalArgumentException("Antall som skal hentes må enten vere et positivt heltall, eller " + HENT_ALLE ) ;
+
         // TODO feilhåndtering ved ugyldig filtervalg i input, evt betre typesikring
 
-        String sql = String.format("SELECT %s, %s, %s, %s, %s\n" +
-                        "FROM (SELECT *, %s ->> ? AS liste_for_filtertype\n" +
-                        "      FROM %s) AS filter_som_skal_telles\n" +
-                        "WHERE liste_for_filtertype != '[]';",
+        // language=postgresql
+        String sqlHentAntall = String.format("""
+                        SELECT %s, %s, %s, %s, %s
+                        FROM (SELECT *, %s ->> ? AS liste_for_filtertype
+                            FROM %s) AS filter_som_skal_telles
+                        WHERE liste_for_filtertype != '[]'
+                        LIMIT ?;""",
                 Filter.FILTER_ID, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET, Filter.FILTER_CLEANUP,
                 Filter.VALGTE_FILTER, Filter.TABLE_NAME);
 
-        // TODO vurder å skrive denne litt ryddigare, for eksempel med å lage ein mapFromResultSet-funksjon.
-        return db.query(sql, this::mapTilFilterModel, filtervalg
-        );
+        // language=postgresql
+        String sqlHentAlle = String.format("""
+                        SELECT %s, %s, %s, %s, %s
+                        FROM (SELECT *, %s ->> ? AS liste_for_filtertype
+                            FROM %s) AS filter_som_skal_telles
+                        WHERE liste_for_filtertype != '[]';""",
+                Filter.FILTER_ID, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET, Filter.FILTER_CLEANUP,
+                Filter.VALGTE_FILTER, Filter.TABLE_NAME);
+
+        if (antallSomSkalHentes == HENT_ALLE) {
+            return db.query(sqlHentAlle, this::mapTilFilterModel, filtervalg);
+        }
+        return db.query(sqlHentAntall, this::mapTilFilterModel, filtervalg, antallSomSkalHentes);
     }
 
     private String mapSituasjonTilBeskrivelse(String situasjon) {
