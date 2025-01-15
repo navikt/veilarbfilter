@@ -27,6 +27,7 @@ public class MigrerFilterService {
 
     public void migrerFilter(int batchStorrelse) {
         List<FilterModel> filtreSomSkalMigreres = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(HOVEDMAL_FILTERVALG_JSON_KEY, batchStorrelse);
+        erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalgBatch(filtreSomSkalMigreres);
     }
 
     public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(FilterModel filterSomSkalOppdateres) throws JsonProcessingException {
@@ -35,7 +36,7 @@ public class MigrerFilterService {
         filterRepository.oppdaterFilterValg(filterSomSkalOppdateres.getFilterId(), filterSomSkalOppdateres.getFilterValg()); // todo handter feil ved skriving
     }
 
-    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalgBatch(List<FilterModel> filtreSomSkalOppdateres) throws JsonProcessingException {
+    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalgBatch(List<FilterModel> filtreSomSkalOppdateres) {
         List<FilterRepository.FilterIdOgFilterValgPar> lagredeFilterMedMigrerteHovedmal = filtreSomSkalOppdateres.stream()
                 .peek(this::migrerArenaHovedmalTilGjeldendeVedtakHovedmalForFilter)
                 .map(this::mapTilFilterIdOgFilterValgPar)

@@ -40,7 +40,7 @@ public class FilterRepository {
         db.update(sql, objectMapper.writeValueAsString(filterValg), filterId);
     }
 
-    public void oppdaterFilterValgBatch(List<FilterIdOgFilterValgPar> filterBatch) throws JsonProcessingException {
+    public void oppdaterFilterValgBatch(List<FilterIdOgFilterValgPar> filterBatch) {
         //language=postgresql
         String sql = String.format("""
                 UPDATE %s SET %s = to_json(?::JSON)
