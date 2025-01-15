@@ -109,24 +109,10 @@ public class FilterRepository {
         return db.query(sqlHentAntall, this::mapTilFilterModel, filtervalg, antallSomSkalHentes);
     }
 
-    private String mapSituasjonTilBeskrivelse(String situasjon) {
-        return switch (situasjon) {
-            case "MISTET_JOBBEN", "OPPSIGELSE" -> "HAR_BLITT_SAGT_OPP";
-            case "JOBB_OVER_2_AAR" -> "IKKE_VAERT_I_JOBB_SISTE_2_AAR";
-            case "VIL_FORTSETTE_I_JOBB" -> "ANNET";
-            case "INGEN_SVAR", "INGEN_VERDI" -> "UDEFINERT";
-            case "ENDRET_PERMITTERINGSPROSENT", "TILBAKE_TIL_JOBB" -> "ER_PERMITTERT";
-            case "SAGT_OPP" -> "HAR_SAGT_OPP";
-            default -> situasjon;
-        };
-    }
-
+    // Denne funksjonen bør kun brukast ifm. migrering av filter
     private FilterModel mapTilFilterModel(ResultSet rs, int rowNum) {
         try {
             PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
-            // Treng vi registreringstyper? Koden her er kopiert frå finnFilterForFilterBruker.
-            List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
-            portefoljeFilter.setRegistreringstype(registreringstyper);
 
             return new FilterModel(
                     rs.getInt(Filter.FILTER_ID),
