@@ -18,6 +18,7 @@ import java.util.Optional;
 import static no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal.*;
 import static no.nav.pto.veilarbfilter.domene.value.ArenaInnsatsgruppe.BATT;
 import static no.nav.pto.veilarbfilter.domene.value.Hovedmal.*;
+import static no.nav.pto.veilarbfilter.service.MigrerFilterService.BATCH_STORRELSE_ALLE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @WebMvcTest
@@ -31,7 +32,7 @@ class MigrerFilterServiceTest extends AbstractTest {
     private FilterRepository filterRepository;
 
     @Test
-    void migrer_filter_skal_migrere_filter_riktig() {
+    void migrer_filter_skal_migrere_filter_riktig_når_bruker_kun_har_arena_hovedmal_fra_før() {
         // Given
         // Kun folk som har filter som er migreringsverdige skal migrerast
         String veilederId1 = "01010111111";
@@ -53,18 +54,15 @@ class MigrerFilterServiceTest extends AbstractTest {
         int filterId5 = mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal)).get().getFilterId();
 
         // When
-        migrerFilterService.migrerFilter(-1);
+        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE);
 
         // Then
-        // * Kor mange finnast med gamle (Arena) hovedmål
         int filterMedGammeltHovedmål = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(FilterRepository.ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
         assertThat(filterMedGammeltHovedmål).isEqualTo(0);
 
-        // * Kor mange finnast med nye (Gjeldende vedtak) hovedmål
         int filterMedNyeHovedmål = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(FilterRepository.GJELDENDE_VEDTAK_HOVEDMAL_FILTERVALG_JSON_KEY);
         assertThat(filterMedNyeHovedmål).isEqualTo(4);
 
-        // * For kvart einskilde filter blei hovedmål migrert rett
         PortefoljeFilter forventetMigrertfilterMedKunHovedmal = new PortefoljeFilter();
         forventetMigrertfilterMedKunHovedmal.setHovedmalGjeldendeVedtak14a(List.of(SKAFFE_ARBEID.name()));
         PortefoljeFilter forventetMigrertfilterUtenHovedmal = new PortefoljeFilter();
@@ -77,4 +75,35 @@ class MigrerFilterServiceTest extends AbstractTest {
         assertThat(mineLagredeFilterRepository.hentFilter(filterId4).get().getFilterValg()).isEqualTo(forventetMigrertfilterMedKunHovedmal);
         assertThat(mineLagredeFilterRepository.hentFilter(filterId5).get().getFilterValg()).isEqualTo(forventetMigrertFilterMedMangeHovedmal);
     }
+
+    // TODO: Ein test der det finnst gjeldande vedtak hovedmål OG arena hovedmål frå før, og som verifiserer at vi "slår saman" og migrerer riktig.
+    @Test
+    void migrer_filter_skal_migrere_filter_riktig_når_bruker_har_arena_hovedmal_og_gjeldende_vedtak_hovedmål_fra_før() {
+        // Given
+        // Kun folk som har filter som er migreringsverdige skal migrerast
+        String veilederId = "01010111111";
+
+        PortefoljeFilter filterMedMangeArenaHovedmalOgGjeldendeVedtakHovedmal = new PortefoljeFilter();
+        filterMedMangeArenaHovedmalOgGjeldendeVedtakHovedmal.setHovedmal(List.of(SKAFFEA.name(), BEHOLDEA.name(), OKEDELT.name()));
+        filterMedMangeArenaHovedmalOgGjeldendeVedtakHovedmal.setHovedmalGjeldendeVedtak14a(List.of(SKAFFE_ARBEID.name(), BEHOLDE_ARBEID.name()));
+
+        int filterId = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("filter med arena hovedmål og gjeldende vedtak hovedmål", filterMedMangeArenaHovedmalOgGjeldendeVedtakHovedmal)).get().getFilterId();
+
+        // When
+        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE);
+
+        // Then
+        int filterMedGammeltHovedmål = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(FilterRepository.ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
+        assertThat(filterMedGammeltHovedmål).isEqualTo(0);
+
+        int filterMedNyeHovedmål = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(FilterRepository.GJELDENDE_VEDTAK_HOVEDMAL_FILTERVALG_JSON_KEY);
+        assertThat(filterMedNyeHovedmål).isEqualTo(1);
+
+        PortefoljeFilter forventetMigrertFilterMedMangeHovedmal = new PortefoljeFilter();
+        forventetMigrertFilterMedMangeHovedmal.setHovedmalGjeldendeVedtak14a(List.of(BEHOLDE_ARBEID.name(), OKE_DELTAKELSE.name(), SKAFFE_ARBEID.name()));
+        PortefoljeFilter faktiskMigrertFilter = mineLagredeFilterRepository.hentFilter(filterId).get().getFilterValg();
+        assertThat(faktiskMigrertFilter).isEqualTo(forventetMigrertFilterMedMangeHovedmal);
+    }
+
+    // TODO: Ein test som har data i dei andre lagra felta også, som verifiserer at vi ikkje migrerer andre data enn berre dei vi skal. NB: Spesielt viktig å verifisere at vi ikkje overskriver data for registreringstyper (FilterRepository#128).
 }

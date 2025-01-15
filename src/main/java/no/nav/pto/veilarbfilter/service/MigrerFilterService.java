@@ -21,6 +21,8 @@ import static no.nav.pto.veilarbfilter.repository.FilterRepository.ARENA_HOVEDMA
 @Service
 @RequiredArgsConstructor
 public class MigrerFilterService {
+    public static final int BATCH_STORRELSE_ALLE = -1;
+
     private final FilterRepository filterRepository;
     private final ObjectMapper objectMapper;
 
