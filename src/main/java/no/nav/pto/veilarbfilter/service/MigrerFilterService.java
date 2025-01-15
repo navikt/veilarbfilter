@@ -8,7 +8,6 @@ import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal;
 import no.nav.pto.veilarbfilter.domene.value.Hovedmal;
 import no.nav.pto.veilarbfilter.repository.FilterRepository;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -16,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static no.nav.pto.veilarbfilter.repository.FilterRepository.HOVEDMAL_FILTERVALG_JSON_KEY;
+import static no.nav.pto.veilarbfilter.repository.FilterRepository.ARENA_HOVEDMAL_FILTERVALG_JSON_KEY;
 
 
 @Service
@@ -26,7 +25,7 @@ public class MigrerFilterService {
     private final ObjectMapper objectMapper;
 
     public void migrerFilter(int batchStorrelse) {
-        List<FilterModel> filtreSomSkalMigreres = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(HOVEDMAL_FILTERVALG_JSON_KEY, batchStorrelse);
+        List<FilterModel> filtreSomSkalMigreres = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY, batchStorrelse);
         erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalgBatch(filtreSomSkalMigreres);
     }
 

@@ -19,7 +19,7 @@ import static no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal.*;
 import static no.nav.pto.veilarbfilter.domene.value.ArenaInnsatsgruppe.BATT;
 import static no.nav.pto.veilarbfilter.domene.value.Hovedmal.SKAFFE_ARBEID;
 import static no.nav.pto.veilarbfilter.domene.value.Innsatsgruppe.STANDARD_INNSATS;
-import static no.nav.pto.veilarbfilter.repository.FilterRepository.HOVEDMAL_FILTERVALG_JSON_KEY;
+import static no.nav.pto.veilarbfilter.repository.FilterRepository.ARENA_HOVEDMAL_FILTERVALG_JSON_KEY;
 
 @WebMvcTest
 @ActiveProfiles({"test"})
@@ -31,7 +31,7 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private String hovedmalfilterArena = HOVEDMAL_FILTERVALG_JSON_KEY;
+    private String hovedmalfilterArena = ARENA_HOVEDMAL_FILTERVALG_JSON_KEY;
     private String hovedmalfilterGjeldendeVedtak = "hovedmalGjeldendeVedtak14a";
     private String innsatsgruppefilterArena = "innsatsgruppe";
     private String innsatsgruppefilterGjeldendeVedtak = "innsatsgruppeGjeldendeVedtak14a";

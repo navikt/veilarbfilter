@@ -1,15 +1,13 @@
 package no.nav.pto.veilarbfilter.domene;
 
 import com.fasterxml.jackson.annotation.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 import static java.util.Collections.emptyList;
 
+@Data
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

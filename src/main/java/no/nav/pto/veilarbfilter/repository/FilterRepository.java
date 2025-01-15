@@ -17,13 +17,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
 public class FilterRepository {
-    public static final String HOVEDMAL_FILTERVALG_JSON_KEY = "hovedmal";
+    public static final String ARENA_HOVEDMAL_FILTERVALG_JSON_KEY = "hovedmal";
+    public static final String GJELDENDE_VEDTAK_HOVEDMAL_FILTERVALG_JSON_KEY = "hovedmalGjeldendeVedtak14a";
 
     private final JdbcTemplate db;
     private final ObjectMapper objectMapper;
