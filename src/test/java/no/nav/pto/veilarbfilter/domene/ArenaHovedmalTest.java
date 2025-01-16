@@ -3,6 +3,7 @@ package no.nav.pto.veilarbfilter.domene;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal;
 import no.nav.pto.veilarbfilter.domene.value.Hovedmal;
+import no.nav.pto.veilarbfilter.mapper.MigrerFilterMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,9 +22,9 @@ public class ArenaHovedmalTest extends AbstractTest {
         ArenaHovedmal okeDeltakelseArbeidArena = ArenaHovedmal.OKEDELT;
 
         // when
-        Hovedmal skaffeArbeidMappingresultat = ArenaHovedmal.mapTilHovedmalGjeldendeVedtak14a(skaffeArbeidArena);
-        Hovedmal beholdeArbeidMappingresultat = ArenaHovedmal.mapTilHovedmalGjeldendeVedtak14a(beholdeArbeidArena);
-        Hovedmal okeDeltakelseMappingresultat = ArenaHovedmal.mapTilHovedmalGjeldendeVedtak14a(okeDeltakelseArbeidArena);
+        Hovedmal skaffeArbeidMappingresultat = MigrerFilterMapper.mapTilHovedmalGjeldendeVedtak14a(skaffeArbeidArena);
+        Hovedmal beholdeArbeidMappingresultat = MigrerFilterMapper.mapTilHovedmalGjeldendeVedtak14a(beholdeArbeidArena);
+        Hovedmal okeDeltakelseMappingresultat = MigrerFilterMapper.mapTilHovedmalGjeldendeVedtak14a(okeDeltakelseArbeidArena);
 
         // then
         Hovedmal skaffeArbeidForventet = Hovedmal.SKAFFE_ARBEID;
@@ -44,7 +45,7 @@ public class ArenaHovedmalTest extends AbstractTest {
         );
 
         // when
-        List<Hovedmal> result = arenaHovedmalListe.stream().map(it -> ArenaHovedmal.mapTilHovedmalGjeldendeVedtak14a(it)).toList();
+        List<Hovedmal> result = arenaHovedmalListe.stream().map(it -> MigrerFilterMapper.mapTilHovedmalGjeldendeVedtak14a(it)).toList();
 
         // then
         List<Hovedmal> expected = List.of(

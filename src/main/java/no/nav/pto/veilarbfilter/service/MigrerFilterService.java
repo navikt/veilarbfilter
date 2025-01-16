@@ -10,6 +10,7 @@ import no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal;
 import no.nav.pto.veilarbfilter.domene.value.ArenaInnsatsgruppe;
 import no.nav.pto.veilarbfilter.domene.value.Hovedmal;
 import no.nav.pto.veilarbfilter.domene.value.Innsatsgruppe;
+import no.nav.pto.veilarbfilter.mapper.MigrerFilterMapper;
 import no.nav.pto.veilarbfilter.repository.FilterRepository;
 import org.springframework.stereotype.Service;
 
@@ -136,9 +137,8 @@ public class MigrerFilterService {
     private List<String> lagGjeldendeVedtakHovedmalFraArenahovedmal(List<String> arenahovedmal) {
         List<Hovedmal> hovedmalGjeldendeVedtak = arenahovedmal.stream()
                 .map(ArenaHovedmal::valueOf)
-                .map(ArenaHovedmal::mapTilHovedmalGjeldendeVedtak14a)
+                .map(MigrerFilterMapper::mapTilHovedmalGjeldendeVedtak14a)
                 .toList();
-
 
         return hovedmalGjeldendeVedtak.stream().map(Hovedmal::name).toList();
     }
@@ -146,10 +146,9 @@ public class MigrerFilterService {
     private List<String> lagGjeldendeVedtakInnsatsgruppeFraArenaInnsatsgruppe(List<String> arenaInnsatsgruppe) {
         List<Innsatsgruppe> innsatsgruppeGjeldendeVedtak = arenaInnsatsgruppe.stream()
                 .map(ArenaInnsatsgruppe::valueOf)
-                .map(ArenaInnsatsgruppe::mapTilInnsatsgruppeGjeldendeVedtak14a)
+                .map(MigrerFilterMapper::mapTilInnsatsgruppeGjeldendeVedtak14a)
                 .flatMap(Collection::stream)
                 .toList();
-
 
         return innsatsgruppeGjeldendeVedtak.stream().map(Innsatsgruppe::name).toList();
     }
