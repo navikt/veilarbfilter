@@ -3,6 +3,7 @@ package no.nav.pto.veilarbfilter.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal;
@@ -16,8 +17,9 @@ import java.util.List;
 import java.util.Set;
 
 import static no.nav.pto.veilarbfilter.repository.FilterRepository.ARENA_HOVEDMAL_FILTERVALG_JSON_KEY;
+import static no.nav.pto.veilarbfilter.util.SecureLogUtils.secureLog;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MigrerFilterService {
@@ -25,10 +27,30 @@ public class MigrerFilterService {
 
     private final FilterRepository filterRepository;
     private final ObjectMapper objectMapper;
+    private static final int BATCHSTORRELSE_FOR_JOBB = 2;
+
+    public void migrerFilterJobb() {
+        log.info("Filtermigrering: Jobb startet");
+
+        int antallFilterMedFilterverdi = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
+        log.info("Filtermigrering: Totalt antall filter med hovedmål = " + antallFilterMedFilterverdi);
+
+        try {
+            migrerFilter(BATCHSTORRELSE_FOR_JOBB);
+            log.info("Filtermigrering: Jobb fullført");
+        } catch (RuntimeException e) {
+            log.error("Filtermigrering: Noe gikk galt i migrering, sjå feilmelding i securelogs");
+            secureLog.error("Filtermigrering: Noe gikk galt i migrering", e);
+        }
+    }
 
     public void migrerFilter(int batchStorrelse) {
         List<FilterModel> filtreSomSkalMigreres = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY, batchStorrelse);
-        erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalgBatch(filtreSomSkalMigreres);
+        int forsoktMigrerteFilter = filtreSomSkalMigreres.size();
+        log.info("Filtermigrering: Antall forsøkt migrert = " + forsoktMigrerteFilter);
+
+        int faktiskMigrerteFilter = erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalgBatch(filtreSomSkalMigreres);
+        log.info("Filtermigrering: Antall faktisk migrert = " + faktiskMigrerteFilter);
     }
 
     public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(FilterModel filterSomSkalOppdateres) throws JsonProcessingException {
@@ -37,13 +59,13 @@ public class MigrerFilterService {
         filterRepository.oppdaterFilterValg(filterSomSkalOppdateres.getFilterId(), filterSomSkalOppdateres.getFilterValg()); // todo handter feil ved skriving
     }
 
-    public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalgBatch(List<FilterModel> filtreSomSkalOppdateres) {
+    public int erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalgBatch(List<FilterModel> filtreSomSkalOppdateres) {
         List<FilterRepository.FilterIdOgFilterValgPar> lagredeFilterMedMigrerteHovedmal = filtreSomSkalOppdateres.stream()
                 .peek(this::migrerArenaHovedmalTilGjeldendeVedtakHovedmalForFilter)
                 .map(this::mapTilFilterIdOgFilterValgPar)
                 .toList();
 
-        filterRepository.oppdaterFilterValgBatch(lagredeFilterMedMigrerteHovedmal);
+        return filterRepository.oppdaterFilterValgBatch(lagredeFilterMedMigrerteHovedmal);
     }
 
     private FilterRepository.FilterIdOgFilterValgPar mapTilFilterIdOgFilterValgPar(FilterModel mappetFilter) {

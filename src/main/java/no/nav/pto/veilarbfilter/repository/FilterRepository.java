@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 @Repository
@@ -40,14 +41,14 @@ public class FilterRepository {
         db.update(sql, objectMapper.writeValueAsString(filterValg), filterId);
     }
 
-    public void oppdaterFilterValgBatch(List<FilterIdOgFilterValgPar> filterBatch) {
+    public int oppdaterFilterValgBatch(List<FilterIdOgFilterValgPar> filterBatch) {
         //language=postgresql
         String sql = String.format("""
                 UPDATE %s SET %s = to_json(?::JSON)
                 WHERE %s = ?
                 """, Filter.TABLE_NAME, Filter.VALGTE_FILTER, Filter.FILTER_ID);
 
-        db.batchUpdate(sql, new BatchPreparedStatementSetter() {
+        int[] affectedRows =  db.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
                 Integer filterID = filterBatch.get(i).filterId;
@@ -62,6 +63,8 @@ public class FilterRepository {
                 return filterBatch.size();
             }
         });
+
+        return Arrays.stream(affectedRows).sum();
     }
 
     public Integer tellMineFilterSomInneholderEnBestemtFiltertype(String filtervalg) {
