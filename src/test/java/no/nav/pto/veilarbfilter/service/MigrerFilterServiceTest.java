@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
+import java.util.Optional;
 
 import static no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal.*;
 import static no.nav.pto.veilarbfilter.domene.value.ArenaInnsatsgruppe.*;
@@ -241,15 +242,15 @@ class MigrerFilterServiceTest extends AbstractTest {
         mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange innsatsgrupper, veileder 2", filterMedMangeInnsatsgrupper)).get().getFilterId();
 
         // When
-        MigrerFilterService.FilterMigreringResultat resultatAvMigrering = migrerFilterService.migrerFilter(100);
+        Optional<MigrerFilterService.FilterMigreringResultat> resultatAvMigrering = migrerFilterService.migrerFilter(100);
 
         // Then
-        assertThat(resultatAvMigrering.hovedmal().totalt()).isEqualTo(4);
-        assertThat(resultatAvMigrering.hovedmal().forsoktMigrert()).isEqualTo(4);
-        assertThat(resultatAvMigrering.hovedmal().faktiskMigrert()).isEqualTo(4);
-        assertThat(resultatAvMigrering.innsatsgruppe().totalt()).isEqualTo(4);
-        assertThat(resultatAvMigrering.innsatsgruppe().forsoktMigrert()).isEqualTo(4);
-        assertThat(resultatAvMigrering.innsatsgruppe().faktiskMigrert()).isEqualTo(4);
+        assertThat(resultatAvMigrering.get().hovedmal().get().totalt()).isEqualTo(4);
+        assertThat(resultatAvMigrering.get().hovedmal().get().forsoktMigrert()).isEqualTo(4);
+        assertThat(resultatAvMigrering.get().hovedmal().get().faktiskMigrert()).isEqualTo(4);
+        assertThat(resultatAvMigrering.get().innsatsgruppe().get().totalt()).isEqualTo(4);
+        assertThat(resultatAvMigrering.get().innsatsgruppe().get().forsoktMigrert()).isEqualTo(4);
+        assertThat(resultatAvMigrering.get().innsatsgruppe().get().faktiskMigrert()).isEqualTo(4);
     }
 
 }

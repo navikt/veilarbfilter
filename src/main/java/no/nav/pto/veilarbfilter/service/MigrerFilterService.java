@@ -12,6 +12,7 @@ import no.nav.pto.veilarbfilter.domene.value.Hovedmal;
 import no.nav.pto.veilarbfilter.domene.value.Innsatsgruppe;
 import no.nav.pto.veilarbfilter.mapper.MigrerFilterMapper;
 import no.nav.pto.veilarbfilter.repository.FilterRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,11 +27,19 @@ import static no.nav.pto.veilarbfilter.util.SecureLogUtils.secureLog;
 public class MigrerFilterService {
     public static final int BATCH_STORRELSE_ALLE = -1;
     private static final int DEFAULT_BATCHSTORRELSE_FOR_JOBB = 2;
+    private static final int ET_MINUTT_MS = 60 * 1000;
+    private static final int TI_SEKUNDER_MS = 10 * 1000;
 
     private final FilterRepository filterRepository;
     private final ObjectMapper objectMapper;
 
-    public FilterMigreringResultat migrerFilter(int batchStorrelseForJobb) {
+    @Scheduled(initialDelay = ET_MINUTT_MS, fixedRate = TI_SEKUNDER_MS)
+    public void migrerFilterJobb() {
+        // TODO
+
+    }
+
+    public Optional<FilterMigreringResultat> migrerFilter(int batchStorrelseForJobb) {
         log.info("Filtermigrering - Jobb startet");
 
         int antallFilterMedFilterverdiArenaHovedmal = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
@@ -38,20 +47,28 @@ public class MigrerFilterService {
         log.info("Filtermigrering - Totalt antall filter med hovedmål: {}", antallFilterMedFilterverdiArenaHovedmal);
         log.info("Filtermigrering - Totalt antall filter med innsatsgruppe: {}", antallFilterMedFilterverdiArenaInnsatsgruppe);
 
+        if (antallFilterMedFilterverdiArenaHovedmal == 0 && antallFilterMedFilterverdiArenaInnsatsgruppe == 0) {
+            log.info("Filtermigrering - Ingen filter å migrere");
+            log.info("Filtermigrering - Jobb fullført");
+            return Optional.empty();
+        }
+
         try {
-            Migrert resultatHovedmalMigrering = migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
-            Migrert resultatInnsatsgruppeMigrering = migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
+            Optional<Migrert> resultatHovedmalMigrering = antallFilterMedFilterverdiArenaHovedmal > 0 ? Optional.of(migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY)) : Optional.empty();
+            Optional<Migrert> resultatInnsatsgruppeMigrering = antallFilterMedFilterverdiArenaInnsatsgruppe > 0 ? Optional.of(migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY)) : Optional.empty();
             log.info("Filtermigrering - Jobb fullført");
 
-            return new FilterMigreringResultat(
-                    new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaHovedmal, resultatHovedmalMigrering.forsokt, resultatHovedmalMigrering.faktisk),
-                    new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaInnsatsgruppe, resultatInnsatsgruppeMigrering.forsokt, resultatInnsatsgruppeMigrering.faktisk)
+            return Optional.of(
+                    new FilterMigreringResultat(
+                            resultatHovedmalMigrering.flatMap(it -> Optional.of(new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaHovedmal, it.forsokt, it.faktisk))),
+                            resultatInnsatsgruppeMigrering.flatMap(it -> Optional.of(new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaInnsatsgruppe, it.forsokt, it.faktisk)))
+                    )
             );
         } catch (RuntimeException e) {
             log.error("Filtermigrering - Noe gikk galt i migrering, se feilmelding i SecureLogs");
             secureLog.error("Filtermigrering - Noe gikk galt i migrering", e);
 
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -165,8 +182,8 @@ public class MigrerFilterService {
     }
 
     public record FilterMigreringResultat(
-            Resultat hovedmal,
-            Resultat innsatsgruppe
+            Optional<Resultat> hovedmal,
+            Optional<Resultat> innsatsgruppe
     ) {
 
         public record Resultat(
