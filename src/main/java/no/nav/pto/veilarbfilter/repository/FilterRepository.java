@@ -24,7 +24,9 @@ import java.util.List;
 @Slf4j
 public class FilterRepository {
     public static final String ARENA_HOVEDMAL_FILTERVALG_JSON_KEY = "hovedmal";
+    public static final String ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY = "innsatsgruppe";
     public static final String GJELDENDE_VEDTAK_HOVEDMAL_FILTERVALG_JSON_KEY = "hovedmalGjeldendeVedtak14a";
+    public static final String GJELDENDE_VEDTAK_INNSATSGRUPPE_FILTERVALG_JSON_KEY = "innsatsgruppeGjeldendeVedtak14a";
 
     private final JdbcTemplate db;
     private final ObjectMapper objectMapper;

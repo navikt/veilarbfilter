@@ -14,9 +14,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.List;
 
 import static no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal.*;
-import static no.nav.pto.veilarbfilter.domene.value.ArenaInnsatsgruppe.BATT;
+import static no.nav.pto.veilarbfilter.domene.value.ArenaInnsatsgruppe.*;
 import static no.nav.pto.veilarbfilter.domene.value.Hovedmal.*;
+import static no.nav.pto.veilarbfilter.domene.value.Innsatsgruppe.*;
 import static no.nav.pto.veilarbfilter.repository.FilterRepository.ARENA_HOVEDMAL_FILTERVALG_JSON_KEY;
+import static no.nav.pto.veilarbfilter.repository.FilterRepository.ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY;
 import static no.nav.pto.veilarbfilter.service.MigrerFilterService.BATCH_STORRELSE_ALLE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -60,7 +62,7 @@ class MigrerFilterServiceTest extends AbstractTest {
         int filterId5 = mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal)).get().getFilterId();
 
         // When
-        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE);
+        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
 
         // Then
         int filterMedGammeltHovedmål = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
@@ -71,8 +73,7 @@ class MigrerFilterServiceTest extends AbstractTest {
 
         PortefoljeFilter forventetMigrertfilterMedKunHovedmal = new PortefoljeFilter();
         forventetMigrertfilterMedKunHovedmal.setHovedmalGjeldendeVedtak14a(List.of(SKAFFE_ARBEID.name()));
-        PortefoljeFilter forventetMigrertfilterUtenHovedmal = new PortefoljeFilter();
-        forventetMigrertfilterUtenHovedmal.setInnsatsgruppe(List.of(BATT.name()));
+        PortefoljeFilter forventetMigrertfilterUtenHovedmal = filterUtenHovedmal;
         PortefoljeFilter forventetMigrertFilterMedMangeHovedmal = new PortefoljeFilter();
         forventetMigrertFilterMedMangeHovedmal.setHovedmalGjeldendeVedtak14a(List.of(BEHOLDE_ARBEID.name(), OKE_DELTAKELSE.name(), SKAFFE_ARBEID.name()));
         assertThat(mineLagredeFilterRepository.hentFilter(filterId1, false).get().getFilterValg()).isEqualTo(forventetMigrertfilterMedKunHovedmal);
@@ -80,6 +81,50 @@ class MigrerFilterServiceTest extends AbstractTest {
         assertThat(mineLagredeFilterRepository.hentFilter(filterId3, false).get().getFilterValg()).isEqualTo(forventetMigrertFilterMedMangeHovedmal);
         assertThat(mineLagredeFilterRepository.hentFilter(filterId4, false).get().getFilterValg()).isEqualTo(forventetMigrertfilterMedKunHovedmal);
         assertThat(mineLagredeFilterRepository.hentFilter(filterId5, false).get().getFilterValg()).isEqualTo(forventetMigrertFilterMedMangeHovedmal);
+    }
+
+    @Test
+    void migrer_filter_skal_migrere_filter_riktig_når_bruker_kun_har_arena_innsatsgruppe_fra_før() {
+        // Given
+        // Kun folk som har filter som er migreringsverdige skal migrerast
+        String veilederId1 = "01010111111";
+        String veilederId2 = "02020222222";
+
+        PortefoljeFilter filterMedInnsatsgruppe = new PortefoljeFilter();
+        filterMedInnsatsgruppe.setInnsatsgruppe(List.of(BFORM.name()));
+
+        PortefoljeFilter filterUtenInnsatsgruppe = new PortefoljeFilter();
+        filterUtenInnsatsgruppe.setHovedmal(List.of(SKAFFEA.name()));
+
+        PortefoljeFilter filterMedMangeInnsatsgruppe = new PortefoljeFilter();
+        filterMedMangeInnsatsgruppe.setInnsatsgruppe(List.of(BATT.name(), BFORM.name(), IKVAL.name(), VARIG.name()));
+
+        int filterId1 = mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter", filterMedInnsatsgruppe)).get().getFilterId();
+        int filterId2 = mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter uten innsatsgruppe", filterUtenInnsatsgruppe)).get().getFilterId();
+        int filterId3 = mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter med mange innsatsgruppe", filterMedMangeInnsatsgruppe)).get().getFilterId();
+        int filterId4 = mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter", filterMedInnsatsgruppe)).get().getFilterId();
+        int filterId5 = mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange innsatsgruppe", filterMedMangeInnsatsgruppe)).get().getFilterId();
+
+        // When
+        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE, ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
+
+        // Then
+        int filterMedGammelInnsatsgruppe = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
+        assertThat(filterMedGammelInnsatsgruppe).isEqualTo(0);
+
+        int filterMedNyeInnsatsgruppe = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(FilterRepository.GJELDENDE_VEDTAK_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
+        assertThat(filterMedNyeInnsatsgruppe).isEqualTo(4);
+
+        PortefoljeFilter forventetMigrertfilterMedKunInnsatsgruppe = new PortefoljeFilter();
+        forventetMigrertfilterMedKunInnsatsgruppe.setInnsatsgruppeGjeldendeVedtak14a(List.of(SITUASJONSBESTEMT_INNSATS.name()));
+        PortefoljeFilter forventetMigrertfilterUtenInnsatsgruppe = filterUtenInnsatsgruppe;
+        PortefoljeFilter forventetMigrertFilterMedMangeInnsatsgruppe = new PortefoljeFilter();
+        forventetMigrertFilterMedMangeInnsatsgruppe.setInnsatsgruppeGjeldendeVedtak14a(List.of(GRADERT_VARIG_TILPASSET_INNSATS.name(), SITUASJONSBESTEMT_INNSATS.name(), SPESIELT_TILPASSET_INNSATS.name(), STANDARD_INNSATS.name(), VARIG_TILPASSET_INNSATS.name()));
+        assertThat(mineLagredeFilterRepository.hentFilter(filterId1, false).get().getFilterValg()).isEqualTo(forventetMigrertfilterMedKunInnsatsgruppe);
+        assertThat(mineLagredeFilterRepository.hentFilter(filterId2, false).get().getFilterValg()).isEqualTo(forventetMigrertfilterUtenInnsatsgruppe);
+        assertThat(mineLagredeFilterRepository.hentFilter(filterId3, false).get().getFilterValg()).isEqualTo(forventetMigrertFilterMedMangeInnsatsgruppe);
+        assertThat(mineLagredeFilterRepository.hentFilter(filterId4, false).get().getFilterValg()).isEqualTo(forventetMigrertfilterMedKunInnsatsgruppe);
+        assertThat(mineLagredeFilterRepository.hentFilter(filterId5, false).get().getFilterValg()).isEqualTo(forventetMigrertFilterMedMangeInnsatsgruppe);
     }
 
     @Test
@@ -95,7 +140,7 @@ class MigrerFilterServiceTest extends AbstractTest {
         int filterId = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("filter med arena hovedmål og gjeldende vedtak hovedmål", filterMedMangeArenaHovedmalOgGjeldendeVedtakHovedmal)).get().getFilterId();
 
         // When
-        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE);
+        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
 
         // Then
         int filterMedGammeltHovedmål = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
@@ -137,7 +182,7 @@ class MigrerFilterServiceTest extends AbstractTest {
         int filterId = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("filter med mange filtervalg inkludert hovedmål", filterMedMangeFiltervalgInkludertHovedmål)).get().getFilterId();
 
         // When
-        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE);
+        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
 
         // Then
         int filterMedGammeltHovedmål = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
