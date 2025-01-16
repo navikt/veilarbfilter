@@ -62,7 +62,7 @@ class MigrerFilterServiceTest extends AbstractTest {
         int filterId5 = mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal)).get().getFilterId();
 
         // When
-        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
+        migrerFilterService.migrerFilterMedFiltertype(BATCH_STORRELSE_ALLE, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
 
         // Then
         int filterMedGammeltHovedmål = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
@@ -106,7 +106,7 @@ class MigrerFilterServiceTest extends AbstractTest {
         int filterId5 = mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange innsatsgruppe", filterMedMangeInnsatsgruppe)).get().getFilterId();
 
         // When
-        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE, ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
+        migrerFilterService.migrerFilterMedFiltertype(BATCH_STORRELSE_ALLE, ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
 
         // Then
         int filterMedGammelInnsatsgruppe = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
@@ -140,7 +140,7 @@ class MigrerFilterServiceTest extends AbstractTest {
         int filterId = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("filter med arena hovedmål og gjeldende vedtak hovedmål", filterMedMangeArenaHovedmalOgGjeldendeVedtakHovedmal)).get().getFilterId();
 
         // When
-        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
+        migrerFilterService.migrerFilterMedFiltertype(BATCH_STORRELSE_ALLE, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
 
         // Then
         int filterMedGammeltHovedmål = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
@@ -182,7 +182,7 @@ class MigrerFilterServiceTest extends AbstractTest {
         int filterId = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("filter med mange filtervalg inkludert hovedmål", filterMedMangeFiltervalgInkludertHovedmål)).get().getFilterId();
 
         // When
-        migrerFilterService.migrerFilter(BATCH_STORRELSE_ALLE, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
+        migrerFilterService.migrerFilterMedFiltertype(BATCH_STORRELSE_ALLE, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
 
         // Then
         int filterMedGammeltHovedmål = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
@@ -222,21 +222,34 @@ class MigrerFilterServiceTest extends AbstractTest {
         PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
         filterMedHovedmal.setHovedmal(List.of(SKAFFEA.name()));
 
-        PortefoljeFilter filterUtenHovedmal = new PortefoljeFilter();
-        filterUtenHovedmal.setInnsatsgruppe(List.of(BATT.name()));
-
         PortefoljeFilter filterMedMangeHovedmal = new PortefoljeFilter();
         filterMedMangeHovedmal.setHovedmal(List.of(SKAFFEA.name(), BEHOLDEA.name(), OKEDELT.name()));
 
-        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter", filterMedHovedmal)).get().getFilterId();
-        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter uten hovedmål", filterUtenHovedmal)).get().getFilterId();
-        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal)).get().getFilterId();
-        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter", filterMedHovedmal)).get().getFilterId();
-        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange hovedmål", filterMedMangeHovedmal)).get().getFilterId();
+        PortefoljeFilter filterMedInnsatsgruppe = new PortefoljeFilter();
+        filterMedInnsatsgruppe.setInnsatsgruppe(List.of(BFORM.name()));
 
-        migrerFilterService.migrerFilterJobb();
-        migrerFilterService.migrerFilterJobb();
-        migrerFilterService.migrerFilterJobb();
+        PortefoljeFilter filterMedMangeInnsatsgrupper = new PortefoljeFilter();
+        filterMedMangeInnsatsgrupper.setInnsatsgruppe(List.of(BATT.name(), BFORM.name(), IKVAL.name(), VARIG.name()));
+
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter med hovedmål, veileder 1", filterMedHovedmal)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter med mange hovedmål, veileder 1", filterMedMangeHovedmal)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med hovedmål, veileder 2", filterMedHovedmal)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange hovedmål, veileder 2", filterMedMangeHovedmal)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter med innsatsgruppe, veileder 1", filterMedInnsatsgruppe)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId1, new NyttFilterModel("filter med mange innsatsgrupper, veileder 1", filterMedMangeInnsatsgrupper)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med innsatsgruppe, veileder 2", filterMedInnsatsgruppe)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("filter med mange innsatsgrupper, veileder 2", filterMedMangeInnsatsgrupper)).get().getFilterId();
+
+        // When
+        MigrerFilterService.FilterMigreringResultat resultatAvMigrering = migrerFilterService.migrerFilter(100);
+
+        // Then
+        assertThat(resultatAvMigrering.hovedmal().totalt()).isEqualTo(4);
+        assertThat(resultatAvMigrering.hovedmal().forsoktMigrert()).isEqualTo(4);
+        assertThat(resultatAvMigrering.hovedmal().faktiskMigrert()).isEqualTo(4);
+        assertThat(resultatAvMigrering.innsatsgruppe().totalt()).isEqualTo(4);
+        assertThat(resultatAvMigrering.innsatsgruppe().forsoktMigrert()).isEqualTo(4);
+        assertThat(resultatAvMigrering.innsatsgruppe().faktiskMigrert()).isEqualTo(4);
     }
 
 }

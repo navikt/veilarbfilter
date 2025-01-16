@@ -25,30 +25,40 @@ import static no.nav.pto.veilarbfilter.util.SecureLogUtils.secureLog;
 @RequiredArgsConstructor
 public class MigrerFilterService {
     public static final int BATCH_STORRELSE_ALLE = -1;
-    private static final int BATCHSTORRELSE_FOR_JOBB = 2;
+    private static final int DEFAULT_BATCHSTORRELSE_FOR_JOBB = 2;
 
     private final FilterRepository filterRepository;
     private final ObjectMapper objectMapper;
 
-    public void migrerFilterJobb() {
-        log.info("Filtermigrering: Jobb startet");
+    public FilterMigreringResultat migrerFilter(int batchStorrelseForJobb) {
+        log.info("Filtermigrering - Jobb startet");
 
-        int antallFilterMedFilterverdi = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
-        log.info("Filtermigrering: Totalt antall filter med hovedmål = " + antallFilterMedFilterverdi);
+        int antallFilterMedFilterverdiArenaHovedmal = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
+        int antallFilterMedFilterverdiArenaInnsatsgruppe = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
+        log.info("Filtermigrering - Totalt antall filter med hovedmål: {}", antallFilterMedFilterverdiArenaHovedmal);
+        log.info("Filtermigrering - Totalt antall filter med innsatsgruppe: {}", antallFilterMedFilterverdiArenaInnsatsgruppe);
 
         try {
-            migrerFilter(BATCHSTORRELSE_FOR_JOBB, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
-            log.info("Filtermigrering: Jobb fullført");
+            Migrert resultatHovedmalMigrering = migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
+            Migrert resultatInnsatsgruppeMigrering = migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
+            log.info("Filtermigrering - Jobb fullført");
+
+            return new FilterMigreringResultat(
+                    new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaHovedmal, resultatHovedmalMigrering.forsokt, resultatHovedmalMigrering.faktisk),
+                    new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaInnsatsgruppe, resultatInnsatsgruppeMigrering.forsokt, resultatInnsatsgruppeMigrering.faktisk)
+            );
         } catch (RuntimeException e) {
-            log.error("Filtermigrering: Noe gikk galt i migrering, sjå feilmelding i securelogs");
-            secureLog.error("Filtermigrering: Noe gikk galt i migrering", e);
+            log.error("Filtermigrering - Noe gikk galt i migrering, se feilmelding i SecureLogs");
+            secureLog.error("Filtermigrering - Noe gikk galt i migrering", e);
+
+            return null;
         }
     }
 
-    public void migrerFilter(int batchStorrelse, String filterType) {
+    public Migrert migrerFilterMedFiltertype(int batchStorrelse, String filterType) {
         List<FilterModel> filtreSomSkalMigreres = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(filterType, batchStorrelse);
         int forsoktMigrerteFilter = filtreSomSkalMigreres.size();
-        log.info("Filtermigrering: Antall forsøkt migrert = " + forsoktMigrerteFilter);
+        log.info("Filtermigrering - Antall forsøkt migrerte filter som inneholder filtertype {}: {}", filterType, forsoktMigrerteFilter);
 
         int faktiskMigrerteFilter = 0;
         if (ARENA_HOVEDMAL_FILTERVALG_JSON_KEY.equals(filterType)) {
@@ -59,11 +69,12 @@ public class MigrerFilterService {
             faktiskMigrerteFilter = erstattArenaInnsatsgruppeMedInnsatsgruppeGjeldendeVedtak14aIFiltervalgBatch(filtreSomSkalMigreres);
         }
 
-        log.info("Filtermigrering: Antall faktisk migrert = " + faktiskMigrerteFilter);
+        log.info("Filtermigrering - Antall faktisk migrerte filter som inneholder filtertype {}: {}", filterType, faktiskMigrerteFilter);
+
+        return new Migrert(forsoktMigrerteFilter, faktiskMigrerteFilter);
     }
 
     public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(FilterModel filterSomSkalOppdateres) throws JsonProcessingException {
-        // Lag liste over migrerte hovedmål
         migrerArenaHovedmalTilGjeldendeVedtakHovedmalForFilter(filterSomSkalOppdateres);
         filterRepository.oppdaterFilterValg(filterSomSkalOppdateres.getFilterId(), filterSomSkalOppdateres.getFilterValg()); // todo handter feil ved skriving
     }
@@ -115,10 +126,10 @@ public class MigrerFilterService {
     }
 
     private void migrerArenaInnsatsgruppeTilGjeldendeVedtakInnsatsgruppeForFilter(FilterModel filterSomSkalOppdateres) {
-        // Lag liste over migrerte hovedmål
+        // Lag liste over migrerte innsatsgrupper
         List<String> innsatsgruppeFraArenaInnsatsgruppe = lagGjeldendeVedtakInnsatsgruppeFraArenaInnsatsgruppe(filterSomSkalOppdateres.getFilterValg().getInnsatsgruppe());
 
-        // Slå saman nye og gamle HovedmalGjeldendeVedtak-filter
+        // Slå saman nye og gamle InnsatsgruppeGjeldendeVedtak-filter
         List<String> innsatsgruppeFraGjeldendeVedtak14a = filterSomSkalOppdateres.getFilterValg().getInnsatsgruppeGjeldendeVedtak14a();
         Set<String> alleUnikeInnsatsgrupper = new HashSet<>(innsatsgruppeFraGjeldendeVedtak14a);
         alleUnikeInnsatsgrupper.addAll(innsatsgruppeFraArenaInnsatsgruppe);
@@ -151,5 +162,24 @@ public class MigrerFilterService {
                 .toList();
 
         return innsatsgruppeGjeldendeVedtak.stream().map(Innsatsgruppe::name).toList();
+    }
+
+    public record FilterMigreringResultat(
+            Resultat hovedmal,
+            Resultat innsatsgruppe
+    ) {
+
+        public record Resultat(
+                int totalt,
+                int forsoktMigrert,
+                int faktiskMigrert
+        ) {
+        }
+    }
+
+    public record Migrert(
+            int forsokt,
+            int faktisk
+    ) {
     }
 }
