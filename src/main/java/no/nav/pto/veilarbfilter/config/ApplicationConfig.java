@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import io.getunleash.DefaultUnleash;
+import io.getunleash.util.UnleashConfig;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import no.nav.common.auth.context.AuthContextHolder;
@@ -13,6 +15,7 @@ import no.nav.common.job.leader_election.LeaderElectionHttpClient;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
+import no.nav.common.utils.EnvironmentUtils;
 import no.nav.poao_tilgang.client.*;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
@@ -35,15 +38,20 @@ import static no.nav.common.utils.NaisUtils.getCredentials;
 @Import(DbConfigPostgres.class)
 @EnableConfigurationProperties({EnvironmentProperties.class})
 public class ApplicationConfig {
+    public static final String APPLICATION_NAME = "veilarbfilter";
+
     private final Cache<PolicyInput, Decision> policyInputToDecisionCache = Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofMinutes(30))
             .build();
+
     private final Cache<UUID, List<AdGruppe>> navAnsattIdToAzureAdGrupperCache = Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofMinutes(30))
             .build();
+
     private final Cache<String, Boolean> norskIdentToErSkjermetCache = Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofMinutes(30))
             .build();
+
     @Bean
     public LockProvider lockProvider(JdbcTemplate jdbcTemplate) {
         return new JdbcTemplateLockProvider(jdbcTemplate);
@@ -91,4 +99,17 @@ public class ApplicationConfig {
         );
     }
 
+    @Bean
+    public DefaultUnleash defaultUnleash(EnvironmentProperties properties) {
+        String environment = EnvironmentUtils.isProduction().orElse(false) ? "production" : "development";
+        UnleashConfig config = UnleashConfig.builder()
+                .appName(APPLICATION_NAME)
+                .instanceId(APPLICATION_NAME)
+                .unleashAPI(properties.getUnleashUrl())
+                .apiKey(properties.getUnleashApiToken())
+                .environment(environment)
+                .build();
+
+        return new DefaultUnleash(config);
+    }
 }

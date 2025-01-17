@@ -72,3 +72,5 @@ spec:
       value: api://dev-gcp.poao.poao-tilgang/.default
     - name: VEILARBVEILEDER_URL
       value: http://veilarbveileder.obo
+  envFrom:
+    - secret: veilarbfilter-unleash-api-token
