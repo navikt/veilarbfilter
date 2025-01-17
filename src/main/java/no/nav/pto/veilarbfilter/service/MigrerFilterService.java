@@ -2,9 +2,11 @@ package no.nav.pto.veilarbfilter.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getunleash.DefaultUnleash;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.common.job.leader_election.LeaderElectionClient;
+import no.nav.pto.veilarbfilter.config.FeatureToggle;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal;
@@ -35,10 +37,11 @@ public class MigrerFilterService {
     private final LeaderElectionClient leaderElectionClient;
     private final FilterRepository filterRepository;
     private final ObjectMapper objectMapper;
+    private final DefaultUnleash defaultUnleash;
 
     @Scheduled(initialDelay = ET_MINUTT_MS, fixedRate = TI_SEKUNDER_MS, timeUnit = TimeUnit.MILLISECONDS)
     public void migrerFilterJobb() {
-        if (leaderElectionClient.isLeader()) {
+        if (leaderElectionClient.isLeader() && defaultUnleash.isEnabled(FeatureToggle.MIGRER_FILTER_JOBB_ENABLED)) {
             migrerFilter(DEFAULT_BATCHSTORRELSE_FOR_JOBB);
         }
     }
