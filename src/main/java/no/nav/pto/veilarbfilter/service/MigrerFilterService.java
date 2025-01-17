@@ -44,23 +44,23 @@ public class MigrerFilterService {
     }
 
     public Optional<FilterMigreringResultat> migrerFilter(int batchStorrelseForJobb) {
-        log.info("Filtermigrering - Jobb startet");
+        log.info("Filtermigrering - Batch startet");
 
         int antallFilterMedFilterverdiArenaHovedmal = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
         int antallFilterMedFilterverdiArenaInnsatsgruppe = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
-        log.info("Filtermigrering - Totalt antall filter med hovedmål: {}", antallFilterMedFilterverdiArenaHovedmal);
-        log.info("Filtermigrering - Totalt antall filter med innsatsgruppe: {}", antallFilterMedFilterverdiArenaInnsatsgruppe);
 
         if (antallFilterMedFilterverdiArenaHovedmal == 0 && antallFilterMedFilterverdiArenaInnsatsgruppe == 0) {
             log.info("Filtermigrering - Ingen filter å migrere");
-            log.info("Filtermigrering - Jobb fullført");
+            log.info("Filtermigrering - Batch fullført");
             return Optional.empty();
         }
+
+        log.info("Filtermigrering - Totalt antall filter med hovedmål: {}, innsatsgruppe: {}", antallFilterMedFilterverdiArenaHovedmal, antallFilterMedFilterverdiArenaInnsatsgruppe);
 
         try {
             Optional<Migrert> resultatHovedmalMigrering = antallFilterMedFilterverdiArenaHovedmal > 0 ? Optional.of(migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY)) : Optional.empty();
             Optional<Migrert> resultatInnsatsgruppeMigrering = antallFilterMedFilterverdiArenaInnsatsgruppe > 0 ? Optional.of(migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY)) : Optional.empty();
-            log.info("Filtermigrering - Jobb fullført");
+            log.info("Filtermigrering - Batch fullført");
 
             return Optional.of(
                     new FilterMigreringResultat(
@@ -79,7 +79,6 @@ public class MigrerFilterService {
     public Migrert migrerFilterMedFiltertype(int batchStorrelse, String filterType) {
         List<FilterModel> filtreSomSkalMigreres = filterRepository.hentMineFilterSomInneholderEnBestemtFiltertype(filterType, batchStorrelse);
         int forsoktMigrerteFilter = filtreSomSkalMigreres.size();
-        log.info("Filtermigrering - Antall forsøkt migrerte filter som inneholder filtertype {}: {}", filterType, forsoktMigrerteFilter);
 
         int faktiskMigrerteFilter = 0;
         if (ARENA_HOVEDMAL_FILTERVALG_JSON_KEY.equals(filterType)) {
@@ -90,7 +89,7 @@ public class MigrerFilterService {
             faktiskMigrerteFilter = erstattArenaInnsatsgruppeMedInnsatsgruppeGjeldendeVedtak14aIFiltervalgBatch(filtreSomSkalMigreres);
         }
 
-        log.info("Filtermigrering - Antall faktisk migrerte filter som inneholder filtertype {}: {}", filterType, faktiskMigrerteFilter);
+        log.info("Filtermigrering - Migrerte {} av {} filter i batch for {}.", faktiskMigrerteFilter, forsoktMigrerteFilter, filterType);
 
         return new Migrert(forsoktMigrerteFilter, faktiskMigrerteFilter);
     }
