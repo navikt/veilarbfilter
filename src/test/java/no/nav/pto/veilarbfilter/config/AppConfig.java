@@ -1,8 +1,10 @@
 package no.nav.pto.veilarbfilter.config;
 
 import io.getunleash.DefaultUnleash;
+import io.getunleash.DefaultUnleash;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
+import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.PoaoTilgangClient;
@@ -15,9 +17,11 @@ import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
 import no.nav.pto.veilarbfilter.rest.MineLagredeFilterController;
 import no.nav.pto.veilarbfilter.rest.OverblikkVisningController;
 import no.nav.pto.veilarbfilter.rest.VeilederGruppeController;
-import no.nav.pto.veilarbfilter.service.*;
+import no.nav.pto.veilarbfilter.service.MigrerFilterService;
+import no.nav.pto.veilarbfilter.service.MineLagredeFilterService;
+import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
+import no.nav.pto.veilarbfilter.service.VeilederGrupperService;
 import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -64,6 +68,13 @@ public class AppConfig {
         VeilarbveilederClient mockVeilarbVeilederClient = mock(VeilarbveilederClient.class);
         Mockito.when(mockVeilarbVeilederClient.hentVeilederePaaEnhet(EnhetId.of("1"))).thenReturn(List.of("1", "2", "3"));
         return mockVeilarbVeilederClient;
+    }
+
+    @Bean
+    public LeaderElectionClient leaderElectionClient() {
+        LeaderElectionClient mockLeaderElectionClient = mock(LeaderElectionClient.class);
+        when(mockLeaderElectionClient.isLeader()).thenReturn(true);
+        return mockLeaderElectionClient;
     }
 
     @Bean
