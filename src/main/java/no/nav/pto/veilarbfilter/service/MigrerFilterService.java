@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal;
@@ -16,6 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static no.nav.pto.veilarbfilter.repository.FilterRepository.ARENA_HOVEDMAL_FILTERVALG_JSON_KEY;
 import static no.nav.pto.veilarbfilter.repository.FilterRepository.ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY;
@@ -30,13 +32,15 @@ public class MigrerFilterService {
     private static final int ET_MINUTT_MS = 60 * 1000;
     private static final int TI_SEKUNDER_MS = 10 * 1000;
 
+    private final LeaderElectionClient leaderElectionClient;
     private final FilterRepository filterRepository;
     private final ObjectMapper objectMapper;
 
-    @Scheduled(initialDelay = ET_MINUTT_MS, fixedRate = TI_SEKUNDER_MS)
+    @Scheduled(initialDelay = ET_MINUTT_MS, fixedRate = TI_SEKUNDER_MS, timeUnit = TimeUnit.MILLISECONDS)
     public void migrerFilterJobb() {
-        // TODO
-
+        if (leaderElectionClient.isLeader()) {
+            migrerFilter(DEFAULT_BATCHSTORRELSE_FOR_JOBB);
+        }
     }
 
     public Optional<FilterMigreringResultat> migrerFilter(int batchStorrelseForJobb) {
