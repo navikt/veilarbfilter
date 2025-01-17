@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.config;
 
+import io.getunleash.DefaultUnleash;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.types.identer.EnhetId;
@@ -20,9 +21,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+
 import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Configuration
 @ActiveProfiles({"test"})
@@ -47,7 +52,8 @@ public class AppConfig {
     public PoaoTilgangClient poaoTilgangClient() {
         PoaoTilgangClient mockPoaoTilgangClient = mock(PoaoTilgangClient.class);
         Mockito.when(mockPoaoTilgangClient.evaluatePolicy(any())).thenReturn(new ApiResult<>(null, Decision.Permit.INSTANCE));
-        return mockPoaoTilgangClient; }
+        return mockPoaoTilgangClient;
+    }
 
     @Bean
     public VeilarbveilederClient veilarbveilederClient() {
@@ -56,4 +62,11 @@ public class AppConfig {
         return mockVeilarbVeilederClient;
     }
 
+    @Bean
+    public DefaultUnleash defaultUnleash() {
+        final DefaultUnleash mock = mock(DefaultUnleash.class);
+        when(mock.isEnabled(anyString())).thenReturn(true);
+
+        return mock;
+    }
 }

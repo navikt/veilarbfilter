@@ -21,6 +21,7 @@
         <avro.version>1.11.0</avro.version>
         <testcontainers.version>1.20.4</testcontainers.version>
         <junit.jupiter.version>5.11.4</junit.jupiter.version>
+        <unleash.version>9.2.4</unleash.version>
 
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -157,6 +158,11 @@
             <artifactId>token-client</artifactId>
             <version>${common.version}</version>
         </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>job</artifactId>
+            <version>${common.version}</version>
+        </dependency>
 
         <!--Logging-->
         <dependency>
@@ -202,6 +208,16 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.navikt.poao-tilgang</groupId>
+            <artifactId>client</artifactId>
+            <version>2024.02.20_07.34-4dbbf67d478e</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getunleash</groupId>
+            <artifactId>unleash-client-java</artifactId>
+            <version>${unleash.version}</version>
         </dependency>
 
         <!-- Prometheus -->
@@ -254,21 +270,10 @@
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.common</groupId>
-            <artifactId>job</artifactId>
-            <version>${common.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.navikt.poao-tilgang</groupId>
-            <artifactId>client</artifactId>
-            <version>2024.02.20_07.34-4dbbf67d478e</version>
         </dependency>
     </dependencies>
 </project>

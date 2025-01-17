@@ -14,4 +14,6 @@ public class EnvironmentProperties {
     private String poaoTilgangUrl;
     private String poaoTilgangScope;
     private String veilarbveilederUrl;
+    private String unleashUrl;
+    private String unleashApiToken;
 }
