@@ -31,15 +31,15 @@ import static no.nav.pto.veilarbfilter.util.SecureLogUtils.secureLog;
 public class MigrerFilterService {
     public static final int BATCH_STORRELSE_ALLE = -1;
     private static final int DEFAULT_BATCHSTORRELSE_FOR_JOBB = 100;
-    private static final int ET_MINUTT_MS = 60 * 1000;
-    private static final int TI_SEKUNDER_MS = 10 * 1000;
+    private static final int ET_MINUTT = 1;
+    private static final int TI_MINUTT = 10;
 
     private final LeaderElectionClient leaderElectionClient;
     private final FilterRepository filterRepository;
     private final ObjectMapper objectMapper;
     private final DefaultUnleash defaultUnleash;
 
-    @Scheduled(initialDelay = ET_MINUTT_MS, fixedRate = TI_SEKUNDER_MS, timeUnit = TimeUnit.MILLISECONDS)
+    @Scheduled(initialDelay = ET_MINUTT, fixedRate = TI_MINUTT, timeUnit = TimeUnit.MINUTES)
     public void migrerFilterJobb() {
         if (leaderElectionClient.isLeader() && defaultUnleash.isEnabled(FeatureToggle.MIGRER_FILTER_JOBB_ENABLED)) {
             migrerFilter(DEFAULT_BATCHSTORRELSE_FOR_JOBB);
