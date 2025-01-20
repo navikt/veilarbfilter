@@ -90,14 +90,22 @@ public class MineLagredeFilterRepository implements FilterService {
 
     @Override
     public Optional<FilterModel> hentFilter(Integer filterId) {
+        return hentFilter(filterId, true);
+    }
+
+    public Optional<FilterModel> hentFilter(Integer filterId, boolean mapRegistreringstypeTilNyeNavn) {
         try {
             String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s AND f.%s = ?",
                     MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, Filter.FILTER_ID);
             FilterModel mineLagredeFilterModel = db.queryForObject(sql, (rs, rowNum) -> {
                         try {
                             PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
-                            List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
-                            portefoljeFilter.setRegistreringstype(registreringstyper);
+
+                            if (mapRegistreringstypeTilNyeNavn) {
+                                List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
+                                portefoljeFilter.setRegistreringstype(registreringstyper);
+                            }
+
                             return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                                     rs.getString(Filter.FILTER_NAVN),
                                     portefoljeFilter,
@@ -144,8 +152,7 @@ public class MineLagredeFilterRepository implements FilterService {
                     throw new RuntimeException(e);
                 }
             });
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("Can't hent filter " + e, e);
             return Collections.emptyList();
         }

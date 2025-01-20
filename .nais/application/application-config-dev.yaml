@@ -57,6 +57,8 @@ spec:
           namespace: poao
         - application: veilarbveileder
           namespace: obo
+      external:
+        - host: team-obo-unleash-api.nav.cloud.nais.io
   resources:
     limits:
       cpu: "1"
@@ -72,3 +74,5 @@ spec:
       value: api://dev-gcp.poao.poao-tilgang/.default
     - name: VEILARBVEILEDER_URL
       value: http://veilarbveileder.obo
+  envFrom:
+    - secret: veilarbfilter-unleash-api-token
