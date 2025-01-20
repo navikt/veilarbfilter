@@ -43,6 +43,8 @@ spec:
           namespace: poao
         - application: veilarbveileder
           namespace: obo
+      external:
+        - host: team-obo-unleash-api.nav.cloud.nais.io
   resources:
     limits:
       cpu: 1500m

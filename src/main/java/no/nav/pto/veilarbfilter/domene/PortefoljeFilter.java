@@ -1,15 +1,13 @@
 package no.nav.pto.veilarbfilter.domene;
 
 import com.fasterxml.jackson.annotation.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 import static java.util.Collections.emptyList;
 
+@Data
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,9 +29,11 @@ public class PortefoljeFilter {
     private List<String> formidlingsgruppe = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
+    @Setter
     private List<String> hovedmal = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
+    @Setter
     private List<String> innsatsgruppe = emptyList();
 
     private String kjonn = "";
@@ -127,9 +127,11 @@ public class PortefoljeFilter {
     private List<String> gjeldendeVedtak14a = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
+    @Setter
     private List<String> innsatsgruppeGjeldendeVedtak14a = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
+    @Setter
     private List<String> hovedmalGjeldendeVedtak14a = emptyList();
 
     @JsonIgnore
