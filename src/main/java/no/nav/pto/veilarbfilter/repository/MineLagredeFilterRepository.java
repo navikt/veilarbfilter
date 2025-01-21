@@ -306,12 +306,9 @@ public class MineLagredeFilterRepository implements FilterService {
 
     private String mapSituasjonTilBeskrivelse(String situasjon) {
         return switch (situasjon) {
-            case "MISTET_JOBBEN", "OPPSIGELSE" -> "HAR_BLITT_SAGT_OPP";
+            case "MISTET_JOBBEN" -> "HAR_BLITT_SAGT_OPP";
             case "JOBB_OVER_2_AAR" -> "IKKE_VAERT_I_JOBB_SISTE_2_AAR";
             case "VIL_FORTSETTE_I_JOBB" -> "ANNET";
-            case "INGEN_SVAR", "INGEN_VERDI" -> "UDEFINERT";
-            case "ENDRET_PERMITTERINGSPROSENT", "TILBAKE_TIL_JOBB" -> "ER_PERMITTERT";
-            case "SAGT_OPP" -> "HAR_SAGT_OPP";
             default -> situasjon;
         };
     }
