@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.service;
 
 import no.nav.pto.veilarbfilter.AbstractTest;
+import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
 import no.nav.pto.veilarbfilter.domene.value.NyeRegistreringstyper;
@@ -274,8 +275,8 @@ class MigrerFilterServiceTest extends AbstractTest {
         migrerFilterService.migrerFilterMedFiltertype(BATCH_STORRELSE_ALLE, REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
 
         // Then
-//        int  filterMedUtdaterteRegistreringstyperEtterMigrering = filterRepository.tellMineFilterSomInneholderUtdaterteRegistreringstyper();
-//        assertThat(filterMedUtdaterteRegistreringstyperEtterMigrering).isEqualTo(0);
+        List<FilterModel>  filterMedUtdaterteRegistreringstyperEtterMigrering = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper();
+        assertThat(filterMedUtdaterteRegistreringstyperEtterMigrering.size()).isEqualTo(0);
 
         int filterMedRegistreringstyperEtterMigrering = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
         assertThat(filterMedRegistreringstyperEtterMigrering).isEqualTo(1);
@@ -309,8 +310,8 @@ class MigrerFilterServiceTest extends AbstractTest {
         migrerFilterService.migrerFilterMedFiltertype(BATCH_STORRELSE_ALLE, REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
 
         // Then
-//        int  filterMedUtdaterteRegistreringstyperEtterMigrering = filterRepository.tellMineFilterSomInneholderUtdaterteRegistreringstyper();
-//        assertThat(filterMedUtdaterteRegistreringstyperEtterMigrering).isEqualTo(0);
+        List<FilterModel> filterMedUtdaterteRegistreringstyperEtterMigrering = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper();
+        assertThat(filterMedUtdaterteRegistreringstyperEtterMigrering.size()).isEqualTo(0);
 
         int filterMedRegistreringstyperEtterMigrering = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
         assertThat(filterMedRegistreringstyperEtterMigrering).isEqualTo(3);

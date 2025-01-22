@@ -115,6 +115,30 @@ public class FilterRepository {
         return db.query(sqlHentAntall, this::mapTilFilterModel, filtervalg, antallSomSkalHentes);
     }
 
+    public List<FilterModel> hentMineFilterSomInneholderUtdaterteRegistreringstyper() {
+        //language=postgresql
+        String sqlHentAlle = String.format("""
+                        SELECT %s, %s, %s, %s, %s
+                        FROM (SELECT *, %s ->> 'registreringstype'
+                                         AS liste_for_filtertype
+                              FROM %s)
+                                 AS filter_som_skal_telles
+                        WHERE liste_for_filtertype != '[]'
+                          AND liste_for_filtertype::jsonb ?| array [
+                            'MISTET_JOBBEN',
+                            'JOBB_OVER_2_AAR',
+                            'VIL_FORTSETTE_I_JOBB'
+                            ];
+                        """,
+                Filter.FILTER_ID, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET, Filter.FILTER_CLEANUP,
+                Filter.VALGTE_FILTER,
+                Filter.TABLE_NAME
+        );
+
+        return db.query(sqlHentAlle, this::mapTilFilterModel);
+    }
+
+
     // Denne funksjonen bør kun brukast ifm. migrering av filter
     private FilterModel mapTilFilterModel(ResultSet rs, int rowNum) {
         try {
