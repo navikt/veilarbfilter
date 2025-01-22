@@ -97,6 +97,18 @@ public class MigrerFilterService {
         return new Migrert(forsoktMigrerteFilter, faktiskMigrerteFilter);
     }
 
+    public Migrert migrerFilterMedUtdaterteRegistreringstyper(int batchStorrelse) {
+        List<FilterModel> filtreSomSkalMigreres = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper();
+        int forsoktMigrerteFilter = filtreSomSkalMigreres.size();
+
+        int faktiskMigrerteFilter = 0;
+        faktiskMigrerteFilter = erstattUtdaterteRegistreringstyperMedNyeRegistreringstyperFiltervalgBatch(filtreSomSkalMigreres);
+
+        log.info("Filtermigrering - Migrerte {} av {} filter i batch for utdaterte registreringstyper.", faktiskMigrerteFilter, forsoktMigrerteFilter);
+
+        return new Migrert(forsoktMigrerteFilter, faktiskMigrerteFilter);
+    }
+
     public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(FilterModel filterSomSkalOppdateres) throws JsonProcessingException {
         migrerArenaHovedmalTilGjeldendeVedtakHovedmalForFilter(filterSomSkalOppdateres);
         filterRepository.oppdaterFilterValg(filterSomSkalOppdateres.getFilterId(), filterSomSkalOppdateres.getFilterValg()); // todo handter feil ved skriving
@@ -105,6 +117,15 @@ public class MigrerFilterService {
     public int erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalgBatch(List<FilterModel> filtreSomSkalOppdateres) {
         List<FilterRepository.FilterIdOgFilterValgPar> lagredeFilterMedMigrerteHovedmal = filtreSomSkalOppdateres.stream()
                 .peek(this::migrerArenaHovedmalTilGjeldendeVedtakHovedmalForFilter)
+                .map(this::mapTilFilterIdOgFilterValgPar)
+                .toList();
+
+        return filterRepository.oppdaterFilterValgBatch(lagredeFilterMedMigrerteHovedmal);
+    }
+
+    public int erstattUtdaterteRegistreringstyperMedNyeRegistreringstyperFiltervalgBatch(List<FilterModel> filtreSomSkalOppdateres) {
+        List<FilterRepository.FilterIdOgFilterValgPar> lagredeFilterMedMigrerteHovedmal = filtreSomSkalOppdateres.stream()
+                .peek(this::migrerUtdaterteRegistreringstyperTilNyeRegistreringstyper)
                 .map(this::mapTilFilterIdOgFilterValgPar)
                 .toList();
 
@@ -166,6 +187,35 @@ public class MigrerFilterService {
 
         // Lag klart oppdatert filtermodell og skriv tilbake til databasen
         filterSomSkalOppdateres.setFilterValg(portefoljeFilterSomSkalOppdateres);
+    }
+
+    private void migrerUtdaterteRegistreringstyperTilNyeRegistreringstyper(FilterModel filterSomSkalOppdateres) {
+        // Lag liste over migrerte innsatsgrupper
+        List<String> byttTilNyeRegistreringstyper = lagNyeRegistreringstyper(filterSomSkalOppdateres.getFilterValg().getRegistreringstype());
+
+        // Fjern duplikat og sorter lista
+        Set<String> alleUnikeFilter = new HashSet<>(byttTilNyeRegistreringstyper);
+        List<String> unikeSorterteFilter = alleUnikeFilter.stream().sorted().toList();
+
+        // Lag oppdatert porteføljefilter
+        PortefoljeFilter portefoljeFilterSomSkalOppdateres = filterSomSkalOppdateres.getFilterValg();
+        portefoljeFilterSomSkalOppdateres.setRegistreringstype(unikeSorterteFilter);
+
+        // Lag klart oppdatert filtermodell og som skal skrivast tilbake til databasen
+        filterSomSkalOppdateres.setFilterValg(portefoljeFilterSomSkalOppdateres);
+    }
+
+    private List<String> lagNyeRegistreringstyper(List<String> registreringstyper) {
+        return registreringstyper.stream().map(this::mapUtdaterteRegistreringstyperTilNyeRegistreringstyper).toList();
+    }
+
+    private String mapUtdaterteRegistreringstyperTilNyeRegistreringstyper(String registreringstype) {
+        return switch (registreringstype) {
+            case "MISTET_JOBBEN" -> "HAR_BLITT_SAGT_OPP";
+            case "JOBB_OVER_2_AAR" -> "IKKE_VAERT_I_JOBB_SISTE_2_AAR";
+            case "VIL_FORTSETTE_I_JOBB" -> "ANNET";
+            default -> registreringstype;
+        };
     }
 
     private List<String> lagGjeldendeVedtakHovedmalFraArenahovedmal(List<String> arenahovedmal) {

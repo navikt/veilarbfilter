@@ -46,8 +46,8 @@ class MigrerFilterServiceTest extends AbstractTest {
     void migrer_filter_skal_migrere_filter_riktig_når_bruker_kun_har_arena_hovedmal_fra_før() {
         // Given
         // Kun folk som har filter som er migreringsverdige skal migrerast
-        String veilederId1 = "01010111111";
-        String veilederId2 = "02020222222";
+        String veilederId1 = "Z111111";
+        String veilederId2 = "Z222222";
 
         PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
         filterMedHovedmal.setHovedmal(List.of(SKAFFEA.name()));
@@ -90,8 +90,8 @@ class MigrerFilterServiceTest extends AbstractTest {
     void migrer_filter_skal_migrere_filter_riktig_når_bruker_kun_har_arena_innsatsgruppe_fra_før() {
         // Given
         // Kun folk som har filter som er migreringsverdige skal migrerast
-        String veilederId1 = "01010111111";
-        String veilederId2 = "02020222222";
+        String veilederId1 = "Z111111";
+        String veilederId2 = "Z222222";
 
         PortefoljeFilter filterMedInnsatsgruppe = new PortefoljeFilter();
         filterMedInnsatsgruppe.setInnsatsgruppe(List.of(BFORM.name()));
@@ -134,7 +134,7 @@ class MigrerFilterServiceTest extends AbstractTest {
     void migrer_filter_skal_migrere_filter_riktig_når_bruker_har_arena_hovedmal_og_gjeldende_vedtak_hovedmål_fra_før() {
         // Given
         // Kun folk som har filter som er migreringsverdige skal migrerast
-        String veilederId = "01010111111";
+        String veilederId = "Z111111";
 
         PortefoljeFilter filterMedMangeArenaHovedmalOgGjeldendeVedtakHovedmal = new PortefoljeFilter();
         filterMedMangeArenaHovedmalOgGjeldendeVedtakHovedmal.setHovedmal(List.of(SKAFFEA.name(), BEHOLDEA.name(), OKEDELT.name()));
@@ -161,7 +161,7 @@ class MigrerFilterServiceTest extends AbstractTest {
     @Test
     void migrer_filter_skal_migrere_filter_riktig_når_bruker_har_mange_filter_valg_satt_inkludert_hovedmål() {
         // Given
-        String veilederId = "01010111111";
+        String veilederId = "Z111111";
 
         PortefoljeFilter filterMedMangeFiltervalgInkludertHovedmål = new PortefoljeFilter();
         filterMedMangeFiltervalgInkludertHovedmål.setHovedmal(List.of(SKAFFEA.name(), BEHOLDEA.name(), OKEDELT.name()));
@@ -219,8 +219,8 @@ class MigrerFilterServiceTest extends AbstractTest {
     @Test
     void test_for_når_vi_vil_se_logging() {
         // Given
-        String veilederId1 = "01010111111";
-        String veilederId2 = "02020222222";
+        String veilederId1 = "Z111111";
+        String veilederId2 = "Z222222";
 
         PortefoljeFilter filterMedHovedmal = new PortefoljeFilter();
         filterMedHovedmal.setHovedmal(List.of(SKAFFEA.name()));
@@ -272,7 +272,7 @@ class MigrerFilterServiceTest extends AbstractTest {
         int filterId = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter med registreringstyper", filterMedRegistreringstyper)).get().getFilterId();
 
         // When
-        migrerFilterService.migrerFilterMedFiltertype(BATCH_STORRELSE_ALLE, REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
+        migrerFilterService.migrerFilterMedUtdaterteRegistreringstyper(BATCH_STORRELSE_ALLE);
 
         // Then
         List<FilterModel>  filterMedUtdaterteRegistreringstyperEtterMigrering = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper();
@@ -307,7 +307,7 @@ class MigrerFilterServiceTest extends AbstractTest {
         int filterIdVilFortsetteIJobb = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 3", filterVilFortsetteIJobb)).get().getFilterId();
 
         // When
-        migrerFilterService.migrerFilterMedFiltertype(BATCH_STORRELSE_ALLE, REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
+        migrerFilterService.migrerFilterMedUtdaterteRegistreringstyper(BATCH_STORRELSE_ALLE);
 
         // Then
         List<FilterModel> filterMedUtdaterteRegistreringstyperEtterMigrering = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper();
@@ -332,5 +332,4 @@ class MigrerFilterServiceTest extends AbstractTest {
         assertThat(faktiskMigrertFilterJobbOver2Aar.getRegistreringstype()).isEqualTo(forventetFilterJobbOver2Aar.getRegistreringstype());
         assertThat(faktiskMigrertFilterVilFortsetteIJobb.getRegistreringstype()).isEqualTo(forventetFilterVilFortsetteIJobb.getRegistreringstype());
     }
-
 }
