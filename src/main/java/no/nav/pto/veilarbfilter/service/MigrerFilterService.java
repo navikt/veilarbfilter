@@ -51,24 +51,28 @@ public class MigrerFilterService {
 
         int antallFilterMedFilterverdiArenaHovedmal = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
         int antallFilterMedFilterverdiArenaInnsatsgruppe = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
+        int antallFilterMedUtdaterteRegistreringstyper = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper().size();
 
-        if (antallFilterMedFilterverdiArenaHovedmal == 0 && antallFilterMedFilterverdiArenaInnsatsgruppe == 0) {
+        if (antallFilterMedFilterverdiArenaHovedmal == 0 && antallFilterMedFilterverdiArenaInnsatsgruppe == 0 && antallFilterMedUtdaterteRegistreringstyper == 0) {
             log.info("Filtermigrering - Ingen filter å migrere");
             log.info("Filtermigrering - Batch fullført");
             return Optional.empty();
         }
 
         log.info("Filtermigrering - Totalt antall filter med hovedmål: {}, innsatsgruppe: {}", antallFilterMedFilterverdiArenaHovedmal, antallFilterMedFilterverdiArenaInnsatsgruppe);
+        log.info("Filtermigrering - Totalt antall filter med utdaterte registreringstyper: {}", antallFilterMedUtdaterteRegistreringstyper);
 
         try {
             Optional<Migrert> resultatHovedmalMigrering = antallFilterMedFilterverdiArenaHovedmal > 0 ? Optional.of(migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY)) : Optional.empty();
             Optional<Migrert> resultatInnsatsgruppeMigrering = antallFilterMedFilterverdiArenaInnsatsgruppe > 0 ? Optional.of(migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY)) : Optional.empty();
+            Optional<Migrert> resultatRegistreringstyperMigrering = antallFilterMedUtdaterteRegistreringstyper > 0 ? Optional.of(migrerFilterMedUtdaterteRegistreringstyper(batchStorrelseForJobb)) : Optional.empty();
             log.info("Filtermigrering - Batch fullført");
 
             return Optional.of(
                     new FilterMigreringResultat(
                             resultatHovedmalMigrering.flatMap(it -> Optional.of(new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaHovedmal, it.forsokt, it.faktisk))),
-                            resultatInnsatsgruppeMigrering.flatMap(it -> Optional.of(new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaInnsatsgruppe, it.forsokt, it.faktisk)))
+                            resultatInnsatsgruppeMigrering.flatMap(it -> Optional.of(new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaInnsatsgruppe, it.forsokt, it.faktisk))),
+                            resultatRegistreringstyperMigrering.flatMap(it -> Optional.of(new FilterMigreringResultat.Resultat(antallFilterMedUtdaterteRegistreringstyper, it.forsokt, it.faktisk)))
                     )
             );
         } catch (RuntimeException e) {
@@ -239,7 +243,8 @@ public class MigrerFilterService {
 
     public record FilterMigreringResultat(
             Optional<Resultat> hovedmal,
-            Optional<Resultat> innsatsgruppe
+            Optional<Resultat> innsatsgruppe,
+            Optional<Resultat> registreringstyper
     ) {
 
         public record Resultat(
