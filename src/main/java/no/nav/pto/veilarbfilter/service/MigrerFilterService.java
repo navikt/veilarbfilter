@@ -98,7 +98,7 @@ public class MigrerFilterService {
     }
 
     public Migrert migrerFilterMedUtdaterteRegistreringstyper(int batchStorrelse) {
-        List<FilterModel> filtreSomSkalMigreres = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper();
+        List<FilterModel> filtreSomSkalMigreres = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper(batchStorrelse);
         int forsoktMigrerteFilter = filtreSomSkalMigreres.size();
 
         int faktiskMigrerteFilter = 0;

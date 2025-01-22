@@ -332,4 +332,38 @@ class MigrerFilterServiceTest extends AbstractTest {
         assertThat(faktiskMigrertFilterJobbOver2Aar.getRegistreringstype()).isEqualTo(forventetFilterJobbOver2Aar.getRegistreringstype());
         assertThat(faktiskMigrertFilterVilFortsetteIJobb.getRegistreringstype()).isEqualTo(forventetFilterVilFortsetteIJobb.getRegistreringstype());
     }
+
+    @Test
+    void migrer_filter_skal_migrere_en_batch_registreringstypefilter_riktig() {
+        // Given
+        String veilederId = "Z111111";
+
+        PortefoljeFilter filterMistetJobben = new PortefoljeFilter();
+        filterMistetJobben.setRegistreringstype(List.of(UtdaterteRegistreringstyper.MISTET_JOBBEN.name()));
+        PortefoljeFilter filterJobbOver2Aar = new PortefoljeFilter();
+        filterJobbOver2Aar.setRegistreringstype(List.of(UtdaterteRegistreringstyper.JOBB_OVER_2_AAR.name()));
+        PortefoljeFilter filterVilFortsetteIJobb = new PortefoljeFilter();
+        filterVilFortsetteIJobb.setRegistreringstype(List.of(UtdaterteRegistreringstyper.VIL_FORTSETTE_I_JOBB.name()));
+
+        mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 1", filterMistetJobben)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 2", filterJobbOver2Aar)).get().getFilterId();
+        int filterIdVilFortsetteIJobb = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 3", filterVilFortsetteIJobb)).get().getFilterId();
+
+        // When
+        int batchStørrelse = 2;
+        migrerFilterService.migrerFilterMedUtdaterteRegistreringstyper(batchStørrelse);
+
+        // Then
+        List<FilterModel> filterMedUtdaterteRegistreringstyperEtterMigrering = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper();
+        assertThat(filterMedUtdaterteRegistreringstyperEtterMigrering.size()).isEqualTo(1);
+
+        int filterMedRegistreringstyperEtterMigrering = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
+        assertThat(filterMedRegistreringstyperEtterMigrering).isEqualTo(3);
+
+        // Den som ikkje er migrert er lik som før
+        PortefoljeFilter forventetFilterVilFortsetteIJobb = filterVilFortsetteIJobb; // uendra
+        PortefoljeFilter faktiskMigrertFilterVilFortsetteIJobb = mineLagredeFilterRepository.hentFilter(filterIdVilFortsetteIJobb, false).get().getFilterValg();
+
+        assertThat(faktiskMigrertFilterVilFortsetteIJobb.getRegistreringstype()).isEqualTo(forventetFilterVilFortsetteIJobb.getRegistreringstype());
+    }
 }
