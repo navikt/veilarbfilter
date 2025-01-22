@@ -3,6 +3,8 @@ package no.nav.pto.veilarbfilter.service;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
+import no.nav.pto.veilarbfilter.domene.value.NyeRegistreringstyper;
+import no.nav.pto.veilarbfilter.domene.value.UtdaterteRegistreringstyper;
 import no.nav.pto.veilarbfilter.repository.FilterRepository;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +20,7 @@ import static no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal.*;
 import static no.nav.pto.veilarbfilter.domene.value.ArenaInnsatsgruppe.*;
 import static no.nav.pto.veilarbfilter.domene.value.Hovedmal.*;
 import static no.nav.pto.veilarbfilter.domene.value.Innsatsgruppe.*;
-import static no.nav.pto.veilarbfilter.repository.FilterRepository.ARENA_HOVEDMAL_FILTERVALG_JSON_KEY;
-import static no.nav.pto.veilarbfilter.repository.FilterRepository.ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY;
+import static no.nav.pto.veilarbfilter.repository.FilterRepository.*;
 import static no.nav.pto.veilarbfilter.service.MigrerFilterService.BATCH_STORRELSE_ALLE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -251,6 +252,84 @@ class MigrerFilterServiceTest extends AbstractTest {
         assertThat(resultatAvMigrering.get().innsatsgruppe().get().totalt()).isEqualTo(4);
         assertThat(resultatAvMigrering.get().innsatsgruppe().get().forsoktMigrert()).isEqualTo(4);
         assertThat(resultatAvMigrering.get().innsatsgruppe().get().faktiskMigrert()).isEqualTo(4);
+    }
+
+    @Test
+    void migrer_filter_skal_migrere_registreringstypefilter_riktig_når_det_også_er_nye_registreringstyper_i_filteret() {
+        // Given
+        String veilederId = "Z111111";
+
+        PortefoljeFilter filterMedRegistreringstyper = new PortefoljeFilter();
+        filterMedRegistreringstyper.setRegistreringstype(List.of(
+                UtdaterteRegistreringstyper.MISTET_JOBBEN.name(),
+                UtdaterteRegistreringstyper.JOBB_OVER_2_AAR.name(),
+                UtdaterteRegistreringstyper.VIL_FORTSETTE_I_JOBB.name(),
+                NyeRegistreringstyper.HAR_BLITT_SAGT_OPP.name(),
+                NyeRegistreringstyper.IKKE_VAERT_I_JOBB_SISTE_2_AAR.name(),
+                NyeRegistreringstyper.ANNET.name()));
+
+        int filterId = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter med registreringstyper", filterMedRegistreringstyper)).get().getFilterId();
+
+        // When
+        migrerFilterService.migrerFilterMedFiltertype(BATCH_STORRELSE_ALLE, REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
+
+        // Then
+//        int  filterMedUtdaterteRegistreringstyperEtterMigrering = filterRepository.tellMineFilterSomInneholderUtdaterteRegistreringstyper();
+//        assertThat(filterMedUtdaterteRegistreringstyperEtterMigrering).isEqualTo(0);
+
+        int filterMedRegistreringstyperEtterMigrering = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
+        assertThat(filterMedRegistreringstyperEtterMigrering).isEqualTo(1);
+
+        PortefoljeFilter forventetFilterMedRegistreringstyper = new PortefoljeFilter();
+        forventetFilterMedRegistreringstyper.setRegistreringstype(List.of(NyeRegistreringstyper.ANNET.name(), NyeRegistreringstyper.HAR_BLITT_SAGT_OPP.name(), NyeRegistreringstyper.IKKE_VAERT_I_JOBB_SISTE_2_AAR.name()));
+        PortefoljeFilter faktiskMigrertFilter = mineLagredeFilterRepository.hentFilter(filterId, false).get().getFilterValg();
+
+        assertThat(faktiskMigrertFilter.getRegistreringstype().size()).isEqualTo(forventetFilterMedRegistreringstyper.getRegistreringstype().size());
+        assertThat(faktiskMigrertFilter.getRegistreringstype()).isEqualTo(forventetFilterMedRegistreringstyper.getRegistreringstype());
+        assertThat(faktiskMigrertFilter).isEqualTo(forventetFilterMedRegistreringstyper);
+    }
+
+    @Test
+    void migrer_filter_skal_migrere_registreringstypefilter_riktig() {
+        // Given
+        String veilederId = "Z111111";
+
+        PortefoljeFilter filterMistetJobben = new PortefoljeFilter();
+        filterMistetJobben.setRegistreringstype(List.of(UtdaterteRegistreringstyper.MISTET_JOBBEN.name()));
+        PortefoljeFilter filterJobbOver2Aar = new PortefoljeFilter();
+        filterJobbOver2Aar.setRegistreringstype(List.of(UtdaterteRegistreringstyper.JOBB_OVER_2_AAR.name()));
+        PortefoljeFilter filterVilFortsetteIJobb = new PortefoljeFilter();
+        filterVilFortsetteIJobb.setRegistreringstype(List.of(UtdaterteRegistreringstyper.VIL_FORTSETTE_I_JOBB.name()));
+
+        int filterIdMistetJobben = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 1", filterMistetJobben)).get().getFilterId();
+        int filterIdJobbOver2Aar = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 2", filterJobbOver2Aar)).get().getFilterId();
+        int filterIdVilFortsetteIJobb = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 3", filterVilFortsetteIJobb)).get().getFilterId();
+
+        // When
+        migrerFilterService.migrerFilterMedFiltertype(BATCH_STORRELSE_ALLE, REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
+
+        // Then
+//        int  filterMedUtdaterteRegistreringstyperEtterMigrering = filterRepository.tellMineFilterSomInneholderUtdaterteRegistreringstyper();
+//        assertThat(filterMedUtdaterteRegistreringstyperEtterMigrering).isEqualTo(0);
+
+        int filterMedRegistreringstyperEtterMigrering = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(REGISTRERINGSTYPE_FILTERVALG_JSON_KEY);
+        assertThat(filterMedRegistreringstyperEtterMigrering).isEqualTo(3);
+
+        // Alle skal ha blitt migrert til rett verdi
+        PortefoljeFilter forventetFilterMistetJobben = new PortefoljeFilter();
+        forventetFilterMistetJobben.setRegistreringstype(List.of(NyeRegistreringstyper.HAR_BLITT_SAGT_OPP.name()));
+        PortefoljeFilter forventetFilterJobbOver2Aar = new PortefoljeFilter();
+        forventetFilterJobbOver2Aar.setRegistreringstype(List.of(NyeRegistreringstyper.IKKE_VAERT_I_JOBB_SISTE_2_AAR.name()));
+        PortefoljeFilter forventetFilterVilFortsetteIJobb = new PortefoljeFilter();
+        forventetFilterVilFortsetteIJobb.setRegistreringstype(List.of(NyeRegistreringstyper.ANNET.name()));
+
+        PortefoljeFilter faktiskMigrertFilterMistetJobben = mineLagredeFilterRepository.hentFilter(filterIdMistetJobben, false).get().getFilterValg();
+        PortefoljeFilter faktiskMigrertFilterJobbOver2Aar = mineLagredeFilterRepository.hentFilter(filterIdJobbOver2Aar, false).get().getFilterValg();
+        PortefoljeFilter faktiskMigrertFilterVilFortsetteIJobb = mineLagredeFilterRepository.hentFilter(filterIdVilFortsetteIJobb, false).get().getFilterValg();
+
+        assertThat(faktiskMigrertFilterMistetJobben.getRegistreringstype()).isEqualTo(forventetFilterMistetJobben.getRegistreringstype());
+        assertThat(faktiskMigrertFilterJobbOver2Aar.getRegistreringstype()).isEqualTo(forventetFilterJobbOver2Aar.getRegistreringstype());
+        assertThat(faktiskMigrertFilterVilFortsetteIJobb.getRegistreringstype()).isEqualTo(forventetFilterVilFortsetteIJobb.getRegistreringstype());
     }
 
 }
