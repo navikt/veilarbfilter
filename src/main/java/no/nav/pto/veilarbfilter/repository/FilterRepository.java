@@ -51,7 +51,7 @@ public class FilterRepository {
                 WHERE %s = ?
                 """, Filter.TABLE_NAME, Filter.VALGTE_FILTER, Filter.FILTER_ID);
 
-        int[] affectedRows =  db.batchUpdate(sql, new BatchPreparedStatementSetter() {
+        int[] affectedRows = db.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
                 Integer filterID = filterBatch.get(i).filterId;
@@ -116,6 +116,13 @@ public class FilterRepository {
     }
 
     public List<FilterModel> hentMineFilterSomInneholderUtdaterteRegistreringstyper() {
+        return hentMineFilterSomInneholderUtdaterteRegistreringstyper(HENT_ALLE);
+    }
+
+    public List<FilterModel> hentMineFilterSomInneholderUtdaterteRegistreringstyper(int antallSomSkalHentes) {
+        if (antallSomSkalHentes != HENT_ALLE && antallSomSkalHentes <= 0)
+            throw new IllegalArgumentException("Antall som skal hentes må enten vere et positivt heltall, eller " + HENT_ALLE);
+
         //language=postgresql
         String sqlHentAlle = String.format("""
                         SELECT %s, %s, %s, %s, %s
@@ -133,9 +140,31 @@ public class FilterRepository {
                 Filter.FILTER_ID, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET, Filter.FILTER_CLEANUP,
                 Filter.VALGTE_FILTER,
                 Filter.TABLE_NAME
+        );       //language=postgresql
+        String sqlHentAntall = String.format("""
+                        SELECT %s, %s, %s, %s, %s
+                        FROM (SELECT *, %s ->> 'registreringstype'
+                                         AS liste_for_filtertype
+                              FROM %s)
+                                 AS filter_som_skal_telles
+                        WHERE liste_for_filtertype != '[]'
+                          AND liste_for_filtertype::jsonb ?| array [
+                            'MISTET_JOBBEN',
+                            'JOBB_OVER_2_AAR',
+                            'VIL_FORTSETTE_I_JOBB'
+                            ]
+                        LIMIT %s;
+                        """,
+                Filter.FILTER_ID, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET, Filter.FILTER_CLEANUP,
+                Filter.VALGTE_FILTER,
+                Filter.TABLE_NAME,
+                antallSomSkalHentes // denne kan ikkje vere ?-parameter i db.query() fordi då vert ?|-operatoren erstatta ¯\_(ツ)_/¯
         );
 
-        return db.query(sqlHentAlle, this::mapTilFilterModel);
+        if (antallSomSkalHentes == HENT_ALLE) {
+            return db.query(sqlHentAlle, this::mapTilFilterModel);
+        }
+        return db.query(sqlHentAntall, this::mapTilFilterModel);
     }
 
 

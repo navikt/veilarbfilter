@@ -249,4 +249,51 @@ public class MineLagredeFilterRepositoryTest extends AbstractTest {
         List<Integer> hentaFilterIdeer = hentaFilterMedUtdaterteRegistreringstyper.stream().map(it -> it.getFilterId()).toList();
         assertThat(hentaFilterIdeer).isEqualTo(forventaFilterIder);
     }
+
+    @Test
+    void kan_hente_ut_en_bestemt_batchstørrelse_med_filter_som_inneholder_utdaterte_registreringstyper() {
+        // given
+        String veilederId = "Z111111";
+        String veilederId2 = "Z222222";
+        List<String> alleUtdaterteRegistreringstyper = Arrays.stream(UtdaterteRegistreringstyper.values()).map(it -> it.name()).toList();
+        List<String> alleNyeRegistreringstyper = Arrays.stream(NyeRegistreringstyper.values()).map(it -> it.name()).toList();
+        List<String> alleRegistreringstyper = Stream.concat(alleUtdaterteRegistreringstyper.stream(), alleNyeRegistreringstyper.stream()).toList();
+
+        PortefoljeFilter filterMistetJobben = new PortefoljeFilter();
+        filterMistetJobben.setRegistreringstype(List.of(UtdaterteRegistreringstyper.MISTET_JOBBEN.name()));
+        PortefoljeFilter filterJobbOver2Aar = new PortefoljeFilter();
+        filterJobbOver2Aar.setRegistreringstype(List.of(UtdaterteRegistreringstyper.JOBB_OVER_2_AAR.name()));
+        PortefoljeFilter filterVilFortsetteIJobb = new PortefoljeFilter();
+        filterVilFortsetteIJobb.setRegistreringstype(List.of(UtdaterteRegistreringstyper.VIL_FORTSETTE_I_JOBB.name()));
+
+        PortefoljeFilter filterAlleUtdaterteRegistreringtypar = new PortefoljeFilter();
+        filterAlleUtdaterteRegistreringtypar.setRegistreringstype(alleUtdaterteRegistreringstyper);
+        PortefoljeFilter filterMedBådeNyeOgUtdaterteRegistreringstper = new PortefoljeFilter();
+        filterMedBådeNyeOgUtdaterteRegistreringstper.setRegistreringstype(alleRegistreringstyper);
+
+        mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 1", filterMistetJobben)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId2, new NyttFilterModel("Filter 2", filterJobbOver2Aar)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 3", filterVilFortsetteIJobb)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 4", filterAlleUtdaterteRegistreringtypar)).get().getFilterId();
+        mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter 7", filterMedBådeNyeOgUtdaterteRegistreringstper)).get().getFilterId();
+
+        // when
+        int batch1 = 2;
+        int batch2 = 4;
+        int flereEnnDetErIDatabasen = 1000;
+        int såMangeViHarIDatabasen = 5;
+
+        List<FilterModel> hentTo = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper(batch1);
+        List<FilterModel> hentFire = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper(batch2);
+        List<FilterModel> hentFlereEnnDetErIDatabasen = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper(flereEnnDetErIDatabasen);
+        List<FilterModel> hentAlleEksplisitt = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper(-1);
+        List<FilterModel> hentAlleImplisitt = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper();
+
+        // then
+        assertThat(hentTo.size()).isEqualTo(batch1);
+        assertThat(hentFire.size()).isEqualTo(batch2);
+        assertThat(hentFlereEnnDetErIDatabasen.size()).isEqualTo(såMangeViHarIDatabasen);
+        assertThat(hentAlleEksplisitt.size()).isEqualTo(såMangeViHarIDatabasen);
+        assertThat(hentAlleImplisitt.size()).isEqualTo(såMangeViHarIDatabasen);
+    }
 }
