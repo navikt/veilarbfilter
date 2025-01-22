@@ -6,7 +6,9 @@ import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
 import no.nav.pto.veilarbfilter.domene.PortefoljeFilter;
+import no.nav.pto.veilarbfilter.domene.value.UtdaterteRegistreringstyper;
 import no.nav.pto.veilarbfilter.repository.FilterRepository;
+import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import java.util.List;
 
 import static no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal.*;
 import static no.nav.pto.veilarbfilter.domene.value.Hovedmal.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @WebMvcTest
 @ActiveProfiles({"test"})
@@ -28,14 +31,14 @@ public class FilterServiceTest extends AbstractTest {
     @Autowired
     private MigrerFilterService migrerFilterService;
     @Autowired
+    private MineLagredeFilterRepository mineLagredeFilterRepository;
+    @Autowired
     private FilterRepository filterRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private String hovedmalfilterArena = "hovedmal";
-    private String hovedmalfilterGjeldendeVedtak = "hovedmalGjeldendeVedtak14a";
-    private String innsatsgruppefilterArena = "innsatsgruppe";
-    private String innsatsgruppefilterGjeldendeVedtak = "innsatsgruppeGjeldendeVedtak14a";
+    private String hovedmalfilterArena = FilterRepository.ARENA_HOVEDMAL_FILTERVALG_JSON_KEY;
+    private String hovedmalfilterGjeldendeVedtak = FilterRepository.GJELDENDE_VEDTAK_HOVEDMAL_FILTERVALG_JSON_KEY;
 
     @BeforeEach
     void setUp() {
@@ -123,5 +126,30 @@ public class FilterServiceTest extends AbstractTest {
         Assertions.assertEquals(forventHovedmalGjeldendeVedtakListe, gjeldendeVedtakFiltervalg);
 
         Assertions.assertEquals(0, filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(hovedmalfilterArena));
+    }
+
+    @Test
+    void skal_få_ut_samme_registreringstyper_som_i_databasen_ved_henting() {
+        // Given
+        String veilederId = "Z111111";
+
+        PortefoljeFilter filterMedRegistreringstyper = new PortefoljeFilter();
+        filterMedRegistreringstyper.setRegistreringstype(List.of(
+                UtdaterteRegistreringstyper.MISTET_JOBBEN.name(),
+                UtdaterteRegistreringstyper.JOBB_OVER_2_AAR.name(),
+                UtdaterteRegistreringstyper.VIL_FORTSETTE_I_JOBB.name()
+        ));
+
+
+        int filterId = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter med registreringstyper", filterMedRegistreringstyper)).get().getFilterId();
+
+        // When
+        FilterModel hentetFilter = mineLagredeFilterService.hentFilter(filterId).get();
+
+        // Then
+        assertThat(hentetFilter.getFilterValg().getRegistreringstype().size()).isEqualTo(3);
+
+        assertThat(hentetFilter.getFilterValg().getRegistreringstype()).isEqualTo(filterMedRegistreringstyper.getRegistreringstype());
+        assertThat(hentetFilter.getFilterValg()).isEqualTo(filterMedRegistreringstyper);
     }
 }
