@@ -27,6 +27,7 @@ public class FilterRepository {
     public static final String ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY = "innsatsgruppe";
     public static final String GJELDENDE_VEDTAK_HOVEDMAL_FILTERVALG_JSON_KEY = "hovedmalGjeldendeVedtak14a";
     public static final String GJELDENDE_VEDTAK_INNSATSGRUPPE_FILTERVALG_JSON_KEY = "innsatsgruppeGjeldendeVedtak14a";
+    public static final String REGISTRERINGSTYPE_FILTERVALG_JSON_KEY = "registreringstype";
 
     private final JdbcTemplate db;
     private final ObjectMapper objectMapper;
@@ -50,7 +51,7 @@ public class FilterRepository {
                 WHERE %s = ?
                 """, Filter.TABLE_NAME, Filter.VALGTE_FILTER, Filter.FILTER_ID);
 
-        int[] affectedRows =  db.batchUpdate(sql, new BatchPreparedStatementSetter() {
+        int[] affectedRows = db.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
                 Integer filterID = filterBatch.get(i).filterId;
@@ -113,6 +114,59 @@ public class FilterRepository {
         }
         return db.query(sqlHentAntall, this::mapTilFilterModel, filtervalg, antallSomSkalHentes);
     }
+
+    public List<FilterModel> hentMineFilterSomInneholderUtdaterteRegistreringstyper() {
+        return hentMineFilterSomInneholderUtdaterteRegistreringstyper(HENT_ALLE);
+    }
+
+    public List<FilterModel> hentMineFilterSomInneholderUtdaterteRegistreringstyper(int antallSomSkalHentes) {
+        if (antallSomSkalHentes != HENT_ALLE && antallSomSkalHentes <= 0)
+            throw new IllegalArgumentException("Antall som skal hentes må enten vere et positivt heltall, eller " + HENT_ALLE);
+
+        //language=postgresql
+        String sqlHentAlle = String.format("""
+                        SELECT %s, %s, %s, %s, %s
+                        FROM (SELECT *, %s ->> 'registreringstype'
+                                         AS liste_for_filtertype
+                              FROM %s)
+                                 AS filter_som_skal_telles
+                        WHERE liste_for_filtertype != '[]'
+                          AND liste_for_filtertype::jsonb ?| array [
+                            'MISTET_JOBBEN',
+                            'JOBB_OVER_2_AAR',
+                            'VIL_FORTSETTE_I_JOBB'
+                            ];
+                        """,
+                Filter.FILTER_ID, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET, Filter.FILTER_CLEANUP,
+                Filter.VALGTE_FILTER,
+                Filter.TABLE_NAME
+        );       //language=postgresql
+        String sqlHentAntall = String.format("""
+                        SELECT %s, %s, %s, %s, %s
+                        FROM (SELECT *, %s ->> 'registreringstype'
+                                         AS liste_for_filtertype
+                              FROM %s)
+                                 AS filter_som_skal_telles
+                        WHERE liste_for_filtertype != '[]'
+                          AND liste_for_filtertype::jsonb ?| array [
+                            'MISTET_JOBBEN',
+                            'JOBB_OVER_2_AAR',
+                            'VIL_FORTSETTE_I_JOBB'
+                            ]
+                        LIMIT %s;
+                        """,
+                Filter.FILTER_ID, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET, Filter.FILTER_CLEANUP,
+                Filter.VALGTE_FILTER,
+                Filter.TABLE_NAME,
+                antallSomSkalHentes // denne kan ikkje vere ?-parameter i db.query() fordi då vert ?|-operatoren erstatta ¯\_(ツ)_/¯
+        );
+
+        if (antallSomSkalHentes == HENT_ALLE) {
+            return db.query(sqlHentAlle, this::mapTilFilterModel);
+        }
+        return db.query(sqlHentAntall, this::mapTilFilterModel);
+    }
+
 
     // Denne funksjonen bør kun brukast ifm. migrering av filter
     private FilterModel mapTilFilterModel(ResultSet rs, int rowNum) {
