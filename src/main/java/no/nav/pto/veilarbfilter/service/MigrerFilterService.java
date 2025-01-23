@@ -30,16 +30,16 @@ import static no.nav.pto.veilarbfilter.util.SecureLogUtils.secureLog;
 @RequiredArgsConstructor
 public class MigrerFilterService {
     public static final int BATCH_STORRELSE_ALLE = -1;
-    private static final int DEFAULT_BATCHSTORRELSE_FOR_JOBB = 100;
-    private static final int ET_MINUTT = 1;
-    private static final int TI_MINUTT = 10;
+    private static final int DEFAULT_BATCHSTORRELSE_FOR_JOBB = 50;
+    private static final int ET_MINUTT = 60;
+    private static final int TI_SEKUND = 10;
 
     private final LeaderElectionClient leaderElectionClient;
     private final FilterRepository filterRepository;
     private final ObjectMapper objectMapper;
     private final DefaultUnleash defaultUnleash;
 
-    @Scheduled(initialDelay = ET_MINUTT, fixedRate = TI_MINUTT, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(initialDelay = ET_MINUTT, fixedRate = TI_SEKUND, timeUnit = TimeUnit.SECONDS)
     public void migrerFilterJobb() {
         if (leaderElectionClient.isLeader() && defaultUnleash.isEnabled(FeatureToggle.MIGRER_FILTER_JOBB_ENABLED)) {
             migrerFilter(DEFAULT_BATCHSTORRELSE_FOR_JOBB);
@@ -49,26 +49,23 @@ public class MigrerFilterService {
     public Optional<FilterMigreringResultat> migrerFilter(int batchStorrelseForJobb) {
         log.info("Filtermigrering - Batch startet");
 
-        int antallFilterMedFilterverdiArenaHovedmal = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_HOVEDMAL_FILTERVALG_JSON_KEY);
-        int antallFilterMedFilterverdiArenaInnsatsgruppe = filterRepository.tellMineFilterSomInneholderEnBestemtFiltertype(ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY);
+        int antallFilterMedUtdaterteRegistreringstyper = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper().size();
 
-        if (antallFilterMedFilterverdiArenaHovedmal == 0 && antallFilterMedFilterverdiArenaInnsatsgruppe == 0) {
+        if (antallFilterMedUtdaterteRegistreringstyper == 0) {
             log.info("Filtermigrering - Ingen filter å migrere");
             log.info("Filtermigrering - Batch fullført");
             return Optional.empty();
         }
 
-        log.info("Filtermigrering - Totalt antall filter med hovedmål: {}, innsatsgruppe: {}", antallFilterMedFilterverdiArenaHovedmal, antallFilterMedFilterverdiArenaInnsatsgruppe);
+        log.info("Filtermigrering - Totalt antall filter med utdaterte registreringstyper: {}", antallFilterMedUtdaterteRegistreringstyper);
 
         try {
-            Optional<Migrert> resultatHovedmalMigrering = antallFilterMedFilterverdiArenaHovedmal > 0 ? Optional.of(migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_HOVEDMAL_FILTERVALG_JSON_KEY)) : Optional.empty();
-            Optional<Migrert> resultatInnsatsgruppeMigrering = antallFilterMedFilterverdiArenaInnsatsgruppe > 0 ? Optional.of(migrerFilterMedFiltertype(batchStorrelseForJobb, ARENA_INNSATSGRUPPE_FILTERVALG_JSON_KEY)) : Optional.empty();
+            Optional<Migrert> resultatRegistreringstyperMigrering = antallFilterMedUtdaterteRegistreringstyper > 0 ? Optional.of(migrerFilterMedUtdaterteRegistreringstyper(batchStorrelseForJobb)) : Optional.empty();
             log.info("Filtermigrering - Batch fullført");
 
             return Optional.of(
                     new FilterMigreringResultat(
-                            resultatHovedmalMigrering.flatMap(it -> Optional.of(new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaHovedmal, it.forsokt, it.faktisk))),
-                            resultatInnsatsgruppeMigrering.flatMap(it -> Optional.of(new FilterMigreringResultat.Resultat(antallFilterMedFilterverdiArenaInnsatsgruppe, it.forsokt, it.faktisk)))
+                            resultatRegistreringstyperMigrering.flatMap(it -> Optional.of(new FilterMigreringResultat.Resultat(antallFilterMedUtdaterteRegistreringstyper, it.forsokt, it.faktisk)))
                     )
             );
         } catch (RuntimeException e) {
@@ -97,6 +94,18 @@ public class MigrerFilterService {
         return new Migrert(forsoktMigrerteFilter, faktiskMigrerteFilter);
     }
 
+    public Migrert migrerFilterMedUtdaterteRegistreringstyper(int batchStorrelse) {
+        List<FilterModel> filtreSomSkalMigreres = filterRepository.hentMineFilterSomInneholderUtdaterteRegistreringstyper(batchStorrelse);
+        int forsoktMigrerteFilter = filtreSomSkalMigreres.size();
+
+        int faktiskMigrerteFilter = 0;
+        faktiskMigrerteFilter = erstattUtdaterteRegistreringstyperMedNyeRegistreringstyperFiltervalgBatch(filtreSomSkalMigreres);
+
+        log.info("Filtermigrering - Migrerte {} av {} filter i batch for utdaterte registreringstyper.", faktiskMigrerteFilter, forsoktMigrerteFilter);
+
+        return new Migrert(forsoktMigrerteFilter, faktiskMigrerteFilter);
+    }
+
     public void erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalg(FilterModel filterSomSkalOppdateres) throws JsonProcessingException {
         migrerArenaHovedmalTilGjeldendeVedtakHovedmalForFilter(filterSomSkalOppdateres);
         filterRepository.oppdaterFilterValg(filterSomSkalOppdateres.getFilterId(), filterSomSkalOppdateres.getFilterValg()); // todo handter feil ved skriving
@@ -105,6 +114,15 @@ public class MigrerFilterService {
     public int erstattArenahovedmalMedHovedmalGjeldendeVedtak14aIFiltervalgBatch(List<FilterModel> filtreSomSkalOppdateres) {
         List<FilterRepository.FilterIdOgFilterValgPar> lagredeFilterMedMigrerteHovedmal = filtreSomSkalOppdateres.stream()
                 .peek(this::migrerArenaHovedmalTilGjeldendeVedtakHovedmalForFilter)
+                .map(this::mapTilFilterIdOgFilterValgPar)
+                .toList();
+
+        return filterRepository.oppdaterFilterValgBatch(lagredeFilterMedMigrerteHovedmal);
+    }
+
+    public int erstattUtdaterteRegistreringstyperMedNyeRegistreringstyperFiltervalgBatch(List<FilterModel> filtreSomSkalOppdateres) {
+        List<FilterRepository.FilterIdOgFilterValgPar> lagredeFilterMedMigrerteHovedmal = filtreSomSkalOppdateres.stream()
+                .peek(this::migrerUtdaterteRegistreringstyperTilNyeRegistreringstyper)
                 .map(this::mapTilFilterIdOgFilterValgPar)
                 .toList();
 
@@ -168,6 +186,35 @@ public class MigrerFilterService {
         filterSomSkalOppdateres.setFilterValg(portefoljeFilterSomSkalOppdateres);
     }
 
+    private void migrerUtdaterteRegistreringstyperTilNyeRegistreringstyper(FilterModel filterSomSkalOppdateres) {
+        // Lag liste over migrerte innsatsgrupper
+        List<String> byttTilNyeRegistreringstyper = lagNyeRegistreringstyper(filterSomSkalOppdateres.getFilterValg().getRegistreringstype());
+
+        // Fjern duplikat og sorter lista
+        Set<String> alleUnikeFilter = new HashSet<>(byttTilNyeRegistreringstyper);
+        List<String> unikeSorterteFilter = alleUnikeFilter.stream().sorted().toList();
+
+        // Lag oppdatert porteføljefilter
+        PortefoljeFilter portefoljeFilterSomSkalOppdateres = filterSomSkalOppdateres.getFilterValg();
+        portefoljeFilterSomSkalOppdateres.setRegistreringstype(unikeSorterteFilter);
+
+        // Lag klart oppdatert filtermodell og som skal skrivast tilbake til databasen
+        filterSomSkalOppdateres.setFilterValg(portefoljeFilterSomSkalOppdateres);
+    }
+
+    private List<String> lagNyeRegistreringstyper(List<String> registreringstyper) {
+        return registreringstyper.stream().map(this::mapUtdaterteRegistreringstyperTilNyeRegistreringstyper).toList();
+    }
+
+    private String mapUtdaterteRegistreringstyperTilNyeRegistreringstyper(String registreringstype) {
+        return switch (registreringstype) {
+            case "MISTET_JOBBEN" -> "HAR_BLITT_SAGT_OPP";
+            case "JOBB_OVER_2_AAR" -> "IKKE_VAERT_I_JOBB_SISTE_2_AAR";
+            case "VIL_FORTSETTE_I_JOBB" -> "ANNET";
+            default -> registreringstype;
+        };
+    }
+
     private List<String> lagGjeldendeVedtakHovedmalFraArenahovedmal(List<String> arenahovedmal) {
         List<Hovedmal> hovedmalGjeldendeVedtak = arenahovedmal.stream()
                 .map(ArenaHovedmal::valueOf)
@@ -188,8 +235,7 @@ public class MigrerFilterService {
     }
 
     public record FilterMigreringResultat(
-            Optional<Resultat> hovedmal,
-            Optional<Resultat> innsatsgruppe
+            Optional<Resultat> registreringstyper
     ) {
 
         public record Resultat(
