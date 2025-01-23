@@ -42,8 +42,7 @@ import static org.mockito.Mockito.when;
         VeilederGruppeController.class,
         OverblikkVisningService.class,
         OverblikkVisningRepository.class,
-        OverblikkVisningController.class,
-})
+        OverblikkVisningController.class})
 public class AppConfig {
 
     @Bean
