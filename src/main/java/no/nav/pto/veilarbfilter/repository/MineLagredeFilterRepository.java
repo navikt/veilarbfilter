@@ -90,7 +90,7 @@ public class MineLagredeFilterRepository implements FilterService {
 
     @Override
     public Optional<FilterModel> hentFilter(Integer filterId) {
-        return hentFilter(filterId, false);
+        return hentFilter(filterId, true);
     }
 
     public Optional<FilterModel> hentFilter(Integer filterId, boolean mapRegistreringstypeTilNyeNavn) {

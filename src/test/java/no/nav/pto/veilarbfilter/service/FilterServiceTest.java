@@ -144,7 +144,7 @@ public class FilterServiceTest extends AbstractTest {
         int filterId = mineLagredeFilterRepository.lagreFilter(veilederId, new NyttFilterModel("Filter med registreringstyper", filterMedRegistreringstyper)).get().getFilterId();
 
         // When
-        FilterModel hentetFilter = mineLagredeFilterService.hentFilter(filterId).get();
+        FilterModel hentetFilter = mineLagredeFilterRepository.hentFilter(filterId, false).get();
 
         // Then
         assertThat(hentetFilter.getFilterValg().getRegistreringstype().size()).isEqualTo(3);
