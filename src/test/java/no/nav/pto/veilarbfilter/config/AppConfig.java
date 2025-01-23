@@ -17,7 +17,6 @@ import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
 import no.nav.pto.veilarbfilter.rest.MineLagredeFilterController;
 import no.nav.pto.veilarbfilter.rest.OverblikkVisningController;
 import no.nav.pto.veilarbfilter.rest.VeilederGruppeController;
-import no.nav.pto.veilarbfilter.service.MigrerFilterService;
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterService;
 import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
 import no.nav.pto.veilarbfilter.service.VeilederGrupperService;
@@ -47,7 +46,6 @@ import static org.mockito.Mockito.when;
         OverblikkVisningRepository.class,
         OverblikkVisningController.class,
         FilterRepository.class,
-        MigrerFilterService.class
 })
 public class AppConfig {
 
