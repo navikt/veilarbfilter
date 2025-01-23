@@ -90,21 +90,12 @@ public class MineLagredeFilterRepository implements FilterService {
 
     @Override
     public Optional<FilterModel> hentFilter(Integer filterId) {
-        return hentFilter(filterId, true);
-    }
-
-    public Optional<FilterModel> hentFilter(Integer filterId, boolean mapRegistreringstypeTilNyeNavn) {
         try {
             String sql = String.format("SELECT * FROM %s as ml, %s as f WHERE ml.%s = f.%s AND f.%s = ?",
                     MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, Filter.FILTER_ID);
             FilterModel mineLagredeFilterModel = db.queryForObject(sql, (rs, rowNum) -> {
                         try {
                             PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
-
-                            if (mapRegistreringstypeTilNyeNavn) {
-                                List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
-                                portefoljeFilter.setRegistreringstype(registreringstyper);
-                            }
 
                             return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                                     rs.getString(Filter.FILTER_NAVN),
@@ -136,8 +127,7 @@ public class MineLagredeFilterRepository implements FilterService {
             return db.query(sql, (rs, rowNum) -> {
                 try {
                     PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
-                    List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
-                    portefoljeFilter.setRegistreringstype(registreringstyper);
+
                     return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
                             portefoljeFilter,
@@ -166,8 +156,7 @@ public class MineLagredeFilterRepository implements FilterService {
             return db.query(sql, (rs, rowNum) -> {
                 try {
                     PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
-                    List<String> registreringstyper = portefoljeFilter.getRegistreringstype().stream().map(this::mapSituasjonTilBeskrivelse).toList();
-                    portefoljeFilter.setRegistreringstype(registreringstyper);
+
                     return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
                             portefoljeFilter,
@@ -224,7 +213,7 @@ public class MineLagredeFilterRepository implements FilterService {
         List<MineLagredeFilterModel> alleMineFilter = hentAllLagredeFilter();
         alleMineFilter.stream().forEach(mineFilter -> {
             if (!mineFilter.getFilterValg().getVeiledere().isEmpty() &&
-                    erVeiledereListeErLik(mineFilter.getFilterValg().getVeiledere(), veiledereInDeletedGroup)) {
+                erVeiledereListeErLik(mineFilter.getFilterValg().getVeiledere(), veiledereInDeletedGroup)) {
                 deactiveMineFilter(mineFilter.getFilterId(), veilederGroupName);
             }
         });
@@ -253,12 +242,12 @@ public class MineLagredeFilterRepository implements FilterService {
         Integer count;
         if (filterIdOptional.isPresent()) {
             sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                            "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ? AND %s =  1 AND f.filter_id != ?",
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ? AND %s =  1 AND f.filter_id != ?",
                     MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.FILTER_NAVN, MineLagredeFilter.AKTIV);
             count = db.queryForObject(sql, Integer.class, veilederId, filterNavn, filterIdOptional.get());
         } else {
             sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                            "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ? AND %s =  1",
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ? AND %s =  1",
                     MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.FILTER_NAVN, MineLagredeFilter.AKTIV);
             count = db.queryForObject(sql, Integer.class, veilederId, filterNavn);
         }
@@ -273,12 +262,12 @@ public class MineLagredeFilterRepository implements FilterService {
             String sql;
             if (filterIdOptional.isPresent()) {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1 AND f.filter_id != ?",
+                                    "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1 AND f.filter_id != ?",
                         MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
                 count = db.queryForObject(sql, Integer.class, veilederId, objectMapper.writeValueAsString(filterValg), filterIdOptional.get());
             } else {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1",
+                                    "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1",
                         MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
                 count = db.queryForObject(sql, Integer.class, veilederId, objectMapper.writeValueAsString(filterValg));
             }
@@ -302,14 +291,5 @@ public class MineLagredeFilterRepository implements FilterService {
     private void validerUnikhet(Boolean navn, Boolean valg) {
         Assert.isTrue(!navn, LagredeFilterFeilmeldinger.NAVN_EKSISTERER.message);
         Assert.isTrue(!valg, LagredeFilterFeilmeldinger.FILTERVALG_EKSISTERER.message);
-    }
-
-    private String mapSituasjonTilBeskrivelse(String situasjon) {
-        return switch (situasjon) {
-            case "MISTET_JOBBEN" -> "HAR_BLITT_SAGT_OPP";
-            case "JOBB_OVER_2_AAR" -> "IKKE_VAERT_I_JOBB_SISTE_2_AAR";
-            case "VIL_FORTSETTE_I_JOBB" -> "ANNET";
-            default -> situasjon;
-        };
     }
 }
