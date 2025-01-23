@@ -30,7 +30,7 @@ import static no.nav.pto.veilarbfilter.util.SecureLogUtils.secureLog;
 @RequiredArgsConstructor
 public class MigrerFilterService {
     public static final int BATCH_STORRELSE_ALLE = -1;
-    private static final int DEFAULT_BATCHSTORRELSE_FOR_JOBB = 2;
+    private static final int DEFAULT_BATCHSTORRELSE_FOR_JOBB = 50;
     private static final int ET_MINUTT = 60;
     private static final int TI_SEKUND = 10;
 
