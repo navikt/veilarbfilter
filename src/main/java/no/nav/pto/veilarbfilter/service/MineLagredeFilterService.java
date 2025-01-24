@@ -1,13 +1,15 @@
 package no.nav.pto.veilarbfilter.service;
 
 import lombok.RequiredArgsConstructor;
-import no.nav.pto.veilarbfilter.domene.*;
-import no.nav.pto.veilarbfilter.domene.value.ArenaHovedmal;
-import no.nav.pto.veilarbfilter.domene.value.Hovedmal;
+import no.nav.pto.veilarbfilter.domene.FilterModel;
+import no.nav.pto.veilarbfilter.domene.MineLagredeFilterModel;
+import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
+import no.nav.pto.veilarbfilter.domene.SortOrder;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

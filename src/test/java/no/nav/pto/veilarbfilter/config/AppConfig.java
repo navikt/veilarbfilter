@@ -1,7 +1,6 @@
 package no.nav.pto.veilarbfilter.config;
 
 import io.getunleash.DefaultUnleash;
-import io.getunleash.DefaultUnleash;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.job.leader_election.LeaderElectionClient;
@@ -10,14 +9,12 @@ import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.PoaoTilgangClient;
 import no.nav.poao_tilgang.client.api.ApiResult;
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
-import no.nav.pto.veilarbfilter.repository.FilterRepository;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import no.nav.pto.veilarbfilter.repository.OverblikkVisningRepository;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
 import no.nav.pto.veilarbfilter.rest.MineLagredeFilterController;
 import no.nav.pto.veilarbfilter.rest.OverblikkVisningController;
 import no.nav.pto.veilarbfilter.rest.VeilederGruppeController;
-import no.nav.pto.veilarbfilter.service.MigrerFilterService;
 import no.nav.pto.veilarbfilter.service.MineLagredeFilterService;
 import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
 import no.nav.pto.veilarbfilter.service.VeilederGrupperService;
@@ -45,10 +42,7 @@ import static org.mockito.Mockito.when;
         VeilederGruppeController.class,
         OverblikkVisningService.class,
         OverblikkVisningRepository.class,
-        OverblikkVisningController.class,
-        FilterRepository.class,
-        MigrerFilterService.class
-})
+        OverblikkVisningController.class})
 public class AppConfig {
 
     @Bean
