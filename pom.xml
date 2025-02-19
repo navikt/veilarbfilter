@@ -193,7 +193,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>11.3.1</version>
+            <version>11.3.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -203,7 +203,7 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>6.2.0</version>
+            <version>6.3.0</version>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -224,7 +224,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.14.3</version>
+            <version>1.14.4</version>
         </dependency>
 
         <!--TEST-->
