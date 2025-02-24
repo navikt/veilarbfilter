@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.2</version>
+        <version>3.4.3</version>
         <relativePath/>
     </parent>
 
@@ -19,8 +19,8 @@
         <common.version>3.2025.01.14_14.19-79b3041cae56</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
-        <testcontainers.version>1.20.4</testcontainers.version>
-        <junit.jupiter.version>5.11.4</junit.jupiter.version>
+        <testcontainers.version>1.20.5</testcontainers.version>
+        <junit.jupiter.version>5.12.0</junit.jupiter.version>
         <unleash.version>10.0.1</unleash.version>
 
         <maven.compiler.source>21</maven.compiler.source>
