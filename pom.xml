@@ -212,7 +212,7 @@
         <dependency>
             <groupId>com.github.navikt.poao-tilgang</groupId>
             <artifactId>client</artifactId>
-            <version>2024.02.20_07.34-4dbbf67d478e</version>
+            <version>2025.03.17_10.46-e6359712fa6d</version>
         </dependency>
         <dependency>
             <groupId>io.getunleash</groupId>
