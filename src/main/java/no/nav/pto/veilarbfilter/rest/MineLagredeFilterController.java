@@ -33,14 +33,8 @@ public class MineLagredeFilterController {
         String veilederId = AuthUtils.getInnloggetVeilederIdent().toString();
 
         Optional<FilterModel> filterModelOptional = mineLagredeFilterService.lagreFilter(veilederId, nyttFilterModel);
-
         if (filterModelOptional.isPresent()) {
-            FilterModel filterModel = filterModelOptional.get();
-
-            mapTrengerVurderingFerdigFilterTilTrengerOppfolgingsvedtak(filterModel.getFilterValg().getFerdigfilterListe())
-                    .ifPresent(it -> filterModel.getFilterValg().setFerdigfilterListe(it));
-
-            return ResponseEntity.ok().body(filterModel);
+            return ResponseEntity.ok().body(filterModelOptional.get());
         }
         throw new IllegalStateException();
     }
@@ -112,6 +106,11 @@ public class MineLagredeFilterController {
         String veilederId = AuthUtils.getInnloggetVeilederIdent().toString();
 
         List<FilterModel> filterModels = mineLagredeFilterService.finnFilterForFilterBruker(veilederId);
+
+        filterModels.forEach(filterModel ->
+                mapTrengerVurderingFerdigFilterTilTrengerOppfolgingsvedtak(filterModel.getFilterValg().getFerdigfilterListe())
+                        .ifPresent(it -> filterModel.getFilterValg().setFerdigfilterListe(it))
+        );
 
         return ResponseEntity.ok().body(filterModels);
     }
