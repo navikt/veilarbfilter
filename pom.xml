@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>
+        <version>3.4.5</version>
         <relativePath/>
     </parent>
 
@@ -19,9 +19,9 @@
         <common.version>3.2025.03.25_13.00-69496eec5820</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
-        <testcontainers.version>1.20.6</testcontainers.version>
-        <junit.jupiter.version>5.12.1</junit.jupiter.version>
-        <unleash.version>10.1.1</unleash.version>
+        <testcontainers.version>1.21.0</testcontainers.version>
+        <junit.jupiter.version>5.12.2</junit.jupiter.version>
+        <unleash.version>10.2.2</unleash.version>
 
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -107,7 +107,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>6.2.1</version>
+            <version>6.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -193,7 +193,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>11.7.2</version>
+            <version>11.8.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -203,7 +203,7 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>6.3.0</version>
+            <version>6.6.1</version>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
