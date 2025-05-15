@@ -55,11 +55,13 @@ public class ScheduleConfig {
     @Scheduled(cron = "0 0 2 16 May *")
     public void migrerTrengerVurderingTilTrengerOppfolgingsvedtak() {
         String jobbNavn = "Migrer TRENGER_VURDERING til TRENGER_OPPFOLGINGSVEDTAK";
+        
         //language=postgresql
         String antallSql = """
                 select count(*) from filter
                 where valgte_filter->'ferdigfilterListe' @> '["TRENGER_VURDERING"]'::jsonb;
                 """;
+
         //language=postgresql
         String migrerSql = """
                 UPDATE filter
@@ -70,7 +72,6 @@ public class ScheduleConfig {
         if (leaderElectionClient.isLeader()) {
             log.info("Jobb starter: {}", jobbNavn);
             try {
-
                 Optional.ofNullable(jdbcTemplate.queryForObject(antallSql, Integer.class)).ifPresent(antall ->
                         log.info("Antall filter med TRENGER_VURDERING før migrering: {}.", antall)
                 );
