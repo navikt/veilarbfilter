@@ -58,7 +58,7 @@ spec:
   secureLogs:
     enabled: true
   replicas:
-    min: 1
+    min: 2
     max: 2
     cpuThresholdPercentage: 50
   prometheus:
