@@ -55,6 +55,11 @@ spec:
   ingresses:
     - https://veilarbfilter.intern.nav.no
   webproxy: true
+  observability:
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
   secureLogs:
     enabled: true
   replicas:
