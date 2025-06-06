@@ -55,10 +55,15 @@ spec:
   ingresses:
     - https://veilarbfilter.intern.nav.no
   webproxy: true
+  observability:
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
   secureLogs:
     enabled: true
   replicas:
-    min: 1
+    min: 2
     max: 2
     cpuThresholdPercentage: 50
   prometheus:
