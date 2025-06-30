@@ -16,7 +16,7 @@ For lokal kjøring :
 
 Opprett en issue i GitHub for eventuelle spørsmål.s
 
-Er du ansatt i NAV kan du stille spørsmål på Slack i kanalen #team-obo-poao.
+Er du ansatt i Nav kan du stille spørsmål på Slack i kanalen #team-obo-poao.
 
 ## Kode generert av GitHub Copilot
 
