@@ -3,7 +3,7 @@ on: push
 env:
   IMAGE_TAG: ${{ github.sha }}
   PRINT_PAYLOAD: true
-permissions: 
+permissions:
   packages: write
   contents: write
 jobs:
@@ -30,7 +30,7 @@ jobs:
   build-and-push:
     name: Build and push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
     permissions:
@@ -59,7 +59,7 @@ jobs:
 
   deploy-dev:
     name: Deploy application to dev
-    if: github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/main'
     needs: build-and-push
     permissions:
       id-token: write
