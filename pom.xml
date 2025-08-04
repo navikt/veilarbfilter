@@ -19,7 +19,7 @@
         <common.version>3.2025.06.23_14.50-3af3985d8555</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
-        <testcontainers.version>1.21.2</testcontainers.version>
+        <testcontainers.version>1.21.3</testcontainers.version>
         <junit.jupiter.version>5.13.1</junit.jupiter.version>
         <unleash.version>11.0.2</unleash.version>
 
