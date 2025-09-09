@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>3.2025.06.23_14.50-3af3985d8555</common.version>
+        <common.version>3.2025.09.03_08.33-728ff4acbfdb</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
         <testcontainers.version>1.21.3</testcontainers.version>
