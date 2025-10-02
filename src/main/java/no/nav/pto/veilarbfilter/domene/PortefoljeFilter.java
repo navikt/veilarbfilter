@@ -134,6 +134,9 @@ public class PortefoljeFilter {
     @Setter
     private List<String> hovedmalGjeldendeVedtak14a = emptyList();
 
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> ytelseAapKelvin = emptyList();
+
     @JsonIgnore
     public Boolean isNotEmpty() {
         return (kjonn != null && !kjonn.isEmpty()) ||
@@ -173,6 +176,7 @@ public class PortefoljeFilter {
                 (fargekategorier != null && !fargekategorier.isEmpty()) ||
                 (gjeldendeVedtak14a != null && !gjeldendeVedtak14a.isEmpty()) ||
                 (innsatsgruppeGjeldendeVedtak14a != null && !innsatsgruppeGjeldendeVedtak14a.isEmpty()) ||
-                (hovedmalGjeldendeVedtak14a != null && !hovedmalGjeldendeVedtak14a.isEmpty());
+                (hovedmalGjeldendeVedtak14a != null && !hovedmalGjeldendeVedtak14a.isEmpty()) ||
+                (ytelseAapKelvin != null && !ytelseAapKelvin.isEmpty());
     }
 }
