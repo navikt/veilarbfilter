@@ -137,6 +137,9 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> ytelseAapKelvin = emptyList();
 
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> ytelseTiltakspenger = emptyList();
+
     @JsonIgnore
     public Boolean isNotEmpty() {
         return (kjonn != null && !kjonn.isEmpty()) ||
@@ -177,6 +180,7 @@ public class PortefoljeFilter {
                 (gjeldendeVedtak14a != null && !gjeldendeVedtak14a.isEmpty()) ||
                 (innsatsgruppeGjeldendeVedtak14a != null && !innsatsgruppeGjeldendeVedtak14a.isEmpty()) ||
                 (hovedmalGjeldendeVedtak14a != null && !hovedmalGjeldendeVedtak14a.isEmpty()) ||
-                (ytelseAapKelvin != null && !ytelseAapKelvin.isEmpty());
+                (ytelseAapKelvin != null && !ytelseAapKelvin.isEmpty()) ||
+                (ytelseTiltakspenger != null && !ytelseTiltakspenger.isEmpty());
     }
 }
