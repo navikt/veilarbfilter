@@ -111,9 +111,8 @@ public class MineLagredeFilterService implements FilterService {
         boolean brukNyttAapFilterErSkruddPå = defaultUnleash.isEnabled(FeatureToggle.BRUK_NYTT_ARENA_AAP_FILTER, unleashContext);
 
         if (brukNyttAapFilterErSkruddPå) {
-            String gammeltAapYtelseFilter = filter.getFilterValg().getYtelse();
-            List<String> muligeAapYtelseFiltre = List.of("AAP", "AAP_MAXTID", "AAP_UNNTAK");
-            if (muligeAapYtelseFiltre.contains(gammeltAapYtelseFilter)) {
+            String gammeltYtelseFilter = filter.getFilterValg().getYtelse();
+            if (gammeltYtelseFilter.equals("AAP") || gammeltYtelseFilter.equals("AAP_MAXTID") || gammeltYtelseFilter.equals("AAP_UNNTAK")) {
                 filter.getFilterValg().setYtelse(null);
             }
         } else {
