@@ -1,7 +1,10 @@
 package no.nav.pto.veilarbfilter.service;
 
 import io.getunleash.DefaultUnleash;
+import io.getunleash.UnleashContext;
 import lombok.RequiredArgsConstructor;
+import no.nav.pto.veilarbfilter.auth.AuthUtils;
+import no.nav.pto.veilarbfilter.config.FeatureToggle;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import org.springframework.stereotype.Service;
@@ -107,7 +110,12 @@ public class MineLagredeFilterService implements FilterService {
 
     // Når toggle er på skal kun det nye AAP filteret returneres. Når den er av skal kun det gamle returneres.
     private FilterModel fjernDuplikatAvAapArenaFilterTilFrontend(FilterModel filter) {
-        if (brukNyttAapArenaFilter(defaultUnleash)) {
+        String veilederId = AuthUtils.getInnloggetVeilederIdent().toString();
+        UnleashContext unleashContext = UnleashContext.builder()
+                .userId(veilederId)
+                .build();
+
+        if (defaultUnleash.isEnabled(FeatureToggle.BRUK_NYTT_ARENA_AAP_FILTER, unleashContext)) {
             String gammeltYtelseFilter = filter.getFilterValg().getYtelse();
             if ("AAP".equals(gammeltYtelseFilter) || "AAP_MAXTID".equals(gammeltYtelseFilter) || "AAP_UNNTAK".equals(gammeltYtelseFilter)) {
                 filter.getFilterValg().setYtelse(null);
@@ -119,7 +127,6 @@ public class MineLagredeFilterService implements FilterService {
             }
         }
         return filter;
-
 
     }
 }
