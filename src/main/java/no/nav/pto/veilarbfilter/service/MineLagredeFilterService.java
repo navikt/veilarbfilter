@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static no.nav.pto.veilarbfilter.config.FeatureToggle.brukNyttAapArenaFilter;
 
 @Service
 @RequiredArgsConstructor
@@ -25,9 +24,9 @@ public class MineLagredeFilterService implements FilterService {
     @Override
     public Optional<FilterModel> lagreFilter(String veilederId, NyttFilterModel nyttFilter) throws IllegalArgumentException {
         try {
-            PortefoljeFilter kopiertAapYtelseTilNyttAapFilterHvisDetFinnes = leggTilAapFraYtelseINyttAapArenaFilter(nyttFilter.getFilterValg());
-            NyttFilterModel oppdatertNyttFilter = new NyttFilterModel(nyttFilter.getFilterNavn(), kopiertAapYtelseTilNyttAapFilterHvisDetFinnes);
-            return mineLagredeFilterRepository.lagreFilter(veilederId, oppdatertNyttFilter);
+            PortefoljeFilter filtereMedKopiertAapArenaFilter = leggTilAapFraYtelseINyttAapArenaFilter(nyttFilter.getFilterValg());
+            nyttFilter.setFilterValg(filtereMedKopiertAapArenaFilter);
+            return mineLagredeFilterRepository.lagreFilter(veilederId, nyttFilter);
         } catch (IllegalArgumentException e) {
             throw e;
         }
@@ -36,15 +35,9 @@ public class MineLagredeFilterService implements FilterService {
     @Override
     public Optional<FilterModel> oppdaterFilter(String veilederId, FilterModel filter) throws IllegalArgumentException {
         try {
-            PortefoljeFilter kopiertAapYtelseTilNyttAapFilterHvisDetFinnes = leggTilAapFraYtelseINyttAapArenaFilter(filter.getFilterValg());
-            FilterModel oppdatertFilter =
-                    new FilterModel(filter.getFilterId(),
-                            filter.getFilterNavn(),
-                            kopiertAapYtelseTilNyttAapFilterHvisDetFinnes,
-                            filter.getOpprettetDato(),
-                            filter.getFilterCleanup()
-                    );
-            return mineLagredeFilterRepository.oppdaterFilter(veilederId, oppdatertFilter);
+            PortefoljeFilter filtereMedKopiertAapArenaFilter = leggTilAapFraYtelseINyttAapArenaFilter(filter.getFilterValg());
+            filter.setFilterValg(filtereMedKopiertAapArenaFilter);
+            return mineLagredeFilterRepository.oppdaterFilter(veilederId, filter);
         } catch (IllegalArgumentException e) {
             throw e;
         }
@@ -127,6 +120,5 @@ public class MineLagredeFilterService implements FilterService {
             }
         }
         return filter;
-
     }
 }
