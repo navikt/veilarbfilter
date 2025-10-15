@@ -1,5 +1,6 @@
 package no.nav.pto.veilarbfilter.service;
 
+import io.getunleash.DefaultUnleash;
 import lombok.RequiredArgsConstructor;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
@@ -9,10 +10,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static no.nav.pto.veilarbfilter.config.FeatureToggle.brukNyttAapArenaFilter;
+
 @Service
 @RequiredArgsConstructor
 public class MineLagredeFilterService implements FilterService {
     private final MineLagredeFilterRepository mineLagredeFilterRepository;
+    private final DefaultUnleash defaultUnleash;
 
     @Override
     public Optional<FilterModel> lagreFilter(String veilederId, NyttFilterModel nyttFilter) throws IllegalArgumentException {
@@ -44,12 +48,16 @@ public class MineLagredeFilterService implements FilterService {
 
     @Override
     public Optional<FilterModel> hentFilter(Integer filterId) {
-        return mineLagredeFilterRepository.hentFilter(filterId);
+        Optional<FilterModel> filterModel = mineLagredeFilterRepository.hentFilter(filterId);
+        return fjernDuplikatAvAapArenaFilter(filterModel);
     }
 
     @Override
     public List<FilterModel> finnFilterForFilterBruker(String veilederId) {
-        return mineLagredeFilterRepository.finnFilterForFilterBruker(veilederId);
+        List<FilterModel> filterModelListe = mineLagredeFilterRepository.finnFilterForFilterBruker(veilederId);
+        return filterModelListe.stream()
+                .map(this::fjernDuplikatAvAapArenaFilter)
+                .toList();
     }
 
     @Override
@@ -89,6 +97,28 @@ public class MineLagredeFilterService implements FilterService {
         }
 
         filter.setYtelseAapArena(aapNyttFilterListe);
+        return filter;
+    }
+
+    private Optional<FilterModel> fjernDuplikatAvAapArenaFilter(Optional<FilterModel> filterModelOptional) {
+        return filterModelOptional.map(this::fjernDuplikatAvAapArenaFilter);
+    }
+
+    private FilterModel fjernDuplikatAvAapArenaFilter(FilterModel filter) {
+        if (!brukNyttAapArenaFilter(defaultUnleash)) {
+            return filter;
+        }
+
+        String ytelseAAP = filter.getFilterValg().getYtelse();
+        boolean inneholderAap =
+                "AAP".equals(ytelseAAP) ||
+                        "AAP_MAXTID".equals(ytelseAAP) ||
+                        "AAP_UNNTAK".equals(ytelseAAP);
+
+        if (inneholderAap) {
+            filter.getFilterValg().setYtelse(null);
+        }
+
         return filter;
     }
 }
