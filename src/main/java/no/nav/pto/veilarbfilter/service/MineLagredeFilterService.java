@@ -108,16 +108,16 @@ public class MineLagredeFilterService implements FilterService {
                 .userId(veilederId)
                 .build();
 
-        if (defaultUnleash.isEnabled(FeatureToggle.BRUK_NYTT_ARENA_AAP_FILTER, unleashContext)) {
-            String gammeltYtelseFilter = filter.getFilterValg().getYtelse();
-            if ("AAP".equals(gammeltYtelseFilter) || "AAP_MAXTID".equals(gammeltYtelseFilter) || "AAP_UNNTAK".equals(gammeltYtelseFilter)) {
+        boolean brukNyttAapFilterErSkruddPå = defaultUnleash.isEnabled(FeatureToggle.BRUK_NYTT_ARENA_AAP_FILTER, unleashContext);
+
+        if (brukNyttAapFilterErSkruddPå) {
+            String gammeltAapYtelseFilter = filter.getFilterValg().getYtelse();
+            List<String> muligeAapYtelseFiltre = List.of("AAP", "AAP_MAXTID", "AAP_UNNTAK");
+            if (muligeAapYtelseFiltre.contains(gammeltAapYtelseFilter)) {
                 filter.getFilterValg().setYtelse(null);
             }
         } else {
-            List<String> nyttYtelseAapFilter = filter.getFilterValg().getYtelseAapArena();
-            if (nyttYtelseAapFilter != null && !nyttYtelseAapFilter.isEmpty()) {
-                filter.getFilterValg().setYtelseAapArena(Collections.emptyList());
-            }
+            filter.getFilterValg().setYtelseAapArena(Collections.emptyList());
         }
         return filter;
     }
