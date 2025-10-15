@@ -1,14 +1,12 @@
 package no.nav.pto.veilarbfilter.service;
 
 import lombok.RequiredArgsConstructor;
-import no.nav.pto.veilarbfilter.domene.FilterModel;
-import no.nav.pto.veilarbfilter.domene.MineLagredeFilterModel;
-import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
-import no.nav.pto.veilarbfilter.domene.SortOrder;
+import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -19,7 +17,9 @@ public class MineLagredeFilterService implements FilterService {
     @Override
     public Optional<FilterModel> lagreFilter(String veilederId, NyttFilterModel nyttFilter) throws IllegalArgumentException {
         try {
-            return mineLagredeFilterRepository.lagreFilter(veilederId, nyttFilter);
+            PortefoljeFilter kopiertAapYtelseTilNyttAapFilterHvisDetFinnes = leggTilAapFraYtelseINyttAapArenaFilter(nyttFilter.getFilterValg());
+            NyttFilterModel oppdatertNyttFilter = new NyttFilterModel(nyttFilter.getFilterNavn(), kopiertAapYtelseTilNyttAapFilterHvisDetFinnes);
+            return mineLagredeFilterRepository.lagreFilter(veilederId, oppdatertNyttFilter);
         } catch (IllegalArgumentException e) {
             throw e;
         }
@@ -28,7 +28,15 @@ public class MineLagredeFilterService implements FilterService {
     @Override
     public Optional<FilterModel> oppdaterFilter(String veilederId, FilterModel filter) throws IllegalArgumentException {
         try {
-            return mineLagredeFilterRepository.oppdaterFilter(veilederId, filter);
+            PortefoljeFilter kopiertAapYtelseTilNyttAapFilterHvisDetFinnes = leggTilAapFraYtelseINyttAapArenaFilter(filter.getFilterValg());
+            FilterModel oppdatertFilter =
+                    new FilterModel(filter.getFilterId(),
+                            filter.getFilterNavn(),
+                            kopiertAapYtelseTilNyttAapFilterHvisDetFinnes,
+                            filter.getOpprettetDato(),
+                            filter.getFilterCleanup()
+                    );
+            return mineLagredeFilterRepository.oppdaterFilter(veilederId, oppdatertFilter);
         } catch (IllegalArgumentException e) {
             throw e;
         }
@@ -56,5 +64,31 @@ public class MineLagredeFilterService implements FilterService {
 
     public List<MineLagredeFilterModel> hentAllLagredeFilter() {
         return mineLagredeFilterRepository.hentAllLagredeFilter();
+    }
+
+    // I en mellomfase hvor vi har trukket ut arena filteret for aap til et nytt et må vi lagre dobbelt.
+    // I det vi har gått helt over til det nye filteret kan denne funksjonen slettes.
+    private PortefoljeFilter leggTilAapFraYtelseINyttAapArenaFilter(PortefoljeFilter filter) {
+        String aapYtelse = filter.getYtelse();
+        boolean aapArenaUnntak = Objects.equals(aapYtelse, "AAP_UNNTAK");
+        boolean aapArenaOrdinar = Objects.equals(aapYtelse, "AAP_MAXTID");
+        boolean aapArena = Objects.equals(aapYtelse, "AAP");
+
+        if (!aapArenaUnntak && !aapArenaOrdinar && !aapArena) {
+            return filter;
+        }
+
+        List<String> aapNyttFilterListe;
+
+        if (aapArenaUnntak) {
+            aapNyttFilterListe = List.of("HAR_AAP_UNNTAK");
+        } else if (aapArenaOrdinar) {
+            aapNyttFilterListe = List.of("HAR_AAP_ORDINAR");
+        } else {
+            aapNyttFilterListe = List.of("HAR_AAP_ORDINAR", "HAR_AAP_UNNTAK");
+        }
+
+        filter.setYtelseAapArena(aapNyttFilterListe);
+        return filter;
     }
 }
