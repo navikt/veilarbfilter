@@ -6,6 +6,7 @@ import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,14 +50,14 @@ public class MineLagredeFilterService implements FilterService {
     @Override
     public Optional<FilterModel> hentFilter(Integer filterId) {
         Optional<FilterModel> filterModel = mineLagredeFilterRepository.hentFilter(filterId);
-        return fjernDuplikatAvAapArenaFilter(filterModel);
+        return fjernDuplikatAvAapArenaFilterTilFrontend(filterModel);
     }
 
     @Override
     public List<FilterModel> finnFilterForFilterBruker(String veilederId) {
         List<FilterModel> filterModelListe = mineLagredeFilterRepository.finnFilterForFilterBruker(veilederId);
         return filterModelListe.stream()
-                .map(this::fjernDuplikatAvAapArenaFilter)
+                .map(this::fjernDuplikatAvAapArenaFilterTilFrontend)
                 .toList();
     }
 
@@ -100,25 +101,25 @@ public class MineLagredeFilterService implements FilterService {
         return filter;
     }
 
-    private Optional<FilterModel> fjernDuplikatAvAapArenaFilter(Optional<FilterModel> filterModelOptional) {
-        return filterModelOptional.map(this::fjernDuplikatAvAapArenaFilter);
+    private Optional<FilterModel> fjernDuplikatAvAapArenaFilterTilFrontend(Optional<FilterModel> filterModelOptional) {
+        return filterModelOptional.map(this::fjernDuplikatAvAapArenaFilterTilFrontend);
     }
 
-    private FilterModel fjernDuplikatAvAapArenaFilter(FilterModel filter) {
-        if (!brukNyttAapArenaFilter(defaultUnleash)) {
-            return filter;
+    // Når toggle er på skal kun det nye AAP filteret returneres. Når den er av skal kun det gamle returneres.
+    private FilterModel fjernDuplikatAvAapArenaFilterTilFrontend(FilterModel filter) {
+        if (brukNyttAapArenaFilter(defaultUnleash)) {
+            String gammeltYtelseFilter = filter.getFilterValg().getYtelse();
+            if ("AAP".equals(gammeltYtelseFilter) || "AAP_MAXTID".equals(gammeltYtelseFilter) || "AAP_UNNTAK".equals(gammeltYtelseFilter)) {
+                filter.getFilterValg().setYtelse(null);
+            }
+        } else {
+            List<String> nyttYtelseAapFilter = filter.getFilterValg().getYtelseAapArena();
+            if (nyttYtelseAapFilter != null && !nyttYtelseAapFilter.isEmpty()) {
+                filter.getFilterValg().setYtelseAapArena(Collections.emptyList());
+            }
         }
-
-        String ytelseAAP = filter.getFilterValg().getYtelse();
-        boolean inneholderAap =
-                "AAP".equals(ytelseAAP) ||
-                        "AAP_MAXTID".equals(ytelseAAP) ||
-                        "AAP_UNNTAK".equals(ytelseAAP);
-
-        if (inneholderAap) {
-            filter.getFilterValg().setYtelse(null);
-        }
-
         return filter;
+
+
     }
 }
