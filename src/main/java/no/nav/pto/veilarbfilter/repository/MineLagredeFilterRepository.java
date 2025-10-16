@@ -219,6 +219,21 @@ public class MineLagredeFilterRepository implements FilterService {
         });
     }
 
+    public List<Integer> hentAlleFilterIderMedAap() {
+        try {
+            String sql = String.format("SELECT %s from %s where (%s::jsonb ->> 'ytelse') = ?",
+                    Filter.FILTER_ID, Filter.TABLE_NAME, Filter.VALGTE_FILTER);
+
+            List<Integer> filterIderMedAap =  db.queryForList(sql, Integer.class, "AAP");
+            log.info("Antall med AAP er " + filterIderMedAap.size());
+            return filterIderMedAap;
+
+        } catch (Exception e) {
+            log.error("Error while fetching all filter ids with AAP " + e, e);
+            return Collections.emptyList();
+        }
+    }
+
     private void deactiveMineFilter(Integer filterId, String note) {
         try {
             String sql = String.format("UPDATE %s SET %s = 0, %s = ? WHERE %s = ?", MineLagredeFilter.TABLE_NAME, MineLagredeFilter.AKTIV, MineLagredeFilter.NOTE, MineLagredeFilter.FILTER_ID);

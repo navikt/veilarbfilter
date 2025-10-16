@@ -73,4 +73,11 @@ public class MineLagredeFilterController {
 
         return ResponseEntity.ok().body(lagreSortering);
     }
+
+    @GetMapping
+    public ResponseEntity<List<Integer>> kopierAapArenaFilter() {
+        List<Integer> antallKopierteAapArenaFilter = mineLagredeFilterService.kopierAapArenaFilter();
+
+        return ResponseEntity.ok().body(antallKopierteAapArenaFilter);
+    }
 }

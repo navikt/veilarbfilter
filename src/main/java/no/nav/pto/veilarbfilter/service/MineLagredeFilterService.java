@@ -71,6 +71,12 @@ public class MineLagredeFilterService implements FilterService {
         return mineLagredeFilterRepository.hentAllLagredeFilter();
     }
 
+
+    public List<Integer> kopierAapArenaFilter() {
+        List<Integer> filterIderMedAap = mineLagredeFilterRepository.hentAlleFilterIderMedAap();
+        return filterIderMedAap;
+    }
+
     // I en mellomfase hvor vi har trukket ut arena filteret for aap til et nytt et må vi lagre dobbelt.
     // I det vi har gått helt over til det nye filteret kan denne funksjonen slettes.
     private PortefoljeFilter leggTilAapFraYtelseINyttAapArenaFilter(PortefoljeFilter filter) {
