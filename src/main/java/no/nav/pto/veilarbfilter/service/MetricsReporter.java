@@ -119,9 +119,6 @@ public class MetricsReporter implements MeterBinder {
                 if (filterValg.getCvJobbprofil() != null && !filterValg.getCvJobbprofil().isEmpty()) {
                     incrementFilterStats(stats, "cvjobbprofil");
                 }
-                if (filterValg.getArbeidslisteKategori() != null && !filterValg.getArbeidslisteKategori().isEmpty()) {
-                    incrementFilterStats(stats, "arbeidslistekategori");
-                }
                 if (filterValg.getLandgruppe() != null && !filterValg.getLandgruppe().isEmpty()) {
                     incrementFilterStats(stats, "landgruppe");
                 }
