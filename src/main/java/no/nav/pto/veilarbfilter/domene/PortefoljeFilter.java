@@ -68,9 +68,6 @@ public class PortefoljeFilter {
     private String cvJobbprofil = "";
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
-    private List<KategoriModell> arbeidslisteKategori = emptyList();
-
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> utdanning = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
@@ -94,7 +91,7 @@ public class PortefoljeFilter {
     private List<String> foedeland = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
-    private List<String> tolkebehov = emptyList();;
+    private List<String> tolkebehov = emptyList();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> tolkBehovSpraak = emptyList();
@@ -149,46 +146,46 @@ public class PortefoljeFilter {
     @JsonIgnore
     public Boolean isNotEmpty() {
         return (kjonn != null && !kjonn.isEmpty()) ||
-                (navnEllerFnrQuery != null && !navnEllerFnrQuery.isEmpty()) ||
-                (veilederNavnQuery != null && !veilederNavnQuery.isEmpty()) ||
-                (ytelse != null && !ytelse.isEmpty()) ||
-                (cvJobbprofil != null && !cvJobbprofil.isEmpty()) ||
-                (alder != null && !alder.isEmpty()) ||
-                (ferdigfilterListe != null && !ferdigfilterListe.isEmpty()) ||
-                (fodselsdagIMnd != null && !fodselsdagIMnd.isEmpty()) ||
-                (formidlingsgruppe != null && !formidlingsgruppe.isEmpty()) ||
-                (hovedmal != null && !hovedmal.isEmpty()) ||
-                (innsatsgruppe != null && !innsatsgruppe.isEmpty()) ||
-                (manuellBrukerStatus != null && !manuellBrukerStatus.isEmpty()) ||
-                (rettighetsgruppe != null && !rettighetsgruppe.isEmpty()) ||
-                (servicegruppe != null && !servicegruppe.isEmpty()) ||
-                (tiltakstyper != null && !tiltakstyper.isEmpty()) ||
-                (veiledere != null && !veiledere.isEmpty()) ||
-                (registreringstype != null && !registreringstype.isEmpty()) ||
-                (utdanning != null && !utdanning.isEmpty()) ||
-                (utdanningGodkjent != null && !utdanningGodkjent.isEmpty()) ||
-                (utdanningBestatt != null && !utdanningBestatt.isEmpty()) ||
-                (sisteEndringKategori != null && !sisteEndringKategori.isEmpty()) ||
-                (aktiviteterForenklet != null && !aktiviteterForenklet.isEmpty()) ||
-                aktiviteter != null ||
-                (landgruppe != null && !landgruppe.isEmpty()) ||
-                (foedeland != null && !foedeland.isEmpty()) ||
-                (tolkebehov != null && !tolkebehov.isEmpty()) ||
-                (tolkBehovSpraak != null && !tolkBehovSpraak.isEmpty()) ||
-                (stillingFraNavFilter != null && !stillingFraNavFilter.isEmpty()) ||
-                (visGeografiskBosted != null && !visGeografiskBosted.isEmpty()) ||
-                (geografiskBosted != null && !geografiskBosted.isEmpty()) ||
-                (avvik14aVedtak != null && !avvik14aVedtak.isEmpty()) ||
-                (ensligeForsorgere != null && !ensligeForsorgere.isEmpty()) ||
-                (barnUnder18Aar != null && !barnUnder18Aar.isEmpty()) ||
-                (barnUnder18AarAlder != null && !barnUnder18AarAlder.isEmpty()) ||
-                (fargekategorier != null && !fargekategorier.isEmpty()) ||
-                (gjeldendeVedtak14a != null && !gjeldendeVedtak14a.isEmpty()) ||
-                (innsatsgruppeGjeldendeVedtak14a != null && !innsatsgruppeGjeldendeVedtak14a.isEmpty()) ||
-                (hovedmalGjeldendeVedtak14a != null && !hovedmalGjeldendeVedtak14a.isEmpty()) ||
-                (ytelseAapArena != null && !ytelseAapArena.isEmpty()) ||
-                (ytelseAapKelvin != null && !ytelseAapKelvin.isEmpty()) ||
-                (ytelseTiltakspenger != null && !ytelseTiltakspenger.isEmpty()) ||
-                (ytelseTiltakspengerArena != null && !ytelseTiltakspengerArena.isEmpty());
+               (navnEllerFnrQuery != null && !navnEllerFnrQuery.isEmpty()) ||
+               (veilederNavnQuery != null && !veilederNavnQuery.isEmpty()) ||
+               (ytelse != null && !ytelse.isEmpty()) ||
+               (cvJobbprofil != null && !cvJobbprofil.isEmpty()) ||
+               (alder != null && !alder.isEmpty()) ||
+               (ferdigfilterListe != null && !ferdigfilterListe.isEmpty()) ||
+               (fodselsdagIMnd != null && !fodselsdagIMnd.isEmpty()) ||
+               (formidlingsgruppe != null && !formidlingsgruppe.isEmpty()) ||
+               (hovedmal != null && !hovedmal.isEmpty()) ||
+               (innsatsgruppe != null && !innsatsgruppe.isEmpty()) ||
+               (manuellBrukerStatus != null && !manuellBrukerStatus.isEmpty()) ||
+               (rettighetsgruppe != null && !rettighetsgruppe.isEmpty()) ||
+               (servicegruppe != null && !servicegruppe.isEmpty()) ||
+               (tiltakstyper != null && !tiltakstyper.isEmpty()) ||
+               (veiledere != null && !veiledere.isEmpty()) ||
+               (registreringstype != null && !registreringstype.isEmpty()) ||
+               (utdanning != null && !utdanning.isEmpty()) ||
+               (utdanningGodkjent != null && !utdanningGodkjent.isEmpty()) ||
+               (utdanningBestatt != null && !utdanningBestatt.isEmpty()) ||
+               (sisteEndringKategori != null && !sisteEndringKategori.isEmpty()) ||
+               (aktiviteterForenklet != null && !aktiviteterForenklet.isEmpty()) ||
+               aktiviteter != null ||
+               (landgruppe != null && !landgruppe.isEmpty()) ||
+               (foedeland != null && !foedeland.isEmpty()) ||
+               (tolkebehov != null && !tolkebehov.isEmpty()) ||
+               (tolkBehovSpraak != null && !tolkBehovSpraak.isEmpty()) ||
+               (stillingFraNavFilter != null && !stillingFraNavFilter.isEmpty()) ||
+               (visGeografiskBosted != null && !visGeografiskBosted.isEmpty()) ||
+               (geografiskBosted != null && !geografiskBosted.isEmpty()) ||
+               (avvik14aVedtak != null && !avvik14aVedtak.isEmpty()) ||
+               (ensligeForsorgere != null && !ensligeForsorgere.isEmpty()) ||
+               (barnUnder18Aar != null && !barnUnder18Aar.isEmpty()) ||
+               (barnUnder18AarAlder != null && !barnUnder18AarAlder.isEmpty()) ||
+               (fargekategorier != null && !fargekategorier.isEmpty()) ||
+               (gjeldendeVedtak14a != null && !gjeldendeVedtak14a.isEmpty()) ||
+               (innsatsgruppeGjeldendeVedtak14a != null && !innsatsgruppeGjeldendeVedtak14a.isEmpty()) ||
+               (hovedmalGjeldendeVedtak14a != null && !hovedmalGjeldendeVedtak14a.isEmpty()) ||
+               (ytelseAapArena != null && !ytelseAapArena.isEmpty()) ||
+               (ytelseAapKelvin != null && !ytelseAapKelvin.isEmpty()) ||
+               (ytelseTiltakspenger != null && !ytelseTiltakspenger.isEmpty()) ||
+               (ytelseTiltakspengerArena != null && !ytelseTiltakspengerArena.isEmpty());
     }
 }
