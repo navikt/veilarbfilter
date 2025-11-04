@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = MineLagredeFilterController.class)
 @ActiveProfiles({"test"})
@@ -91,7 +92,9 @@ public class MineLagredeFilterTest extends AbstractTest {
                         .post("/api/minelagredefilter")
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn().getResponse().getContentAsString();
+        )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
         String expectedResponse = FileUtils.getResourceFileAsString("nytt-filter-response.json");
 
@@ -251,7 +254,9 @@ public class MineLagredeFilterTest extends AbstractTest {
                         .put("/api/minelagredefilter")
                         .content(requestOppdatertFilter)
                         .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn().getResponse().getContentAsString();
+        )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
         String expectedResponse = FileUtils.getResourceFileAsString("oppdatert-filter-response.json");
 
@@ -259,6 +264,7 @@ public class MineLagredeFilterTest extends AbstractTest {
         Object expectedResponseFilterValg = JsonPath.read(expectedResponse, "$.filterValg");
         String actualResponseFilterNavn = JsonPath.read(actualResponse, "$.filterNavn");
         String expectedResponseFilterNavn = JsonPath.read(actualResponse, "$.filterNavn");
+
 
         assertThat(actualResponseFilterValg).isEqualTo(expectedResponseFilterValg);
         assertThat(actualResponseFilterNavn).isEqualTo(expectedResponseFilterNavn);
