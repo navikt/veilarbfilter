@@ -1,12 +1,12 @@
 package no.nav.pto.veilarbfilter.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.jayway.jsonpath.JsonPath;
 import lombok.val;
 import no.nav.common.json.JsonUtils;
 import no.nav.common.utils.FileUtils;
 import no.nav.pto.veilarbfilter.AbstractTest;
+import no.nav.pto.veilarbfilter.database.Table;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger;
 import org.junit.jupiter.api.Assertions;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -38,11 +39,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class MineLagredeFilterTest extends AbstractTest {
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private MockMvc mockMvc = MockMvcBuilders.standaloneSetup()
             .setControllerAdvice(RestResponseEntityExceptionHandler.class).build();
 
     @BeforeEach
     public void beforeEach() {
+        jdbcTemplate.update(String.format("TRUNCATE TABLE %s", Table.MineLagredeFilter.TABLE_NAME));
+        jdbcTemplate.update(String.format("TRUNCATE TABLE %s CASCADE", Table.Filter.TABLE_NAME));
+        jdbcTemplate.update(String.format("ALTER SEQUENCE %s RESTART WITH 1", Table.Filter.FILTER_ID_SEQUENCE));
 
     }
 
@@ -88,11 +95,11 @@ public class MineLagredeFilterTest extends AbstractTest {
         val request = FileUtils.getResourceFileAsString("nytt-filter-request.json");
 
         String actualResponse = this.mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/minelagredefilter")
-                        .content(request)
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        MockMvcRequestBuilders
+                                .post("/api/minelagredefilter")
+                                .content(request)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -250,11 +257,11 @@ public class MineLagredeFilterTest extends AbstractTest {
 
         String requestOppdatertFilter = FileUtils.getResourceFileAsString("oppdatert-filter-request.json");
         String actualResponse = this.mockMvc.perform(
-                MockMvcRequestBuilders
-                        .put("/api/minelagredefilter")
-                        .content(requestOppdatertFilter)
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
+                        MockMvcRequestBuilders
+                                .put("/api/minelagredefilter")
+                                .content(requestOppdatertFilter)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
