@@ -26,6 +26,8 @@ import static org.mockito.ArgumentMatchers.any;
 @ActiveProfiles({"test"})
 public abstract class AbstractTest {
     public static PostgreSQLContainer<?> postgreDBContainer = new PostgreSQLContainer<>("postgres:14.1-alpine");
+    public static final String TEST_VEILEDER_ID = "Z999999";
+    public static final UUID TEST_VEILEDER_UUID = UUID.fromString("cb91d58b-a01c-4d3a-a28e-2e8c160425cb");
 
     static {
         postgreDBContainer.setWaitStrategy(Wait.defaultWaitStrategy());
@@ -33,9 +35,9 @@ public abstract class AbstractTest {
 
         MockedStatic<AuthUtils> authUtilsMockedStatic = Mockito.mockStatic(AuthUtils.class);
         authUtilsMockedStatic.when(AuthUtils::getInnloggetVeilederIdent)
-                .thenReturn(VeilederId.of("1"));
+                .thenReturn(VeilederId.of(TEST_VEILEDER_ID));
         authUtilsMockedStatic.when(() -> AuthUtils.getInnloggetVeilederUUID(any()))
-                .thenReturn(UUID.randomUUID());
+                .thenReturn(TEST_VEILEDER_UUID);
     }
 
     public static class DockerPostgreDataSourceInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
