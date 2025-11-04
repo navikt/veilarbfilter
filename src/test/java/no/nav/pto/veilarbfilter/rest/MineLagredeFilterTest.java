@@ -3,7 +3,9 @@ package no.nav.pto.veilarbfilter.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import lombok.val;
+import no.nav.common.utils.FileUtils;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger;
@@ -27,6 +29,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(controllers = MineLagredeFilterController.class)
@@ -50,11 +53,11 @@ public class MineLagredeFilterTest extends AbstractTest {
         Assertions.assertNotNull(mockMvc);
     }
 
-    /**
+    /*
      * TESTER RELATERT TIL GYLDIGHET FOR LAGRING AV NYTT FILTER
-     **/
-    @Test
+     */
 
+    @Test
     public void LagringAvNyttFilterErGyldig() {
         val mineLagredeFilterResponse = getMineLagredeFilter();
 
@@ -73,8 +76,41 @@ public class MineLagredeFilterTest extends AbstractTest {
     }
 
     /**
+     * Denne testen sjekker i utgangspunktet det samme some {@link MineLagredeFilterTest#LagringAvNyttFilterErGyldig},
+     * men gjør det et hakk "lenger ut" (sett fra brukers perspektiv) ved å verifisere at JSON-responsen er som forventet.
+     * <br>
+     * <br>
+     * Testen ble opprettet på bakgrunn av en bug ifm. serialisering av {@link PortefoljeFilter}. Når nye filtre lagres
+     * i DB serialiseres {@link NyttFilterModel#filterValg} som en JSON-string. Bug-en resulterte i at alle feltene i
+     * {@link PortefoljeFilter#aktiviteter} ble duplisert (både lowercase og uppercase). Dette klarte derimot ikke
+     * {@link MineLagredeFilterTest#LagringAvNyttFilterErGyldig} å fange opp.
+     */
+    @Test
+    public void LagringAvNyttFilterErGyldigJsonAssert() throws Exception {
+        val request = FileUtils.getResourceFileAsString("nytt-filter-request.json");
+
+        String actualResponse = this.mockMvc.perform(
+                MockMvcRequestBuilders
+                        .post("/api/minelagredefilter")
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse().getContentAsString();
+
+        String expectedResponse = FileUtils.getResourceFileAsString("nytt-filter-response.json");
+
+        Object actualResponseFilterValg = JsonPath.read(actualResponse, "$.filterValg");
+        Object expectedResponseFilterValg = JsonPath.read(expectedResponse, "$.filterValg");
+        String actualResponseFilterNavn = JsonPath.read(actualResponse, "$.filterNavn");
+        String expectedResponseFilterNavn = JsonPath.read(actualResponse, "$.filterNavn");
+
+        assertThat(actualResponseFilterValg).isEqualTo(expectedResponseFilterValg);
+        assertThat(actualResponseFilterNavn).isEqualTo(expectedResponseFilterNavn);
+    }
+
+    /*
      * TESTER RELATERT TIL UGYLDIGHET FOR LAGRING AV NYTT FILTER
-     **/
+     */
+
     @Test
     public void FilternavnEksistererAlleredeForNyttFilter() {
         val randomNyttFilter = getRandomNyttFilter();
@@ -159,9 +195,10 @@ public class MineLagredeFilterTest extends AbstractTest {
         );
     }
 
-    /**
+    /*
      * TESTER RELATERT TIL GYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER
-     **/
+     */
+
     @Test
     public void OppdateringAvFilterErGyldig() throws JsonProcessingException {
         val nyttFilter = lagreNyttFilterVerdi(getRandomNyttFilter());
@@ -191,6 +228,45 @@ public class MineLagredeFilterTest extends AbstractTest {
         assertTrue(objectMapper.writeValueAsString(oppdatertFilter.get().getFilterValg()).equals(objectMapper.writeValueAsString(nyttFilter.getFilterValg())));
     }
 
+    /**
+     * Denne testen sjekker i utgangspunktet det samme some {@link MineLagredeFilterTest#OppdateringAvFilterErGyldig},
+     * men gjør det et hakk "lenger ut" (sett fra brukers perspektiv) ved å verifisere at JSON-responsen er som forventet.
+     * <br>
+     * <br>
+     * Testen ble opprettet på bakgrunn av en bug ifm. serialisering av {@link PortefoljeFilter}. Når nye filtre lagres
+     * i DB serialiseres {@link NyttFilterModel#filterValg} som en JSON-string. Bug-en resulterte i at alle feltene i
+     * {@link PortefoljeFilter#aktiviteter} ble duplisert (både lowercase og uppercase). Dette klarte derimot ikke
+     * {@link MineLagredeFilterTest#OppdateringAvFilterErGyldig} å fange opp.
+     */
+    @Test
+    public void OppdateringAvFilterErGyldigJsonAssert() throws Exception {
+        String requestNyttFilter = FileUtils.getResourceFileAsString("nytt-filter-2-request.json");
+        this.mockMvc.perform(
+                MockMvcRequestBuilders
+                        .post("/api/minelagredefilter")
+                        .content(requestNyttFilter)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        String requestOppdatertFilter = FileUtils.getResourceFileAsString("oppdatert-filter-request.json");
+        String actualResponse = this.mockMvc.perform(
+                MockMvcRequestBuilders
+                        .put("/api/minelagredefilter")
+                        .content(requestOppdatertFilter)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse().getContentAsString();
+
+        String expectedResponse = FileUtils.getResourceFileAsString("oppdatert-filter-response.json");
+
+        Object actualResponseFilterValg = JsonPath.read(actualResponse, "$.filterValg");
+        Object expectedResponseFilterValg = JsonPath.read(expectedResponse, "$.filterValg");
+        String actualResponseFilterNavn = JsonPath.read(actualResponse, "$.filterNavn");
+        String expectedResponseFilterNavn = JsonPath.read(actualResponse, "$.filterNavn");
+
+        assertThat(actualResponseFilterValg).isEqualTo(expectedResponseFilterValg);
+        assertThat(actualResponseFilterNavn).isEqualTo(expectedResponseFilterNavn);
+    }
+
     @Test
     public void SlettingAvFilterErGyldig() {
         val lagretMineLagredeFilterResponse = lagreNyttFilterVerdi(getRandomNyttFilter());
@@ -213,9 +289,10 @@ public class MineLagredeFilterTest extends AbstractTest {
         assertTrue(mineLagredeFilter.stream().noneMatch(x -> x.getFilterId() == lagretMineLagredeFilterResponse.getFilterId()));
     }
 
-    /**
+    /*
      * TESTER RELATERT TIL UGYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER 
-     **/
+     */
+
     @Test
     public void ForLangtNnavnErUgyldig() {
         val endepunktRespons =
@@ -262,9 +339,9 @@ public class MineLagredeFilterTest extends AbstractTest {
     }
 
 
-    /**
+    /*
      * TESTER RELATERT TIL GYLDIGHET FOR BÅDE LAGRING OG OPPDATERING
-     **/
+     */
     //@Test
     // @TODO: fix this test
     public void SpesialbokstaverFungerer() {
@@ -280,9 +357,10 @@ public class MineLagredeFilterTest extends AbstractTest {
         assertTrue(endepunktRespons.getContent().getFilterNavn().equals(spesialbokstaverFilterNavn));
     }
 
-    /**
+    /*
      * TESTER RELATERT TIL SORTING
-     **/
+     */
+
     @Test
     public void SortingFungerer() {
         Random random = new Random();
@@ -311,10 +389,10 @@ public class MineLagredeFilterTest extends AbstractTest {
         assertTrue(mineLagredeFilterMedSortOrder.getContent().stream().allMatch(x -> x.getSortOrder() == sortOrderMap.get(x.getFilterId())));
     }
 
-
-    /**
+    /*
      * HJELPEFUNKSJONER
-     **/
+     */
+
     private ApiResponse<List<MineLagredeFilterModel>> getMineLagredeFilter() {
         try {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/minelagredefilter").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
