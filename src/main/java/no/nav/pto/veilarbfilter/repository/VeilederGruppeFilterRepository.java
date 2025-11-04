@@ -1,8 +1,8 @@
 package no.nav.pto.veilarbfilter.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.common.json.JsonUtils;
 import no.nav.pto.veilarbfilter.database.Table.VeilederGrupperFilter;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger;
@@ -26,8 +26,6 @@ import static no.nav.pto.veilarbfilter.util.DateUtils.fromLocalDateTimeToTimesta
 public class VeilederGruppeFilterRepository implements FilterService {
     private final JdbcTemplate db;
     private final MineLagredeFilterRepository mineLagredeFilterRepository;
-    private final ObjectMapper objectMapper;
-
 
     public Optional<FilterModel> lagreFilter(String enhetId, NyttFilterModel nyttFilterModel) throws IllegalArgumentException {
         try {
@@ -42,7 +40,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
             Integer updateCount = db.execute(insertSql, (PreparedStatementCallback<Integer>) ps -> {
                 try {
                     ps.setString(1, nyttFilterModel.getFilterNavn());
-                    ps.setString(2, objectMapper.writeValueAsString(nyttFilterModel.getFilterValg()));
+                    ps.setString(2, JsonUtils.toJson(nyttFilterModel.getFilterValg()));
                     ps.setTimestamp(3, fromLocalDateTimeToTimestamp(LocalDateTime.now()));
                     return ps.executeUpdate();
                 } catch (Exception e) {
@@ -82,7 +80,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
 
             if (numOfRows > 0) {
                 sql = String.format("UPDATE %s SET %s = ?, %s = to_json(?::JSON), %s = ? WHERE %s = ?", Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.FILTER_CLEANUP, Filter.FILTER_ID);
-                db.update(sql, filter.getFilterNavn(), objectMapper.writeValueAsString(filter.getFilterValg()), filter.getFilterCleanup(), filter.getFilterId());
+                db.update(sql, filter.getFilterNavn(), JsonUtils.toJson(filter.getFilterValg()), filter.getFilterCleanup(), filter.getFilterId());
             }
 
             return hentFilter(filter.getFilterId());
@@ -101,7 +99,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
                     VeilederGrupperFilter.TABLE_NAME, Filter.TABLE_NAME, VeilederGrupperFilter.FILTER_ID, Filter.FILTER_ID);
             FilterModel veilederGruppeFilterModel = db.queryForObject(sql, (rs, rowNum) -> {
                         try {
-                            PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
+                            PortefoljeFilter portefoljeFilter = JsonUtils.fromJson(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
                             return new VeilederGruppeFilterModel(rs.getInt(VeilederGrupperFilter.FILTER_ID),
                                     rs.getString(Filter.FILTER_NAVN),
                                     portefoljeFilter,
@@ -130,7 +128,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
                 try {
                     return new VeilederGruppeFilterModel(rs.getInt(VeilederGrupperFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
-                            objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class),
+                            JsonUtils.fromJson(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class),
                             DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                             rs.getInt(Filter.FILTER_CLEANUP),
                             rs.getString(VeilederGrupperFilter.ENHET_ID));

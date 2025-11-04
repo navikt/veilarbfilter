@@ -2,9 +2,9 @@ package no.nav.pto.veilarbfilter.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import lombok.val;
+import no.nav.common.json.JsonUtils;
 import no.nav.common.utils.FileUtils;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.*;
@@ -35,9 +35,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @WebMvcTest(controllers = MineLagredeFilterController.class)
 @ActiveProfiles({"test"})
 public class MineLagredeFilterTest extends AbstractTest {
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mockMvc = MockMvcBuilders.standaloneSetup()
@@ -200,7 +197,7 @@ public class MineLagredeFilterTest extends AbstractTest {
      */
 
     @Test
-    public void OppdateringAvFilterErGyldig() throws JsonProcessingException {
+    public void OppdateringAvFilterErGyldig() {
         val nyttFilter = lagreNyttFilterVerdi(getRandomNyttFilter());
 
         if (nyttFilter == null) {
@@ -225,7 +222,7 @@ public class MineLagredeFilterTest extends AbstractTest {
 
         assertTrue(oppdatertFilter.isPresent());
         assertTrue(oppdatertFilter.get().getFilterNavn().equals(nyttFilter.getFilterNavn()));
-        assertTrue(objectMapper.writeValueAsString(oppdatertFilter.get().getFilterValg()).equals(objectMapper.writeValueAsString(nyttFilter.getFilterValg())));
+        assertTrue(JsonUtils.toJson(oppdatertFilter.get().getFilterValg()).equals(JsonUtils.toJson(nyttFilter.getFilterValg())));
     }
 
     /**
@@ -398,7 +395,7 @@ public class MineLagredeFilterTest extends AbstractTest {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/minelagredefilter").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
                 }), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(),
@@ -413,10 +410,10 @@ public class MineLagredeFilterTest extends AbstractTest {
     private ApiResponse<MineLagredeFilterModel> lagreNyttFilterRespons(NyttFilterModel valgteFilter) {
         try {
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter").content(objectMapper.writeValueAsString(valgteFilter)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter").content(JsonUtils.toJson(valgteFilter)).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
@@ -429,10 +426,10 @@ public class MineLagredeFilterTest extends AbstractTest {
     private ApiResponse<MineLagredeFilterModel> oppdaterMineLagredeFilter(FilterModel filterModel) {
         try {
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/minelagredefilter").content(objectMapper.writeValueAsString(filterModel)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/minelagredefilter").content(JsonUtils.toJson(filterModel)).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
@@ -444,9 +441,9 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private ApiResponse<List<MineLagredeFilterModel>> oppdaterMineLagredeFilter(List<SortOrder> sortOrder) {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter/lagresortering").content(objectMapper.writeValueAsString(sortOrder)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter/lagresortering").content(JsonUtils.toJson(sortOrder)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
                 }), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
