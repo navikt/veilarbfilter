@@ -111,7 +111,7 @@ class PortefoljeFilterTest {
         PortefoljeFilter portefoljeFilter = new PortefoljeFilter(null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null, List.of("A123", "B123"), null, null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null);
+                null, null, null, null, null, null);
         String jsonString = objectMapper.writeValueAsString(portefoljeFilter);
         Assertions.assertEquals(jsonString, correctOutput);
     }

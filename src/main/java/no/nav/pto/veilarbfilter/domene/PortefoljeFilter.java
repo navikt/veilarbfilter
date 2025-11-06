@@ -143,6 +143,9 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> ytelseTiltakspengerArena = emptyList();
 
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> ytelseDagpengerArena = emptyList();
+
     @JsonIgnore
     public Boolean isNotEmpty() {
         return (kjonn != null && !kjonn.isEmpty()) ||
@@ -186,6 +189,7 @@ public class PortefoljeFilter {
                (ytelseAapArena != null && !ytelseAapArena.isEmpty()) ||
                (ytelseAapKelvin != null && !ytelseAapKelvin.isEmpty()) ||
                (ytelseTiltakspenger != null && !ytelseTiltakspenger.isEmpty()) ||
-               (ytelseTiltakspengerArena != null && !ytelseTiltakspengerArena.isEmpty());
+               (ytelseTiltakspengerArena != null && !ytelseTiltakspengerArena.isEmpty()) ||
+               (ytelseDagpengerArena != null && !ytelseDagpengerArena.isEmpty());
     }
 }
