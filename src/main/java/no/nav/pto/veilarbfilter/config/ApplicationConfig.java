@@ -1,7 +1,6 @@
 package no.nav.pto.veilarbfilter.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.getunleash.DefaultUnleash;
@@ -12,14 +11,13 @@ import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.job.leader_election.LeaderElectionHttpClient;
+import no.nav.common.json.JsonMapper;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
 import no.nav.common.utils.EnvironmentUtils;
 import no.nav.poao_tilgang.api.dto.response.TilgangsattributterResponse;
 import no.nav.poao_tilgang.client.*;
-import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
-import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +26,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,12 +71,7 @@ public class ApplicationConfig {
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(LocalDateTime.class, new DateDeserializer());
-        module.addSerializer(LocalDateTime.class, new DateSerializer());
-        mapper.registerModule(module);
-        return mapper;
+        return JsonMapper.defaultObjectMapper();
     }
 
     @Bean

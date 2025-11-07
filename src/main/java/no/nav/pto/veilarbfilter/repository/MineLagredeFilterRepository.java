@@ -1,8 +1,8 @@
 package no.nav.pto.veilarbfilter.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.common.json.JsonUtils;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger;
 import no.nav.pto.veilarbfilter.util.DateUtils;
@@ -25,7 +25,6 @@ import static no.nav.pto.veilarbfilter.util.DateUtils.fromLocalDateTimeToTimesta
 @RequiredArgsConstructor
 public class MineLagredeFilterRepository implements FilterService {
     private final JdbcTemplate db;
-    private final ObjectMapper objectMapper;
 
     public Optional<FilterModel> lagreFilter(String veilederId, NyttFilterModel nyttFilterModel) throws IllegalArgumentException {
         try {
@@ -38,7 +37,7 @@ public class MineLagredeFilterRepository implements FilterService {
 
             String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?, to_json(?::JSON), ?)",
                     Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET);
-            int affectedRows = db.update(insertSql, nyttFilterModel.getFilterNavn(), objectMapper.writeValueAsString(nyttFilterModel.getFilterValg()), fromLocalDateTimeToTimestamp(LocalDateTime.now()));
+            int affectedRows = db.update(insertSql, nyttFilterModel.getFilterNavn(), JsonUtils.toJson(nyttFilterModel.getFilterValg()), fromLocalDateTimeToTimestamp(LocalDateTime.now()));
 
             if (affectedRows > 0) {
                 String lastId = String.format("SELECT MAX(%s) FROM %s",
@@ -76,7 +75,7 @@ public class MineLagredeFilterRepository implements FilterService {
 
             if (numOfRows > 0) {
                 sql = String.format("UPDATE %s SET %s = ?, %s = to_json(?::JSON) WHERE %s = ?", Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.FILTER_ID);
-                db.update(sql, filter.getFilterNavn(), objectMapper.writeValueAsString(filter.getFilterValg()), filter.getFilterId());
+                db.update(sql, filter.getFilterNavn(), JsonUtils.toJson(filter.getFilterValg()), filter.getFilterId());
             }
 
             return hentFilter(filter.getFilterId());
@@ -95,7 +94,7 @@ public class MineLagredeFilterRepository implements FilterService {
                     MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, Filter.FILTER_ID);
             FilterModel mineLagredeFilterModel = db.queryForObject(sql, (rs, rowNum) -> {
                         try {
-                            PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
+                            PortefoljeFilter portefoljeFilter = JsonUtils.fromJson(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
 
                             return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                                     rs.getString(Filter.FILTER_NAVN),
@@ -126,7 +125,7 @@ public class MineLagredeFilterRepository implements FilterService {
 
             return db.query(sql, (rs, rowNum) -> {
                 try {
-                    PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
+                    PortefoljeFilter portefoljeFilter = JsonUtils.fromJson(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
 
                     return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
@@ -155,7 +154,7 @@ public class MineLagredeFilterRepository implements FilterService {
 
             return db.query(sql, (rs, rowNum) -> {
                 try {
-                    PortefoljeFilter portefoljeFilter = objectMapper.readValue(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
+                    PortefoljeFilter portefoljeFilter = JsonUtils.fromJson(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
 
                     return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
@@ -213,7 +212,7 @@ public class MineLagredeFilterRepository implements FilterService {
         List<MineLagredeFilterModel> alleMineFilter = hentAllLagredeFilter();
         alleMineFilter.stream().forEach(mineFilter -> {
             if (!mineFilter.getFilterValg().getVeiledere().isEmpty() &&
-                erVeiledereListeErLik(mineFilter.getFilterValg().getVeiledere(), veiledereInDeletedGroup)) {
+                    erVeiledereListeErLik(mineFilter.getFilterValg().getVeiledere(), veiledereInDeletedGroup)) {
                 deactiveMineFilter(mineFilter.getFilterId(), veilederGroupName);
             }
         });
@@ -242,12 +241,12 @@ public class MineLagredeFilterRepository implements FilterService {
         Integer count;
         if (filterIdOptional.isPresent()) {
             sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ? AND %s =  1 AND f.filter_id != ?",
+                            "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ? AND %s =  1 AND f.filter_id != ?",
                     MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.FILTER_NAVN, MineLagredeFilter.AKTIV);
             count = db.queryForObject(sql, Integer.class, veilederId, filterNavn, filterIdOptional.get());
         } else {
             sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ? AND %s =  1",
+                            "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ? AND %s =  1",
                     MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.FILTER_NAVN, MineLagredeFilter.AKTIV);
             count = db.queryForObject(sql, Integer.class, veilederId, filterNavn);
         }
@@ -262,14 +261,14 @@ public class MineLagredeFilterRepository implements FilterService {
             String sql;
             if (filterIdOptional.isPresent()) {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                    "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1 AND f.filter_id != ?",
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1 AND f.filter_id != ?",
                         MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
-                count = db.queryForObject(sql, Integer.class, veilederId, objectMapper.writeValueAsString(filterValg), filterIdOptional.get());
+                count = db.queryForObject(sql, Integer.class, veilederId, JsonUtils.toJson(filterValg), filterIdOptional.get());
             } else {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                    "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1",
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1",
                         MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
-                count = db.queryForObject(sql, Integer.class, veilederId, objectMapper.writeValueAsString(filterValg));
+                count = db.queryForObject(sql, Integer.class, veilederId, JsonUtils.toJson(filterValg));
             }
 
             return count > 0;

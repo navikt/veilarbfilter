@@ -1,10 +1,12 @@
 package no.nav.pto.veilarbfilter.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import lombok.val;
+import no.nav.common.json.JsonUtils;
+import no.nav.common.utils.FileUtils;
 import no.nav.pto.veilarbfilter.AbstractTest;
+import no.nav.pto.veilarbfilter.database.Table;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.service.LagredeFilterFeilmeldinger;
 import org.junit.jupiter.api.Assertions;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -27,14 +30,16 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = MineLagredeFilterController.class)
 @ActiveProfiles({"test"})
 public class MineLagredeFilterTest extends AbstractTest {
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private MockMvc mockMvc = MockMvcBuilders.standaloneSetup()
@@ -42,6 +47,9 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     @BeforeEach
     public void beforeEach() {
+        jdbcTemplate.update(String.format("TRUNCATE TABLE %s", Table.MineLagredeFilter.TABLE_NAME));
+        jdbcTemplate.update(String.format("TRUNCATE TABLE %s CASCADE", Table.Filter.TABLE_NAME));
+        jdbcTemplate.update(String.format("ALTER SEQUENCE %s RESTART WITH 1", Table.Filter.FILTER_ID_SEQUENCE));
 
     }
 
@@ -50,11 +58,11 @@ public class MineLagredeFilterTest extends AbstractTest {
         Assertions.assertNotNull(mockMvc);
     }
 
-    /**
+    /*
      * TESTER RELATERT TIL GYLDIGHET FOR LAGRING AV NYTT FILTER
-     **/
-    @Test
+     */
 
+    @Test
     public void LagringAvNyttFilterErGyldig() {
         val mineLagredeFilterResponse = getMineLagredeFilter();
 
@@ -73,8 +81,43 @@ public class MineLagredeFilterTest extends AbstractTest {
     }
 
     /**
+     * Denne testen sjekker i utgangspunktet det samme some {@link MineLagredeFilterTest#LagringAvNyttFilterErGyldig},
+     * men gjør det et hakk "lenger ut" (sett fra brukers perspektiv) ved å verifisere at JSON-responsen er som forventet.
+     * <br>
+     * <br>
+     * Testen ble opprettet på bakgrunn av en bug ifm. serialisering av {@link PortefoljeFilter}. Når nye filtre lagres
+     * i DB serialiseres {@link NyttFilterModel#filterValg} som en JSON-string. Bug-en resulterte i at alle feltene i
+     * {@link PortefoljeFilter#aktiviteter} ble duplisert (både lowercase og uppercase). Dette klarte derimot ikke
+     * {@link MineLagredeFilterTest#LagringAvNyttFilterErGyldig} å fange opp.
+     */
+    @Test
+    public void LagringAvNyttFilterErGyldigJsonAssert() throws Exception {
+        val request = FileUtils.getResourceFileAsString("nytt-filter-request.json");
+
+        String actualResponse = this.mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .post("/api/minelagredefilter")
+                                .content(request)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String expectedResponse = FileUtils.getResourceFileAsString("nytt-filter-response.json");
+
+        Object actualResponseFilterValg = JsonPath.read(actualResponse, "$.filterValg");
+        Object expectedResponseFilterValg = JsonPath.read(expectedResponse, "$.filterValg");
+        String actualResponseFilterNavn = JsonPath.read(actualResponse, "$.filterNavn");
+        String expectedResponseFilterNavn = JsonPath.read(actualResponse, "$.filterNavn");
+
+        assertThat(actualResponseFilterValg).isEqualTo(expectedResponseFilterValg);
+        assertThat(actualResponseFilterNavn).isEqualTo(expectedResponseFilterNavn);
+    }
+
+    /*
      * TESTER RELATERT TIL UGYLDIGHET FOR LAGRING AV NYTT FILTER
-     **/
+     */
+
     @Test
     public void FilternavnEksistererAlleredeForNyttFilter() {
         val randomNyttFilter = getRandomNyttFilter();
@@ -159,11 +202,12 @@ public class MineLagredeFilterTest extends AbstractTest {
         );
     }
 
-    /**
+    /*
      * TESTER RELATERT TIL GYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER
-     **/
+     */
+
     @Test
-    public void OppdateringAvFilterErGyldig() throws JsonProcessingException {
+    public void OppdateringAvFilterErGyldig() {
         val nyttFilter = lagreNyttFilterVerdi(getRandomNyttFilter());
 
         if (nyttFilter == null) {
@@ -188,7 +232,49 @@ public class MineLagredeFilterTest extends AbstractTest {
 
         assertTrue(oppdatertFilter.isPresent());
         assertTrue(oppdatertFilter.get().getFilterNavn().equals(nyttFilter.getFilterNavn()));
-        assertTrue(objectMapper.writeValueAsString(oppdatertFilter.get().getFilterValg()).equals(objectMapper.writeValueAsString(nyttFilter.getFilterValg())));
+        assertTrue(JsonUtils.toJson(oppdatertFilter.get().getFilterValg()).equals(JsonUtils.toJson(nyttFilter.getFilterValg())));
+    }
+
+    /**
+     * Denne testen sjekker i utgangspunktet det samme some {@link MineLagredeFilterTest#OppdateringAvFilterErGyldig},
+     * men gjør det et hakk "lenger ut" (sett fra brukers perspektiv) ved å verifisere at JSON-responsen er som forventet.
+     * <br>
+     * <br>
+     * Testen ble opprettet på bakgrunn av en bug ifm. serialisering av {@link PortefoljeFilter}. Når nye filtre lagres
+     * i DB serialiseres {@link NyttFilterModel#filterValg} som en JSON-string. Bug-en resulterte i at alle feltene i
+     * {@link PortefoljeFilter#aktiviteter} ble duplisert (både lowercase og uppercase). Dette klarte derimot ikke
+     * {@link MineLagredeFilterTest#OppdateringAvFilterErGyldig} å fange opp.
+     */
+    @Test
+    public void OppdateringAvFilterErGyldigJsonAssert() throws Exception {
+        String requestNyttFilter = FileUtils.getResourceFileAsString("nytt-filter-2-request.json");
+        this.mockMvc.perform(
+                MockMvcRequestBuilders
+                        .post("/api/minelagredefilter")
+                        .content(requestNyttFilter)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        String requestOppdatertFilter = FileUtils.getResourceFileAsString("oppdatert-filter-request.json");
+        String actualResponse = this.mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .put("/api/minelagredefilter")
+                                .content(requestOppdatertFilter)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String expectedResponse = FileUtils.getResourceFileAsString("oppdatert-filter-response.json");
+
+        Object actualResponseFilterValg = JsonPath.read(actualResponse, "$.filterValg");
+        Object expectedResponseFilterValg = JsonPath.read(expectedResponse, "$.filterValg");
+        String actualResponseFilterNavn = JsonPath.read(actualResponse, "$.filterNavn");
+        String expectedResponseFilterNavn = JsonPath.read(actualResponse, "$.filterNavn");
+
+
+        assertThat(actualResponseFilterValg).isEqualTo(expectedResponseFilterValg);
+        assertThat(actualResponseFilterNavn).isEqualTo(expectedResponseFilterNavn);
     }
 
     @Test
@@ -213,9 +299,10 @@ public class MineLagredeFilterTest extends AbstractTest {
         assertTrue(mineLagredeFilter.stream().noneMatch(x -> x.getFilterId() == lagretMineLagredeFilterResponse.getFilterId()));
     }
 
-    /**
+    /*
      * TESTER RELATERT TIL UGYLDIGHET FOR OPPDATERING AV EKSISTERENDE FILTER 
-     **/
+     */
+
     @Test
     public void ForLangtNnavnErUgyldig() {
         val endepunktRespons =
@@ -262,9 +349,9 @@ public class MineLagredeFilterTest extends AbstractTest {
     }
 
 
-    /**
+    /*
      * TESTER RELATERT TIL GYLDIGHET FOR BÅDE LAGRING OG OPPDATERING
-     **/
+     */
     //@Test
     // @TODO: fix this test
     public void SpesialbokstaverFungerer() {
@@ -280,9 +367,10 @@ public class MineLagredeFilterTest extends AbstractTest {
         assertTrue(endepunktRespons.getContent().getFilterNavn().equals(spesialbokstaverFilterNavn));
     }
 
-    /**
+    /*
      * TESTER RELATERT TIL SORTING
-     **/
+     */
+
     @Test
     public void SortingFungerer() {
         Random random = new Random();
@@ -311,16 +399,16 @@ public class MineLagredeFilterTest extends AbstractTest {
         assertTrue(mineLagredeFilterMedSortOrder.getContent().stream().allMatch(x -> x.getSortOrder() == sortOrderMap.get(x.getFilterId())));
     }
 
-
-    /**
+    /*
      * HJELPEFUNKSJONER
-     **/
+     */
+
     private ApiResponse<List<MineLagredeFilterModel>> getMineLagredeFilter() {
         try {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/minelagredefilter").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
                 }), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(),
@@ -335,10 +423,10 @@ public class MineLagredeFilterTest extends AbstractTest {
     private ApiResponse<MineLagredeFilterModel> lagreNyttFilterRespons(NyttFilterModel valgteFilter) {
         try {
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter").content(objectMapper.writeValueAsString(valgteFilter)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter").content(JsonUtils.toJson(valgteFilter)).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
@@ -351,10 +439,10 @@ public class MineLagredeFilterTest extends AbstractTest {
     private ApiResponse<MineLagredeFilterModel> oppdaterMineLagredeFilter(FilterModel filterModel) {
         try {
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/minelagredefilter").content(objectMapper.writeValueAsString(filterModel)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/minelagredefilter").content(JsonUtils.toJson(filterModel)).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
@@ -366,9 +454,9 @@ public class MineLagredeFilterTest extends AbstractTest {
 
     private ApiResponse<List<MineLagredeFilterModel>> oppdaterMineLagredeFilter(List<SortOrder> sortOrder) {
         try {
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter/lagresortering").content(objectMapper.writeValueAsString(sortOrder)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter/lagresortering").content(JsonUtils.toJson(sortOrder)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
                 }), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());

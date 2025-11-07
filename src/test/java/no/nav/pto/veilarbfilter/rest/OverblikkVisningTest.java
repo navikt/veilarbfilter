@@ -1,10 +1,9 @@
 package no.nav.pto.veilarbfilter.rest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import no.nav.common.json.JsonUtils;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.database.Table;
-import no.nav.pto.veilarbfilter.domene.OverblikkVisning;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,9 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @WebMvcTest(controllers = OverblikkVisningController.class)
 @ActiveProfiles({"test"})
 public class OverblikkVisningTest extends AbstractTest {
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mockMvc = MockMvcBuilders.standaloneSetup()
@@ -135,7 +131,7 @@ public class OverblikkVisningTest extends AbstractTest {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/overblikkvisning").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
                 }), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(),

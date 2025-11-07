@@ -1,0 +1,105 @@
+{
+  "filterNavn": "Stort filter 2",
+  "filterValg": {
+    "ferdigfilterListe": [],
+    "alder": [
+      "0-10"
+    ],
+    "kjonn": "M",
+    "landgruppe": [
+      "LANDGRUPPE_2"
+    ],
+    "foedeland": [],
+    "fodselsdagIMnd": [
+      "10"
+    ],
+    "innsatsgruppe": [],
+    "formidlingsgruppe": [
+      "IARBS"
+    ],
+    "servicegruppe": [
+      "IVURD"
+    ],
+    "veiledere": [],
+    "ytelse": "ORDINARE_DAGPENGER",
+    "aktiviteter": {
+      "BEHANDLING": "NA",
+      "EGEN": "NA",
+      "GRUPPEAKTIVITET": "NA",
+      "IJOBB": "NEI",
+      "MOTE": "JA",
+      "SOKEAVTALE": "NA",
+      "STILLING": "NEI",
+      "TILTAK": "JA",
+      "UTDANNINGAKTIVITET": "NA"
+    },
+    "aktiviteterForenklet": [],
+    "tiltakstyper": [],
+    "hovedmal": [],
+    "navnEllerFnrQuery": "",
+    "rettighetsgruppe": [
+      "AAP"
+    ],
+    "manuellBrukerStatus": [
+      "KRR"
+    ],
+    "veilederNavnQuery": "",
+    "registreringstype": [
+      "HAR_BLITT_SAGT_OPP"
+    ],
+    "cvJobbprofil": "HAR_DELT_CV",
+    "utdanning": [
+      "VIDEREGAENDE_FAGBREV_SVENNEBREV"
+    ],
+    "utdanningGodkjent": [
+      "VET_IKKE"
+    ],
+    "utdanningBestatt": [
+      "NEI"
+    ],
+    "sisteEndringKategori": [
+      "NY_IJOBB"
+    ],
+    "ulesteEndringer": null,
+    "tolkebehov": [
+      "TALESPRAAKTOLK"
+    ],
+    "tolkBehovSpraak": [],
+    "stillingFraNavFilter": [
+      "CV_KAN_DELES_STATUS_JA"
+    ],
+    "geografiskBosted": [
+      "030114"
+    ],
+    "visGeografiskBosted": [
+      "1"
+    ],
+    "avvik14aVedtak": [],
+    "ensligeForsorgere": [
+      "OVERGANGSSTONAD"
+    ],
+    "barnUnder18Aar": [
+      "HAR_BARN_UNDER_18_AAR"
+    ],
+    "barnUnder18AarAlder": [],
+    "fargekategorier": [],
+    "gjeldendeVedtak14a": [
+      "HAR_14A_VEDTAK"
+    ],
+    "innsatsgruppeGjeldendeVedtak14a": [
+      "SPESIELT_TILPASSET_INNSATS"
+    ],
+    "hovedmalGjeldendeVedtak14a": [
+      "BEHOLDE_ARBEID"
+    ],
+    "ytelseAapArena": [],
+    "ytelseAapKelvin": [
+      "HAR_IKKE_AAP"
+    ],
+    "ytelseTiltakspengerArena": [],
+    "ytelseTiltakspenger": [
+      "HAR_TILTAKSPENGER"
+    ],
+    "ytelseDagpengerArena": []
+  }
+}
