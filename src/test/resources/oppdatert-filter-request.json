@@ -99,7 +99,8 @@
     "ytelseTiltakspenger": [
       "HAR_TILTAKSPENGER"
     ],
-    "ytelseTiltakspengerArena": []
+    "ytelseTiltakspengerArena": [],
+    "ytelseDagpengerArena": []
   },
   "filterId": 1
 }
