@@ -11,6 +11,7 @@ public class Table {
         public static final String VALGTE_FILTER = "valgte_filter";
         public static final String OPPRETTET = "opprettet";
         public static final String FILTER_CLEANUP = "filter_cleanup";
+        public static final String FILTER_ID_SEQUENCE = "filter_filter_id_seq";
         private Filter() { throw new UnsupportedOperationException(); }
     }
 

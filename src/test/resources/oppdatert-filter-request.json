@@ -1,0 +1,106 @@
+{
+  "filterNavn": "Stort filter 2 (oppdatert)",
+  "filterValg": {
+    "aktiviteter": {
+      "BEHANDLING": "NA",
+      "EGEN": "NA",
+      "GRUPPEAKTIVITET": "NA",
+      "IJOBB": "NEI",
+      "MOTE": "JA",
+      "SOKEAVTALE": "JA",
+      "STILLING": "NEI",
+      "TILTAK": "JA",
+      "UTDANNINGAKTIVITET": "JA"
+    },
+    "aktiviteterForenklet": [],
+    "alder": [
+      "0-10"
+    ],
+    "avvik14aVedtak": [],
+    "barnUnder18Aar": [
+      "HAR_BARN_UNDER_18_AAR"
+    ],
+    "barnUnder18AarAlder": [],
+    "cvJobbprofil": "HAR_DELT_CV",
+    "ensligeForsorgere": [
+      "OVERGANGSSTONAD"
+    ],
+    "fargekategorier": [],
+    "ferdigfilterListe": [],
+    "fodselsdagIMnd": [
+      "10"
+    ],
+    "foedeland": [],
+    "formidlingsgruppe": [
+      "IARBS"
+    ],
+    "geografiskBosted": [
+      "030114"
+    ],
+    "gjeldendeVedtak14a": [
+      "HAR_14A_VEDTAK"
+    ],
+    "hovedmal": [],
+    "hovedmalGjeldendeVedtak14a": [
+      "BEHOLDE_ARBEID"
+    ],
+    "innsatsgruppe": [],
+    "innsatsgruppeGjeldendeVedtak14a": [
+      "SPESIELT_TILPASSET_INNSATS"
+    ],
+    "kjonn": "M",
+    "landgruppe": [
+      "LANDGRUPPE_2"
+    ],
+    "manuellBrukerStatus": [
+      "KRR"
+    ],
+    "navnEllerFnrQuery": "",
+    "registreringstype": [
+      "HAR_BLITT_SAGT_OPP"
+    ],
+    "rettighetsgruppe": [
+      "AAP"
+    ],
+    "servicegruppe": [
+      "IVURD"
+    ],
+    "sisteEndringKategori": [
+      "NY_IJOBB"
+    ],
+    "stillingFraNavFilter": [
+      "CV_KAN_DELES_STATUS_JA"
+    ],
+    "tiltakstyper": [],
+    "tolkBehovSpraak": [],
+    "tolkebehov": [
+      "TALESPRAAKTOLK"
+    ],
+    "ulesteEndringer": null,
+    "utdanning": [
+      "VIDEREGAENDE_FAGBREV_SVENNEBREV"
+    ],
+    "utdanningBestatt": [
+      "NEI"
+    ],
+    "utdanningGodkjent": [
+      "VET_IKKE"
+    ],
+    "veilederNavnQuery": "",
+    "veiledere": [],
+    "visGeografiskBosted": [
+      "1"
+    ],
+    "ytelse": "ORDINARE_DAGPENGER",
+    "ytelseAapArena": [],
+    "ytelseAapKelvin": [
+      "HAR_IKKE_AAP"
+    ],
+    "ytelseTiltakspenger": [
+      "HAR_TILTAKSPENGER"
+    ],
+    "ytelseTiltakspengerArena": [],
+    "ytelseDagpengerArena": []
+  },
+  "filterId": 1
+}

@@ -1,9 +1,11 @@
 package no.nav.pto.veilarbfilter.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getunleash.DefaultUnleash;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.job.leader_election.LeaderElectionClient;
+import no.nav.common.json.JsonMapper;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.PoaoTilgangClient;
@@ -22,6 +24,7 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -77,5 +80,11 @@ public class AppConfig {
         when(mock.isEnabled(anyString())).thenReturn(true);
 
         return mock;
+    }
+
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+        return JsonMapper.defaultObjectMapper();
     }
 }

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.0</version>
+        <version>3.5.6</version>
         <relativePath/>
     </parent>
 
@@ -16,12 +16,12 @@
 
     <properties>
         <java.version>21</java.version>
-        <common.version>3.2025.05.30_07.00-bef2e550fb22</common.version>
+        <common.version>3.2025.09.03_08.33-728ff4acbfdb</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
-        <testcontainers.version>1.21.1</testcontainers.version>
-        <junit.jupiter.version>5.13.1</junit.jupiter.version>
-        <unleash.version>10.2.2</unleash.version>
+        <testcontainers.version>1.21.3</testcontainers.version>
+        <junit.jupiter.version>6.0.0</junit.jupiter.version>
+        <unleash.version>11.1.1</unleash.version>
 
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -54,7 +54,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.3</version>
+                    <version>3.5.4</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -79,10 +79,20 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jetty</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -107,19 +117,19 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>6.3.0</version>
+            <version>7.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.7</version>
+            <version>42.7.8</version>
         </dependency>
 
         <!-- Funksjonell programmering-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.38</version>
+            <version>1.18.42</version>
         </dependency>
 
         <!-- Common -->
@@ -163,6 +173,11 @@
             <artifactId>job</artifactId>
             <version>${common.version}</version>
         </dependency>
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>json</artifactId>
+            <version>${common.version}</version>
+        </dependency>
 
         <!--Logging-->
         <dependency>
@@ -188,12 +203,12 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.18.0</version>
+            <version>1.19.0</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>11.9.1</version>
+            <version>11.15.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -203,7 +218,7 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>6.9.0</version>
+            <version>6.10.0</version>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -212,7 +227,7 @@
         <dependency>
             <groupId>com.github.navikt.poao-tilgang</groupId>
             <artifactId>client</artifactId>
-            <version>2025.04.07_12.31-9f6c0070a56e</version>
+            <version>2025.10.16_11.29-aaf8578da14c</version>
         </dependency>
         <dependency>
             <groupId>io.getunleash</groupId>
@@ -224,14 +239,14 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.15.0</version>
+            <version>1.15.4</version>
         </dependency>
 
         <!--TEST-->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.18.0</version>
+            <version>5.19.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

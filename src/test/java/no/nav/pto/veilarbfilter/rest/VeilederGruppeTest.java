@@ -1,8 +1,8 @@
 package no.nav.pto.veilarbfilter.rest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
+import no.nav.common.json.JsonUtils;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.domene.FilterModel;
 import no.nav.pto.veilarbfilter.domene.MineLagredeFilterModel;
@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-import java.util.UUID;
 
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,8 +32,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 @WebMvcTest(controllers = VeilederGruppeController.class)
 @ActiveProfiles({"test"})
 public class VeilederGruppeTest extends AbstractTest {
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private VeilederGrupperService veilederGrupperService;
@@ -152,7 +149,7 @@ public class VeilederGruppeTest extends AbstractTest {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/enhet/" + enhetId).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
                 }), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(),
@@ -167,10 +164,10 @@ public class VeilederGruppeTest extends AbstractTest {
     private ApiResponse<MineLagredeFilterModel> lagreNyttFilterRespons(String enhetId, NyttFilterModel valgteFilter) {
         try {
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/enhet/" + enhetId).content(objectMapper.writeValueAsString(valgteFilter)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/enhet/" + enhetId).content(JsonUtils.toJson(valgteFilter)).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
@@ -183,10 +180,10 @@ public class VeilederGruppeTest extends AbstractTest {
     private ApiResponse<MineLagredeFilterModel> oppdaterVeilederFilter(String enhetId, FilterModel filterModel) {
         try {
 
-            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/enhet/" + enhetId).content(objectMapper.writeValueAsString(filterModel)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/enhet/" + enhetId).content(JsonUtils.toJson(filterModel)).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
@@ -213,8 +210,32 @@ public class VeilederGruppeTest extends AbstractTest {
     }
 
     public PortefoljeFilter getRandomPortefoljeFilter(List<String> veiledersList) {
-        return new PortefoljeFilter(null, emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), "",
-                emptyList(), "", emptyList(), emptyList(), emptyList(), "", veiledersList, "", emptyList(), "", emptyList(),
-                emptyList(), emptyList(), emptyList(), emptyList(), "", emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList());
+        return new PortefoljeFilter(
+                null,
+                emptyList(),
+                emptyList(),
+                emptyList(),
+                emptyList(),
+                emptyList(),
+                emptyList(),
+                "",
+                emptyList(),
+                "",
+                emptyList(),
+                emptyList(),
+                emptyList(),
+                "",
+                veiledersList,
+                "",
+                emptyList(),
+                "",
+                emptyList(),
+                emptyList(),
+                emptyList(),
+                emptyList(),
+                "",
+                emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(),
+                emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(),
+                emptyList(), emptyList(), emptyList(), emptyList(), emptyList());
     }
 }
