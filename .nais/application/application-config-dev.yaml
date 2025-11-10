@@ -16,6 +16,9 @@ spec:
     - https://veilarbfilter.intern.dev.nav.no
   webproxy: true
   observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
     logging:
       destinations:
         - id: elastic
