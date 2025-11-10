@@ -13,6 +13,15 @@ import static java.util.Collections.emptyList;
 @AllArgsConstructor
 @JsonPropertyOrder(alphabetic = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
+
+/* * * * * VIKTIG! * * * * * VIKTIG! * * * * * VIKTIG! * * * * * VIKTIG! * * * * * VIKTIG! * * * * *
+ * Om PortefoljeFilter får endringar må ein også oppdatere FiltervalgModell i                      *
+ * veilarbportefoljeflatefs. Begge repoa må deployast samstundes, elles knekk ein Mine filter i    *
+ * prod.                                                                                           *
+ *                                                                                                 *
+ * Relevant fil: https://github.com/navikt/veilarbportefoljeflatefs/blob/main/src/typer/filtervalg-modell.ts (2025-11-10) *
+ * Eksempel-PR frå "ytelseDagpengerArena"-filter: https://github.com/navikt/veilarbportefoljeflatefs/pull/1341 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public class PortefoljeFilter {
     private Aktiviteter aktiviteter = null;
 
