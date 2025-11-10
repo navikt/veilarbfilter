@@ -25,7 +25,8 @@ public class MineLagredeFilterService implements FilterService {
         try {
             PortefoljeFilter filtereMedKopiertArenaFilter = leggTilDagpengerFraYtelseINyttDagpengerArenaFilter(nyttFilter.getFilterValg());
             nyttFilter.setFilterValg(filtereMedKopiertArenaFilter);
-            return mineLagredeFilterRepository.lagreFilter(veilederId, nyttFilter);
+            Optional<FilterModel> lagraFilter = mineLagredeFilterRepository.lagreFilter(veilederId, nyttFilter);
+            return fjernDuplikatAvDagpengerArenaFilterTilFrontend(lagraFilter);
         } catch (IllegalArgumentException e) {
             throw e;
         }
@@ -36,7 +37,8 @@ public class MineLagredeFilterService implements FilterService {
         try {
             PortefoljeFilter filtereMedKopiertArenaFilter = leggTilDagpengerFraYtelseINyttDagpengerArenaFilter(filter.getFilterValg());
             filter.setFilterValg(filtereMedKopiertArenaFilter);
-            return mineLagredeFilterRepository.oppdaterFilter(veilederId, filter);
+            Optional<FilterModel> lagraFilter = mineLagredeFilterRepository.oppdaterFilter(veilederId, filter);
+            return fjernDuplikatAvDagpengerArenaFilterTilFrontend(lagraFilter);
         } catch (IllegalArgumentException e) {
             throw e;
         }
