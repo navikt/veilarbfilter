@@ -56,7 +56,7 @@ public class MineLagredeFilterService implements FilterService {
         List<FilterModel> filterModelListe = mineLagredeFilterRepository.finnFilterForFilterBruker(veilederId);
         return filterModelListe.stream()
                 .map(this::filtrerUtSamanlikn14aOgArenaFilterTilFrontend)
-                .map(this::fjernDuplikatAvDagpengerArenaFilterTilFrontend)
+                .map(filter -> filter == null ? null : fjernDuplikatAvDagpengerArenaFilterTilFrontend(filter))
                 .filter(Objects::nonNull).toList();
     }
 
