@@ -7,6 +7,7 @@ import no.nav.pto.veilarbfilter.auth.AuthUtils;
 import no.nav.pto.veilarbfilter.config.FeatureToggle;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -56,7 +57,7 @@ public class MineLagredeFilterService implements FilterService {
         List<FilterModel> filterModelListe = mineLagredeFilterRepository.finnFilterForFilterBruker(veilederId);
         return filterModelListe.stream()
                 .map(this::filtrerUtSamanlikn14aOgArenaFilterTilFrontend)
-                .map(this::fjernDuplikatAvDagpengerArenaFilterTilFrontend)
+                .map(filter -> filter == null ? null : fjernDuplikatAvDagpengerArenaFilterTilFrontend(filter))
                 .filter(Objects::nonNull).toList();
     }
 
@@ -145,7 +146,7 @@ public class MineLagredeFilterService implements FilterService {
     }
 
     // Når toggle er på skal kun det nye dagpenger filteret returneres. Når den er av skal kun det gamle returneres.
-    private FilterModel fjernDuplikatAvDagpengerArenaFilterTilFrontend(FilterModel filter) {
+    private FilterModel fjernDuplikatAvDagpengerArenaFilterTilFrontend(@NotNull FilterModel filter) {
         boolean brukNyttDagpengerFilterErSkruddPå = defaultUnleash.isEnabled(FeatureToggle.BRUK_NYTT_ARENA_DAGPENGER_FILTER);
 
         if (brukNyttDagpengerFilterErSkruddPå) {
