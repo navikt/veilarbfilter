@@ -7,10 +7,7 @@ import no.nav.pto.veilarbfilter.auth.AuthUtils;
 import no.nav.pto.veilarbfilter.config.FeatureToggle;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,10 +21,7 @@ public class MineLagredeFilterService implements FilterService {
     @Override
     public Optional<FilterModel> lagreFilter(String veilederId, NyttFilterModel nyttFilter) throws IllegalArgumentException {
         try {
-            PortefoljeFilter filtereMedKopiertArenaFilter = leggTilDagpengerFraYtelseINyttDagpengerArenaFilter(nyttFilter.getFilterValg());
-            nyttFilter.setFilterValg(filtereMedKopiertArenaFilter);
-            Optional<FilterModel> lagraFilter = mineLagredeFilterRepository.lagreFilter(veilederId, nyttFilter);
-            return fjernDuplikatAvDagpengerArenaFilterTilFrontend(lagraFilter);
+            return mineLagredeFilterRepository.lagreFilter(veilederId, nyttFilter);
         } catch (IllegalArgumentException e) {
             throw e;
         }
@@ -36,10 +30,7 @@ public class MineLagredeFilterService implements FilterService {
     @Override
     public Optional<FilterModel> oppdaterFilter(String veilederId, FilterModel filter) throws IllegalArgumentException {
         try {
-            PortefoljeFilter filtereMedKopiertArenaFilter = leggTilDagpengerFraYtelseINyttDagpengerArenaFilter(filter.getFilterValg());
-            filter.setFilterValg(filtereMedKopiertArenaFilter);
-            Optional<FilterModel> lagraFilter = mineLagredeFilterRepository.oppdaterFilter(veilederId, filter);
-            return fjernDuplikatAvDagpengerArenaFilterTilFrontend(lagraFilter);
+            return mineLagredeFilterRepository.oppdaterFilter(veilederId, filter);
         } catch (IllegalArgumentException e) {
             throw e;
         }
@@ -48,8 +39,7 @@ public class MineLagredeFilterService implements FilterService {
     @Override
     public Optional<FilterModel> hentFilter(Integer filterId) {
         Optional<FilterModel> filterModel = mineLagredeFilterRepository.hentFilter(filterId);
-        Optional<FilterModel> filterModelUtenDuplisertDagpenger = fjernDuplikatAvDagpengerArenaFilterTilFrontend(filterModel);
-        return filtrerUtSamanlikn14aOgArenaFilterTilFrontend(filterModelUtenDuplisertDagpenger);
+        return filtrerUtSamanlikn14aOgArenaFilterTilFrontend(filterModel);
     }
 
     @Override
@@ -57,7 +47,6 @@ public class MineLagredeFilterService implements FilterService {
         List<FilterModel> filterModelListe = mineLagredeFilterRepository.finnFilterForFilterBruker(veilederId);
         return filterModelListe.stream()
                 .map(this::filtrerUtSamanlikn14aOgArenaFilterTilFrontend)
-                .map(filter -> filter == null ? null : fjernDuplikatAvDagpengerArenaFilterTilFrontend(filter))
                 .filter(Objects::nonNull).toList();
     }
 
@@ -106,61 +95,4 @@ public class MineLagredeFilterService implements FilterService {
         }
     }
 
-    private PortefoljeFilter leggTilDagpengerFraYtelseINyttDagpengerArenaFilter(PortefoljeFilter filter) {
-        String dpYtelse = filter.getYtelse();
-        boolean dpOrdinar = Objects.equals(dpYtelse, "ORDINARE_DAGPENGER");
-        boolean dpMedPermittering = Objects.equals(dpYtelse, "DAGPENGER_MED_PERMITTERING");
-        boolean dpMedPermitteringFiskeindustri = Objects.equals(dpYtelse, "DAGPENGER_MED_PERMITTERING_FISKEINDUSTRI");
-        boolean dpLonnsgarantimidler = Objects.equals(dpYtelse, "LONNSGARANTIMIDLER_DAGPENGER");
-        boolean dpOvrige = Objects.equals(dpYtelse, "DAGPENGER_OVRIGE");
-        boolean dpArena = Objects.equals(dpYtelse, "DAGPENGER");
-
-
-        if (!dpOrdinar && !dpMedPermittering && !dpMedPermitteringFiskeindustri && !dpLonnsgarantimidler && !dpOvrige && !dpArena) {
-            return filter;
-        }
-
-        List<String> dagpengerNyttFilterListe;
-
-        if (dpOrdinar) {
-            dagpengerNyttFilterListe = List.of("HAR_DAGPENGER_ORDINAER");
-        } else if (dpMedPermittering) {
-            dagpengerNyttFilterListe = List.of("HAR_DAGPENGER_MED_PERMITTERING");
-        } else if (dpMedPermitteringFiskeindustri) {
-            dagpengerNyttFilterListe = List.of("HAR_DAGPENGER_MED_PERMITTERING_FISKEINDUSTRI");
-        } else if (dpLonnsgarantimidler) {
-            dagpengerNyttFilterListe = List.of("HAR_DAGPENGER_LONNSGARANTIMIDLER");
-        } else if (dpOvrige) {
-            dagpengerNyttFilterListe = List.of("HAR_DAGPENGER_OVRIGE");
-        } else {
-            dagpengerNyttFilterListe = List.of("HAR_DAGPENGER_ORDINAER", "HAR_DAGPENGER_MED_PERMITTERING", "HAR_DAGPENGER_MED_PERMITTERING_FISKEINDUSTRI",
-                    "HAR_DAGPENGER_LONNSGARANTIMIDLER", "HAR_DAGPENGER_OVRIGE");
-        }
-
-        filter.setYtelseDagpengerArena(dagpengerNyttFilterListe);
-        return filter;
-    }
-
-    private Optional<FilterModel> fjernDuplikatAvDagpengerArenaFilterTilFrontend(Optional<FilterModel> filterModelOptional) {
-        return filterModelOptional.map(this::fjernDuplikatAvDagpengerArenaFilterTilFrontend);
-    }
-
-    // Når toggle er på skal kun det nye dagpenger filteret returneres. Når den er av skal kun det gamle returneres.
-    private FilterModel fjernDuplikatAvDagpengerArenaFilterTilFrontend(@NotNull FilterModel filter) {
-        boolean brukNyttDagpengerFilterErSkruddPå = defaultUnleash.isEnabled(FeatureToggle.BRUK_NYTT_ARENA_DAGPENGER_FILTER);
-
-        if (brukNyttDagpengerFilterErSkruddPå) {
-            String gammeltYtelseFilter = filter.getFilterValg().getYtelse();
-            if (gammeltYtelseFilter != null) {
-                List<String> muligeDagpengerYtelseFiltre = List.of("ORDINARE_DAGPENGER", "DAGPENGER_MED_PERMITTERING",
-                        "DAGPENGER_MED_PERMITTERING_FISKEINDUSTRI", "LONNSGARANTIMIDLER_DAGPENGER", "DAGPENGER_OVRIGE", "DAGPENGER");
-                if (muligeDagpengerYtelseFiltre.contains(gammeltYtelseFilter)) {
-                    filter.getFilterValg().setYtelse(null);
-                }
-            }
-        } else {
-            filter.getFilterValg().setYtelseDagpengerArena(Collections.emptyList());
-        }
-        return filter;
-    }
 }
