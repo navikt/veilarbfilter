@@ -226,7 +226,6 @@ public class VeilederGruppeTest extends AbstractTest {
                 emptyList(),
                 "",
                 veiledersList,
-                "",
                 emptyList(),
                 "",
                 emptyList(),

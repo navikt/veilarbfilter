@@ -110,9 +110,6 @@ public class MetricsReporter implements MeterBinder {
                 if (filterValg.getVeiledere() != null && !filterValg.getVeiledere().isEmpty()) {
                     incrementFilterStats(stats, "veiledere");
                 }
-                if (filterValg.getYtelse() != null && !filterValg.getYtelse().isEmpty()) {
-                    incrementFilterStats(stats, "ytelse");
-                }
                 if (filterValg.getRegistreringstype() != null && !filterValg.getRegistreringstype().isEmpty()) {
                     incrementFilterStats(stats, "registreringstype");
                 }
