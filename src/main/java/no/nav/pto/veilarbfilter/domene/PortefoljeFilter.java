@@ -68,8 +68,6 @@ public class PortefoljeFilter {
     @Setter
     private List<String> veiledere = emptyList();
 
-    private String ytelse = "";
-
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     @Setter
     private List<String> registreringstype = emptyList();
@@ -160,7 +158,6 @@ public class PortefoljeFilter {
         return (kjonn != null && !kjonn.isEmpty()) ||
                (navnEllerFnrQuery != null && !navnEllerFnrQuery.isEmpty()) ||
                (veilederNavnQuery != null && !veilederNavnQuery.isEmpty()) ||
-               (ytelse != null && !ytelse.isEmpty()) ||
                (cvJobbprofil != null && !cvJobbprofil.isEmpty()) ||
                (alder != null && !alder.isEmpty()) ||
                (ferdigfilterListe != null && !ferdigfilterListe.isEmpty()) ||
