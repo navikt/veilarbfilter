@@ -503,7 +503,6 @@ public class MineLagredeFilterTest extends AbstractTest {
                 List.of(ferdigfilterListe.get(random.nextInt(6)), ferdigfilterListe.get(random.nextInt(6)), ferdigfilterListe.get(random.nextInt(6))),
                 emptyList(),
                 emptyList(),
-                emptyList(),
                 kjonnVelg.get(random.nextInt(1)),
                 emptyList(),
                 String.valueOf(rndChar()),
