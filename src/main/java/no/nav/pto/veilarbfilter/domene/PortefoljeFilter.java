@@ -41,10 +41,6 @@ public class PortefoljeFilter {
     @Setter
     private List<String> hovedmal = emptyList();
 
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
-    @Setter
-    private List<String> innsatsgruppe = emptyList();
-
     private String kjonn = "";
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
@@ -164,7 +160,6 @@ public class PortefoljeFilter {
                (fodselsdagIMnd != null && !fodselsdagIMnd.isEmpty()) ||
                (formidlingsgruppe != null && !formidlingsgruppe.isEmpty()) ||
                (hovedmal != null && !hovedmal.isEmpty()) ||
-               (innsatsgruppe != null && !innsatsgruppe.isEmpty()) ||
                (manuellBrukerStatus != null && !manuellBrukerStatus.isEmpty()) ||
                (rettighetsgruppe != null && !rettighetsgruppe.isEmpty()) ||
                (servicegruppe != null && !servicegruppe.isEmpty()) ||

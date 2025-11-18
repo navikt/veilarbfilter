@@ -86,9 +86,6 @@ public class MetricsReporter implements MeterBinder {
                 if (filterValg.getHovedmal() != null && !filterValg.getHovedmal().isEmpty()) {
                     incrementFilterStats(stats, "hovedmal");
                 }
-                if (filterValg.getInnsatsgruppe() != null && !filterValg.getInnsatsgruppe().isEmpty()) {
-                    incrementFilterStats(stats, "innsatsgruppe");
-                }
                 if (filterValg.getKjonn() != null && !filterValg.getKjonn().isEmpty()) {
                     incrementFilterStats(stats, "kjonn");
                 }
