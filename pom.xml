@@ -17,7 +17,7 @@
     <properties>
         <java.version>21</java.version>
         <kotlin.version>2.0.21</kotlin.version>
-        <common.version>3.2025.09.03_08.33-728ff4acbfdb</common.version>
+        <common.version>3.2025.10.10_08.21-bb7c7830d93c</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
         <testcontainers.version>1.21.3</testcontainers.version>
