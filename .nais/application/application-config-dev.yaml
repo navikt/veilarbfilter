@@ -23,8 +23,6 @@ spec:
       destinations:
         - id: elastic
         - id: loki
-  secureLogs:
-    enabled: true
   gcp:
     sqlInstances:
       - type: POSTGRES_15
@@ -65,6 +63,8 @@ spec:
           namespace: poao
         - application: veilarbveileder
           namespace: obo
+        - application: logging
+          namespace: nais-system
       external:
         - host: team-obo-unleash-api.nav.cloud.nais.io
   resources:
