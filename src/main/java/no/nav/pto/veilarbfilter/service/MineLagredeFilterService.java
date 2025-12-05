@@ -4,10 +4,13 @@ import io.getunleash.DefaultUnleash;
 import io.getunleash.UnleashContext;
 import lombok.RequiredArgsConstructor;
 import no.nav.pto.veilarbfilter.auth.AuthUtils;
-import no.nav.pto.veilarbfilter.config.FeatureToggle;
-import no.nav.pto.veilarbfilter.domene.*;
+import no.nav.pto.veilarbfilter.domene.FilterModel;
+import no.nav.pto.veilarbfilter.domene.MineLagredeFilterModel;
+import no.nav.pto.veilarbfilter.domene.NyttFilterModel;
+import no.nav.pto.veilarbfilter.domene.SortOrder;
 import no.nav.pto.veilarbfilter.repository.MineLagredeFilterRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -68,8 +71,8 @@ public class MineLagredeFilterService implements FilterService {
         return filterModelOptional.map(this::filtrerUtSamanlikn14aOgArenaFilterTilFrontend);
     }
 
-    /* I ein mellomfase der vi har skrudd på feature-toggle for å skjule samanliknings-filteret
-     * mellom gjeldande § 14 a-vedtak og Arena filtrerer vi vekk filter som inneheld det.
+    /* I ein mellomfase der vi har fjerna samanliknings-filteret for gjeldande § 14 a-vedtak og Arena frå frontend
+     * filtrerer vi vekk lagra filter som inneheld det. Neste steg blir å fjerne filteret heilt også i dette repoet.
      * Vi har på førehand sjekka at omfanget er lite, og at filtera berre handlar om avvik mellom gjeldande vedtak og Arena. */
     private FilterModel filtrerUtSamanlikn14aOgArenaFilterTilFrontend(FilterModel filter) {
         String veilederId = AuthUtils.getInnloggetVeilederIdent().toString();
@@ -77,22 +80,16 @@ public class MineLagredeFilterService implements FilterService {
                 .userId(veilederId)
                 .build();
 
-        boolean skjulFilterSammenligneGjeldende14aOgArena = defaultUnleash.isEnabled(FeatureToggle.SKJUL_FILTER_SAMMENLIGNE_GJELDENDE_14A_OG_ARENA, unleashContext);
+        List<String> avvik14aFilter = filter.getFilterValg().getAvvik14aVedtak();
 
-        if (!skjulFilterSammenligneGjeldende14aOgArena) {
-            // Ikkje gjer noko dersom feature-toggle er av
+        // Ikkje gjer noko om filteret ikkje inneheld Samanlikningsfilteret
+        if (avvik14aFilter.isEmpty()) {
             return filter;
-        } else {
-            List<String> avvik14aFilter = filter.getFilterValg().getAvvik14aVedtak();
-
-            // Ikkje gjer noko om filteret ikkje inneheld Samanlikningsfilteret
-            if (avvik14aFilter.isEmpty()) {
-                return filter;
-            }
-
-            // Filtrer bort filteret om det inneheld Samanlikningsfilteret
-            return null;
         }
+
+        // Filtrer bort filteret om det inneheld Samanlikningsfilteret
+        return null;
+
     }
 
 }
