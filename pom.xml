@@ -21,7 +21,7 @@
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
         <testcontainers.version>1.21.3</testcontainers.version>
-        <junit.jupiter.version>6.0.0</junit.jupiter.version>
+        <junit.jupiter.version>6.0.1</junit.jupiter.version>
         <unleash.version>11.1.1</unleash.version>
 
         <maven.compiler.source>21</maven.compiler.source>
