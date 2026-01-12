@@ -161,7 +161,7 @@ public class PortefoljeFilter {
                (utdanning != null && !utdanning.isEmpty()) ||
                (utdanningGodkjent != null && !utdanningGodkjent.isEmpty()) ||
                (utdanningBestatt != null && !utdanningBestatt.isEmpty()) ||
-               sisteEndringKategori != null ||
+                (sisteEndringKategori != null && !sisteEndringKategori.isEmpty() ) ||
                (aktiviteterForenklet != null && !aktiviteterForenklet.isEmpty()) ||
                aktiviteter != null ||
                (landgruppe != null && !landgruppe.isEmpty()) ||
