@@ -62,9 +62,7 @@
     "servicegruppe": [
       "IVURD"
     ],
-    "sisteEndringKategori": [
-      "NY_IJOBB"
-    ],
+    "sisteEndringKategori": "NY_IJOBB",
     "stillingFraNavFilter": [
       "CV_KAN_DELES_STATUS_JA"
     ],

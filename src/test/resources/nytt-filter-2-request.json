@@ -54,9 +54,7 @@
     "utdanningBestatt": [
       "NEI"
     ],
-    "sisteEndringKategori": [
-      "NY_IJOBB"
-    ],
+    "sisteEndringKategori": "NY_IJOBB",
     "ulesteEndringer": null,
     "tolkebehov": [
       "TALESPRAAKTOLK"
