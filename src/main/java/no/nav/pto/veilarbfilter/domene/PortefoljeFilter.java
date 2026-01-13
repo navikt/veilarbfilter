@@ -75,7 +75,6 @@ public class PortefoljeFilter {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> utdanningBestatt = emptyList();
 
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private String sisteEndringKategori = "";
 
     private String ulesteEndringer = "";
@@ -161,7 +160,7 @@ public class PortefoljeFilter {
                (utdanning != null && !utdanning.isEmpty()) ||
                (utdanningGodkjent != null && !utdanningGodkjent.isEmpty()) ||
                (utdanningBestatt != null && !utdanningBestatt.isEmpty()) ||
-                (sisteEndringKategori != null && !sisteEndringKategori.isEmpty() ) ||
+                (sisteEndringKategori != null && !sisteEndringKategori.isEmpty()) ||
                (aktiviteterForenklet != null && !aktiviteterForenklet.isEmpty()) ||
                aktiviteter != null ||
                (landgruppe != null && !landgruppe.isEmpty()) ||
