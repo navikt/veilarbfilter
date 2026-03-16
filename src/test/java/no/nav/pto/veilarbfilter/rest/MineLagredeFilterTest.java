@@ -516,11 +516,11 @@ public class MineLagredeFilterTest extends AbstractTest {
                 emptyList(),
                 emptyList(),
                 emptyList(),
-                emptyList(),
+                "",
                 "",
                 emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(),
                 emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(),
-                emptyList(), emptyList(), emptyList(), emptyList(), emptyList());
+                emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList());
     }
 
     private static char rndChar() {
