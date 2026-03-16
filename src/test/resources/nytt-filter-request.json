@@ -54,9 +54,7 @@
     "utdanningBestatt": [
       "NEI"
     ],
-    "sisteEndringKategori": [
-      "NY_IJOBB"
-    ],
+    "sisteEndringKategori": "NY_IJOBB",
     "ulesteEndringer": null,
     "tolkebehov": [
       "TALESPRAAKTOLK"
@@ -71,7 +69,6 @@
     "visGeografiskBosted": [
       "1"
     ],
-    "avvik14aVedtak": [],
     "ensligeForsorgere": [
       "OVERGANGSSTONAD"
     ],
@@ -97,6 +94,7 @@
     "ytelseTiltakspenger": [
       "HAR_TILTAKSPENGER"
     ],
-    "ytelseDagpengerArena": []
+    "ytelseDagpengerArena": [],
+    "ytelseDagpenger": []
   }
 }

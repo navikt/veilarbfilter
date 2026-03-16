@@ -154,6 +154,15 @@ public class MineLagredeFilterRepository implements FilterService {
 
             return db.query(sql, (rs, rowNum) -> {
                 try {
+                    // Normal oppførsel er at valgte_filter alltid skal ha en verdi.
+                    // Men vi har hatt et tilfelle der valgte_filter ble satt til "null", derfor legger vi til denne
+                    // håndteringen slik at vi slipper exception som følger av dette.
+                    Optional<String> maybeValgteFilterJson = Optional.ofNullable(rs.getString(Filter.VALGTE_FILTER));
+
+                    if(maybeValgteFilterJson.isEmpty()) {
+                        return null;
+                    }
+
                     PortefoljeFilter portefoljeFilter = JsonUtils.fromJson(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class);
 
                     return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),

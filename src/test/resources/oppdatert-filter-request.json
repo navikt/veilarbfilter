@@ -16,7 +16,6 @@
     "alder": [
       "0-10"
     ],
-    "avvik14aVedtak": [],
     "barnUnder18Aar": [
       "HAR_BARN_UNDER_18_AAR"
     ],
@@ -63,9 +62,7 @@
     "servicegruppe": [
       "IVURD"
     ],
-    "sisteEndringKategori": [
-      "NY_IJOBB"
-    ],
+    "sisteEndringKategori": "NY_IJOBB",
     "stillingFraNavFilter": [
       "CV_KAN_DELES_STATUS_JA"
     ],
@@ -97,7 +94,8 @@
       "HAR_TILTAKSPENGER"
     ],
     "ytelseTiltakspengerArena": [],
-    "ytelseDagpengerArena": []
+    "ytelseDagpengerArena": [],
+    "ytelseDagpenger" : []
   },
   "filterId": 1
 }
