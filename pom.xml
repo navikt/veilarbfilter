@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.6</version>
+        <version>4.0.6</version>
         <relativePath/>
     </parent>
 
@@ -16,11 +16,11 @@
 
     <properties>
         <java.version>21</java.version>
-        <kotlin.version>2.0.21</kotlin.version>
-        <common.version>3.2025.09.03_08.33-728ff4acbfdb</common.version>
+        <kotlin.version>2.3.20</kotlin.version>
+        <common.version>4.2026.05.05_06.25-f72fab488a93</common.version>
         <confluent.version>5.5.1</confluent.version>
         <avro.version>1.11.0</avro.version>
-        <testcontainers.version>1.21.3</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
         <junit.jupiter.version>6.0.1</junit.jupiter.version>
         <unleash.version>12.1.1</unleash.version>
 
@@ -175,7 +175,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.8</version>
+            <version>42.7.11</version>
         </dependency>
 
         <!-- Funksjonell programmering-->
@@ -271,7 +271,7 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>6.10.0</version>
+            <version>7.7.0</version>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -280,7 +280,7 @@
         <dependency>
             <groupId>com.github.navikt.poao-tilgang</groupId>
             <artifactId>client</artifactId>
-            <version>2025.10.16_11.29-aaf8578da14c</version>
+            <version>4.2026.05.11_07.01-54ab6eae4dde</version>
         </dependency>
         <dependency>
             <groupId>io.getunleash</groupId>
@@ -341,6 +341,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
