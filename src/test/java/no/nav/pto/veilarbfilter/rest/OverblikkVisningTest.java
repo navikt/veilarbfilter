@@ -1,6 +1,5 @@
 package no.nav.pto.veilarbfilter.rest;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import no.nav.common.json.JsonUtils;
 import no.nav.pto.veilarbfilter.AbstractTest;
 import no.nav.pto.veilarbfilter.database.Table;
@@ -9,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -131,8 +130,8 @@ public class OverblikkVisningTest extends AbstractTest {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/overblikkvisning").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
-                }), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), OverblikkVisningResponse.class
+                ), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(),
                         null, mvcResult.getResolvedException().getMessage());

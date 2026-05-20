@@ -1,19 +1,21 @@
 package no.nav.pto.veilarbfilter.domene.deserializer;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.FromStringDeserializer;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.pto.veilarbfilter.util.DateUtils;
-
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Slf4j
-public class DateDeserializer extends JsonDeserializer<LocalDateTime> {
+public class DateDeserializer extends FromStringDeserializer<LocalDateTime> {
+
+    public DateDeserializer() {
+        super(LocalDateTime.class);
+    }
 
     @Override
-    public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        return LocalDateTime.parse(jsonParser.getText(), DateUtils.getFormat());
+    protected LocalDateTime _deserialize(String value, DeserializationContext ctx) throws JacksonException {
+        return LocalDateTime.parse(value, DateUtils.getFormat());
     }
 }

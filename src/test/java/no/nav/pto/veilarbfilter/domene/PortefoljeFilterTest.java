@@ -3,20 +3,16 @@ package no.nav.pto.veilarbfilter.domene;
 import no.nav.common.json.JsonUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import java.io.IOException;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
 class PortefoljeFilterTest {
 
     @Test
     public void testDeserialization() throws IOException {
         var jsonString =
                 """
-                                 {"aktiviteter":{"BEHANDLING":"NA","EGEN":"NA","GRUPPEAKTIVITET":"NA","IJOBB":"NA","MOTE":"NA","SOKEAVTALE":"NA","STILLING":"NA","TILTAK":"NA","UTDANNINGAKTIVITET":"NA"},"alder":[],"ferdigfilterListe":["NYE_BRUKERE_FOR_VEILEDER","PERMITTERTE_ETTER_NIENDE_MARS"],"fodselsdagIMnd":[],"formidlingsgruppe":[],"kjonn":null,"manuellBrukerStatus":[],"navnEllerFnrQuery":"","rettighetsgruppe":[],"servicegruppe":[],"tiltakstyper":[],"veilederNavnQuery":"","veiledere":[],"registreringstype":[],"cvJobbprofil":null}"
+                                 {"aktiviteter":{"BEHANDLING":"NA","EGEN":"NA","GRUPPEAKTIVITET":"NA","IJOBB":"NA","MOTE":"NA","SOKEAVTALE":"NA","STILLING":"NA","TILTAK":"NA","UTDANNINGAKTIVITET":"NA"},"alder":[],"ferdigfilterListe":["NYE_BRUKERE_FOR_VEILEDER","PERMITTERTE_ETTER_NIENDE_MARS"],"fodselsdagIMnd":[],"formidlingsgruppe":[],"kjonn":null,"manuellBrukerStatus":[],"navnEllerFnrQuery":"","rettighetsgruppe":[],"servicegruppe":[],"tiltakstyper":[],"veilederNavnQuery":"","veiledere":[],"registreringstype":[],"cvJobbprofil":null}
                         """;
         PortefoljeFilter filterModel = JsonUtils.fromJson(jsonString, PortefoljeFilter.class);
 
@@ -80,22 +76,22 @@ class PortefoljeFilterTest {
     @Test
     public void testSerializationOfEmptyFilter() {
         String correctOutput = """
-                {"aktiviteter":null,"aktiviteterForenklet":[],"alder":[],"barnUnder18Aar":[],"barnUnder18AarAlder":[],"cvJobbprofil":"","ensligeForsorgere":[],"fargekategorier":[],"ferdigfilterListe":[],"fodselsdagIMnd":[],"foedeland":[],"formidlingsgruppe":[],"geografiskBosted":[],"gjeldendeVedtak14a":[],"hovedmalGjeldendeVedtak14a":[],"innsatsgruppeGjeldendeVedtak14a":[],"kjonn":"","landgruppe":[],"manuellBrukerStatus":[],"navnEllerFnrQuery":"","registreringstype":[],"rettighetsgruppe":[],"servicegruppe":[],"sisteEndringKategori":"","stillingFraNavFilter":[],"tiltakstyper":[],"tolkBehovSpraak":[],"tolkebehov":[],"ulesteEndringer":"","utdanning":[],"utdanningBestatt":[],"utdanningGodkjent":[],"veilederNavnQuery":"","veiledere":[],"visGeografiskBosted":[],"ytelseAapArena":[],"ytelseAapKelvin":[],"ytelseDagpenger":[],"ytelseDagpengerArena":[],"ytelseTiltakspenger":[],"ytelseTiltakspengerArena":[]}""";
+                {"aktiviteter":null,"alder":[],"ferdigfilterListe":[],"fodselsdagIMnd":[],"formidlingsgruppe":[],"kjonn":"","manuellBrukerStatus":[],"navnEllerFnrQuery":"","rettighetsgruppe":[],"servicegruppe":[],"tiltakstyper":[],"veilederNavnQuery":"","veiledere":[],"registreringstype":[],"cvJobbprofil":"","utdanning":[],"utdanningGodkjent":[],"utdanningBestatt":[],"sisteEndringKategori":"","ulesteEndringer":"","aktiviteterForenklet":[],"landgruppe":[],"foedeland":[],"tolkebehov":[],"tolkBehovSpraak":[],"stillingFraNavFilter":[],"geografiskBosted":[],"visGeografiskBosted":[],"ensligeForsorgere":[],"barnUnder18Aar":[],"barnUnder18AarAlder":[],"fargekategorier":[],"gjeldendeVedtak14a":[],"innsatsgruppeGjeldendeVedtak14a":[],"hovedmalGjeldendeVedtak14a":[],"ytelseAapArena":[],"ytelseAapKelvin":[],"ytelseTiltakspenger":[],"ytelseTiltakspengerArena":[],"ytelseDagpengerArena":[],"ytelseDagpenger":[]}""";
         PortefoljeFilter portefoljeFilter = new PortefoljeFilter();
         String jsonString = JsonUtils.toJson(portefoljeFilter);
-        Assertions.assertEquals(jsonString, correctOutput);
+        Assertions.assertEquals(correctOutput, jsonString);
     }
 
     @Test
     public void testSerializationOfVeiledere() {
         String correctOutput = """
-                {"aktiviteter":null,"aktiviteterForenklet":null,"alder":null,"barnUnder18Aar":null,"barnUnder18AarAlder":null,"cvJobbprofil":null,"ensligeForsorgere":null,"fargekategorier":null,"ferdigfilterListe":null,"fodselsdagIMnd":null,"foedeland":null,"formidlingsgruppe":null,"geografiskBosted":null,"gjeldendeVedtak14a":null,"hovedmalGjeldendeVedtak14a":null,"innsatsgruppeGjeldendeVedtak14a":null,"kjonn":null,"landgruppe":null,"manuellBrukerStatus":null,"navnEllerFnrQuery":null,"registreringstype":null,"rettighetsgruppe":null,"servicegruppe":null,"sisteEndringKategori":null,"stillingFraNavFilter":null,"tiltakstyper":null,"tolkBehovSpraak":null,"tolkebehov":null,"ulesteEndringer":null,"utdanning":null,"utdanningBestatt":null,"utdanningGodkjent":null,"veilederNavnQuery":null,"veiledere":["A123","B123"],"visGeografiskBosted":null,"ytelseAapArena":null,"ytelseAapKelvin":null,"ytelseDagpenger":null,"ytelseDagpengerArena":null,"ytelseTiltakspenger":null,"ytelseTiltakspengerArena":null}""";
+                {"aktiviteter":null,"alder":null,"ferdigfilterListe":null,"fodselsdagIMnd":null,"formidlingsgruppe":null,"kjonn":null,"manuellBrukerStatus":null,"navnEllerFnrQuery":null,"rettighetsgruppe":null,"servicegruppe":null,"tiltakstyper":null,"veilederNavnQuery":null,"veiledere":["A123","B123"],"registreringstype":null,"cvJobbprofil":null,"utdanning":null,"utdanningGodkjent":null,"utdanningBestatt":null,"sisteEndringKategori":null,"ulesteEndringer":null,"aktiviteterForenklet":null,"landgruppe":null,"foedeland":null,"tolkebehov":null,"tolkBehovSpraak":null,"stillingFraNavFilter":null,"geografiskBosted":null,"visGeografiskBosted":null,"ensligeForsorgere":null,"barnUnder18Aar":null,"barnUnder18AarAlder":null,"fargekategorier":null,"gjeldendeVedtak14a":null,"innsatsgruppeGjeldendeVedtak14a":null,"hovedmalGjeldendeVedtak14a":null,"ytelseAapArena":null,"ytelseAapKelvin":null,"ytelseTiltakspenger":null,"ytelseTiltakspengerArena":null,"ytelseDagpengerArena":null,"ytelseDagpenger":null}""";
         PortefoljeFilter portefoljeFilter = new PortefoljeFilter(null, null, null, null, null, null, null, null,
                 null, null, null, null, List.of("A123", "B123"), null, null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null);
         String jsonString = JsonUtils.toJson(portefoljeFilter);
-        Assertions.assertEquals(jsonString, correctOutput);
+        Assertions.assertEquals(correctOutput, jsonString);
     }
 
 }
