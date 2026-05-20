@@ -16,7 +16,7 @@ public class DateSerializer extends StdScalarSerializer<LocalDateTime> {
     }
 
     @Override
-    public void serialize(LocalDateTime value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
-        gen.writeString(value.format(DateUtils.getFormat()));
+    public void serialize(LocalDateTime value, JsonGenerator jsonGenerator, SerializationContext ctxt) throws JacksonException {
+        jsonGenerator.writeString(value.format(DateUtils.getFormat()));
     }
 }
