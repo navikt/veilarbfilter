@@ -2,23 +2,13 @@
   "filterNavn": "Stort filter",
   "filterValg": {
     "ferdigfilterListe": [],
-    "alder": [
-      "0-10"
-    ],
+    "alder": ["0-10"],
     "kjonn": "M",
-    "landgruppe": [
-      "LANDGRUPPE_2"
-    ],
+    "landgruppe": ["LANDGRUPPE_2"],
     "foedeland": [],
-    "fodselsdagIMnd": [
-      "10"
-    ],
-    "formidlingsgruppe": [
-      "IARBS"
-    ],
-    "servicegruppe": [
-      "IVURD"
-    ],
+    "fodselsdagIMnd": ["10"],
+    "formidlingsgruppe": ["IARBS"],
+    "servicegruppe": ["IVURD"],
     "veiledere": [],
     "aktiviteter": {
       "BEHANDLING": "NA",
@@ -34,67 +24,34 @@
     "aktiviteterForenklet": [],
     "tiltakstyper": [],
     "navnEllerFnrQuery": "",
-    "rettighetsgruppe": [
-      "AAP"
-    ],
-    "manuellBrukerStatus": [
-      "KRR"
-    ],
+    "rettighetsgruppe": ["AAP"],
+    "manuellBrukerStatus": ["KRR"],
     "veilederNavnQuery": "",
-    "registreringstype": [
-      "HAR_BLITT_SAGT_OPP"
-    ],
+    "registreringstype": ["HAR_BLITT_SAGT_OPP"],
     "cvJobbprofil": "HAR_DELT_CV",
-    "utdanning": [
-      "VIDEREGAENDE_FAGBREV_SVENNEBREV"
-    ],
-    "utdanningGodkjent": [
-      "VET_IKKE"
-    ],
-    "utdanningBestatt": [
-      "NEI"
-    ],
+    "utdanning": ["VIDEREGAENDE_FAGBREV_SVENNEBREV"],
+    "utdanningGodkjent": ["VET_IKKE"],
+    "utdanningBestatt": ["NEI"],
     "sisteEndringKategori": "NY_IJOBB",
     "ulesteEndringer": null,
-    "tolkebehov": [
-      "TALESPRAAKTOLK"
-    ],
+    "tolkebehov": ["TALESPRAAKTOLK"],
     "tolkBehovSpraak": [],
-    "stillingFraNavFilter": [
-      "CV_KAN_DELES_STATUS_JA"
-    ],
-    "geografiskBosted": [
-      "030114"
-    ],
-    "visGeografiskBosted": [
-      "1"
-    ],
-    "ensligeForsorgere": [
-      "OVERGANGSSTONAD"
-    ],
-    "barnUnder18Aar": [
-      "HAR_BARN_UNDER_18_AAR"
-    ],
+    "stillingFraNavFilter": ["CV_KAN_DELES_STATUS_JA"],
+    "geografiskBosted": ["030114"],
+    "visGeografiskBosted": ["1"],
+    "ensligeForsorgere": ["OVERGANGSSTONAD"],
+    "barnUnder18Aar": ["HAR_BARN_UNDER_18_AAR"],
     "barnUnder18AarAlder": [],
     "fargekategorier": [],
-    "gjeldendeVedtak14a": [
-      "HAR_14A_VEDTAK"
-    ],
-    "innsatsgruppeGjeldendeVedtak14a": [
-      "SPESIELT_TILPASSET_INNSATS"
-    ],
-    "hovedmalGjeldendeVedtak14a": [
-      "BEHOLDE_ARBEID"
-    ],
+    "gjeldendeVedtak14a": ["HAR_14A_VEDTAK"],
+    "innsatsgruppeGjeldendeVedtak14a": ["SPESIELT_TILPASSET_INNSATS"],
+    "hovedmalGjeldendeVedtak14a": ["BEHOLDE_ARBEID"],
     "ytelseAapArena": [],
-    "ytelseAapKelvin": [
-      "HAR_IKKE_AAP"
-    ],
+    "ytelseAapKelvin": ["HAR_IKKE_AAP"],
     "ytelseTiltakspengerArena": [],
-    "ytelseTiltakspenger": [
-      "HAR_TILTAKSPENGER"
-    ],
+    "ytelseTiltakspenger": ["HAR_TILTAKSPENGER"],
     "ytelseDagpengerArena": [],
-    "ytelseDagpenger": []
+    "ytelseDagpenger": [],
+    "ytelseUngdomsprogram": []
   }
 }
