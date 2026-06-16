@@ -1,6 +1,5 @@
 package no.nav.pto.veilarbfilter.rest;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.jayway.jsonpath.JsonPath;
 import lombok.val;
 import no.nav.common.json.JsonUtils;
@@ -13,7 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -408,11 +407,13 @@ public class MineLagredeFilterTest extends AbstractTest {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/minelagredefilter").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
-                }), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJsonArray(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class
+                ), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(),
-                        null, mvcResult.getResolvedException().getMessage());
+                        null, mvcResult.getResolvedException() != null
+                        ? mvcResult.getResolvedException().getMessage()
+                        : "HTTP" + mvcResult.getResponse().getStatus());
             }
         } catch (Exception e) {
             Assertions.fail();
@@ -456,8 +457,8 @@ public class MineLagredeFilterTest extends AbstractTest {
         try {
             MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/minelagredefilter/lagresortering").content(JsonUtils.toJson(sortOrder)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andReturn();
             if (mvcResult.getResponse().getStatus() == HttpStatus.OK.value()) {
-                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
-                }), "");
+                return new ApiResponse<>(mvcResult.getResponse().getStatus(), JsonUtils.fromJsonArray(mvcResult.getResponse().getContentAsString(), MineLagredeFilterModel.class
+                ), "");
             } else {
                 return new ApiResponse<>(mvcResult.getResponse().getStatus(), null, mvcResult.getResponse().getContentAsString());
             }
@@ -520,7 +521,7 @@ public class MineLagredeFilterTest extends AbstractTest {
                 "",
                 emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(),
                 emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(),
-                emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList());
+                emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList());
     }
 
     private static char rndChar() {
