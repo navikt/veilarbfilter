@@ -37,7 +37,7 @@ public class MineLagredeFilterRepository implements FilterService {
             validerUnikhet(erUgyldigNavn(veilederId, nyttFilterModel.getFilterNavn(), Optional.empty()),
                     erUgyldigFiltervalg(veilederId, nyttFilterModel.getFilterValg(), Optional.empty()));
 
-            String insertSql = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?, to_json(?::JSON), ?, ?)",
+            String insertSql = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?, to_json(?::JSON), ?::jsonb, ?)",
                     Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER,Filter.AKTIVE_VALGTE_FILTER, Filter.OPPRETTET);
             int affectedRows = db.update(insertSql,
                     nyttFilterModel.getFilterNavn(),
@@ -105,6 +105,7 @@ public class MineLagredeFilterRepository implements FilterService {
                             return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                                     rs.getString(Filter.FILTER_NAVN),
                                     portefoljeFilter,
+                                    rs.getString(Filter.AKTIVE_VALGTE_FILTER),
                                     DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                                     rs.getInt(Filter.FILTER_CLEANUP),
                                     rs.getString(MineLagredeFilter.VEILEDER_ID),
@@ -136,6 +137,7 @@ public class MineLagredeFilterRepository implements FilterService {
                     return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
                             portefoljeFilter,
+                            rs.getString(Filter.AKTIVE_VALGTE_FILTER),
                             DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                             rs.getInt(Filter.FILTER_CLEANUP),
                             rs.getString(MineLagredeFilter.VEILEDER_ID),
@@ -174,6 +176,7 @@ public class MineLagredeFilterRepository implements FilterService {
                     return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
                             portefoljeFilter,
+                            rs.getString(Filter.AKTIVE_VALGTE_FILTER),
                             DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                             rs.getInt(Filter.FILTER_CLEANUP),
                             rs.getString(MineLagredeFilter.VEILEDER_ID),

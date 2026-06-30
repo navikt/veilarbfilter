@@ -147,7 +147,8 @@ class VeilederGrupperServiceTest extends AbstractTest {
         portefoljeFilter.setVeiledere(veiledereList);
         return new NyttFilterModel(
                 "Filter " + filterId,
-                portefoljeFilter
+                portefoljeFilter,
+                "{\"key\":[\"ENUM\"]}"
         );
     }
 }

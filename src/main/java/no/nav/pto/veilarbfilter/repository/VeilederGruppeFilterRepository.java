@@ -103,6 +103,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
                             return new VeilederGruppeFilterModel(rs.getInt(VeilederGrupperFilter.FILTER_ID),
                                     rs.getString(Filter.FILTER_NAVN),
                                     portefoljeFilter,
+                                    rs.getString(Filter.AKTIVE_VALGTE_FILTER),
                                     DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                                     rs.getInt(Filter.FILTER_CLEANUP),
                                     rs.getString(VeilederGrupperFilter.ENHET_ID));
@@ -129,6 +130,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
                     return new VeilederGruppeFilterModel(rs.getInt(VeilederGrupperFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
                             JsonUtils.fromJson(rs.getString(Filter.VALGTE_FILTER), PortefoljeFilter.class),
+                            rs.getString(Filter.AKTIVE_VALGTE_FILTER),
                             DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                             rs.getInt(Filter.FILTER_CLEANUP),
                             rs.getString(VeilederGrupperFilter.ENHET_ID));
