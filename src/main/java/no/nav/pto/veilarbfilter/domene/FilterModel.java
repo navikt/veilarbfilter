@@ -1,13 +1,13 @@
 package no.nav.pto.veilarbfilter.domene;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import tools.jackson.databind.annotation.JsonDeserialize;
-import tools.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateDeserializer;
 import no.nav.pto.veilarbfilter.domene.deserializer.DateSerializer;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +19,7 @@ public class FilterModel {
     private Integer filterId = null;
     private String filterNavn = null;
     private PortefoljeFilter filterValg = null;
+    private String aktiveFilterValg = null;
     @JsonDeserialize(using = DateDeserializer.class)
     @JsonSerialize(using = DateSerializer.class)
     private LocalDateTime opprettetDato = null;
