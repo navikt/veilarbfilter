@@ -13,6 +13,7 @@ import org.springframework.util.Assert;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -32,12 +33,17 @@ public class MineLagredeFilterRepository implements FilterService {
 
             validerFilterNavn(nyttFilterModel.getFilterNavn());
             validerFilterValg(nyttFilterModel.getFilterValg());
+            validerAktiveFilterValg(nyttFilterModel.getAktiveFilterValg());
             validerUnikhet(erUgyldigNavn(veilederId, nyttFilterModel.getFilterNavn(), Optional.empty()),
                     erUgyldigFiltervalg(veilederId, nyttFilterModel.getFilterValg(), Optional.empty()));
 
-            String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?, to_json(?::JSON), ?)",
-                    Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET);
-            int affectedRows = db.update(insertSql, nyttFilterModel.getFilterNavn(), JsonUtils.toJson(nyttFilterModel.getFilterValg()), fromLocalDateTimeToTimestamp(LocalDateTime.now()));
+            String insertSql = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?, to_json(?::JSON), ?::jsonb, ?)",
+                    Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER,Filter.AKTIVE_VALGTE_FILTER, Filter.OPPRETTET);
+            int affectedRows = db.update(insertSql,
+                    nyttFilterModel.getFilterNavn(),
+                    JsonUtils.toJson(nyttFilterModel.getFilterValg()),
+                    nyttFilterModel.getAktiveFilterValg(),
+                    fromLocalDateTimeToTimestamp(LocalDateTime.now()));
 
             if (affectedRows > 0) {
                 String lastId = String.format("SELECT MAX(%s) FROM %s",
@@ -99,6 +105,7 @@ public class MineLagredeFilterRepository implements FilterService {
                             return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                                     rs.getString(Filter.FILTER_NAVN),
                                     portefoljeFilter,
+                                    rs.getString(Filter.AKTIVE_VALGTE_FILTER),
                                     DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                                     rs.getInt(Filter.FILTER_CLEANUP),
                                     rs.getString(MineLagredeFilter.VEILEDER_ID),
@@ -130,6 +137,7 @@ public class MineLagredeFilterRepository implements FilterService {
                     return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
                             portefoljeFilter,
+                            rs.getString(Filter.AKTIVE_VALGTE_FILTER),
                             DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                             rs.getInt(Filter.FILTER_CLEANUP),
                             rs.getString(MineLagredeFilter.VEILEDER_ID),
@@ -168,6 +176,7 @@ public class MineLagredeFilterRepository implements FilterService {
                     return new MineLagredeFilterModel(rs.getInt(MineLagredeFilter.FILTER_ID),
                             rs.getString(Filter.FILTER_NAVN),
                             portefoljeFilter,
+                            rs.getString(Filter.AKTIVE_VALGTE_FILTER),
                             DateUtils.fromTimestampToLocalDateTime(rs.getTimestamp(Filter.OPPRETTET)),
                             rs.getInt(Filter.FILTER_CLEANUP),
                             rs.getString(MineLagredeFilter.VEILEDER_ID),
@@ -294,6 +303,10 @@ public class MineLagredeFilterRepository implements FilterService {
 
     private void validerFilterValg(PortefoljeFilter valg) {
         Assert.isTrue(valg.isNotEmpty(), LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message);
+    }
+
+    private void validerAktiveFilterValg(String aktiveFilterValg) {
+        Assert.isTrue(!Objects.equals(aktiveFilterValg, ""), LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message);
     }
 
     private void validerUnikhet(Boolean navn, Boolean valg) {
