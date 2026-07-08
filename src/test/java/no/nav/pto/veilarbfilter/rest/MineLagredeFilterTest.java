@@ -127,7 +127,8 @@ public class MineLagredeFilterTest extends AbstractTest {
         val nyttFilterModelEksisterendeNavn =
                 new NyttFilterModel(
                         randomNyttFilter.getFilterNavn(),
-                        getRandomPortefoljeFilter()
+                        getRandomPortefoljeFilter(),
+                        "{\"kjonn\":\"K\"}"
                 );
 
         val lagreNyttFilterMedEksisterendeNavn = lagreNyttFilterRespons(nyttFilterModelEksisterendeNavn);
@@ -151,7 +152,8 @@ public class MineLagredeFilterTest extends AbstractTest {
         val nyttFilterModelEksisterendeFilter =
                 new NyttFilterModel(
                         "NyFilter",
-                        randomNyttFilter.getFilterValg()
+                        randomNyttFilter.getFilterValg(),
+                        "{\"key\":[\"ENUM\"]}"
                 );
 
         val lagreNyttFilterMedEksisterendeFilterKombinasjon =
@@ -175,7 +177,8 @@ public class MineLagredeFilterTest extends AbstractTest {
         val nyttFilterModel =
                 new NyttFilterModel(
                         "",
-                        getRandomPortefoljeFilter()
+                        getRandomPortefoljeFilter(),
+                        "{\"key\":[\"ENUM\"]}"
                 );
 
         val lagreNyttFilterMedTomtFilterNavn = lagreNyttFilterRespons(nyttFilterModel);
@@ -190,7 +193,8 @@ public class MineLagredeFilterTest extends AbstractTest {
         val nyttFilterModel =
                 new NyttFilterModel(
                         "Nytt filter",
-                        new PortefoljeFilter()
+                        new PortefoljeFilter(),
+                        "{\"key\":[\"ENUM\"]}"
                 );
 
         val lagreNyttFilterMedTomFilterKombinasjon = lagreNyttFilterRespons(nyttFilterModel);
@@ -308,7 +312,8 @@ public class MineLagredeFilterTest extends AbstractTest {
                 lagreNyttFilterRespons(
                         new NyttFilterModel(
                                 "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                                getRandomPortefoljeFilter()
+                                getRandomPortefoljeFilter(),
+                                "{\"key\":[\"ENUM\"]}"
                         )
                 );
 
@@ -359,7 +364,8 @@ public class MineLagredeFilterTest extends AbstractTest {
                 lagreNyttFilterRespons(
                         new NyttFilterModel(
                                 spesialbokstaverFilterNavn,
-                                getRandomPortefoljeFilter()
+                                getRandomPortefoljeFilter(),
+                                "{\"key\":[\"ENUM\"]}"
                         )
                 );
         assertTrue(endepunktRespons.getStatus() == 200);
@@ -487,7 +493,7 @@ public class MineLagredeFilterTest extends AbstractTest {
     private NyttFilterModel getRandomNyttFilter() {
         Random random = new Random();
 
-        return new NyttFilterModel("Filter navn " + random.nextInt(100000), getRandomPortefoljeFilter());
+        return new NyttFilterModel("Filter navn " + random.nextInt(100000), getRandomPortefoljeFilter(), "{\"key\":[\"ENUM\"]}");
     }
 
     public PortefoljeFilter getRandomPortefoljeFilter() {

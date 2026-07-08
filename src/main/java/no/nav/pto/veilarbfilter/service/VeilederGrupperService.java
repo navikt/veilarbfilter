@@ -86,7 +86,7 @@ public class VeilederGrupperService implements FilterService {
 
                 PortefoljeFilter filterValg = filter.getFilterValg();
                 filterValg.setVeiledere(aktiveVeileder);
-                VeilederGruppeFilterModel updatedVeilederGruppeFilterModel = new VeilederGruppeFilterModel(filter.getFilterId(), filter.getFilterNavn(), filterValg, filter.getOpprettetDato(), 1, enhetId);
+                VeilederGruppeFilterModel updatedVeilederGruppeFilterModel = new VeilederGruppeFilterModel(filter.getFilterId(), filter.getFilterNavn(), filterValg, filter.getAktiveFilterValg(), filter.getOpprettetDato(), 1, enhetId);
                 oppdaterFilter(enhetId, updatedVeilederGruppeFilterModel);
                 log.warn("Updated veiledergruppe: " + filter.getFilterNavn() + " from enhet: " + enhetId);
             }

@@ -15,8 +15,8 @@ public class MineLagredeFilterModel extends FilterModel {
     private Boolean aktiv = null;
     private String note = null;
 
-    public MineLagredeFilterModel(Integer filterId, String filterNavn, PortefoljeFilter filterValg, LocalDateTime opprettetDato, Integer filterCleanup, String veilederId, Integer sortOrder, Boolean aktiv, String note) {
-        super(filterId, filterNavn, filterValg, opprettetDato, filterCleanup);
+    public MineLagredeFilterModel(Integer filterId, String filterNavn, PortefoljeFilter filterValg, String aktiveFiltervalg, LocalDateTime opprettetDato, Integer filterCleanup, String veilederId, Integer sortOrder, Boolean aktiv, String note) {
+        super(filterId, filterNavn, filterValg, aktiveFiltervalg, opprettetDato, filterCleanup);
         this.veilederId = veilederId;
         this.sortOrder = sortOrder;
         this.aktiv = aktiv;

@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 public class VeilederGruppeFilterModel extends FilterModel {
     private String enhetId;
 
-    public VeilederGruppeFilterModel(Integer filterId, String filterNavn, PortefoljeFilter filterValg, LocalDateTime opprettetDato, Integer filterCleanup, String enhetId) {
-        super(filterId, filterNavn, filterValg, opprettetDato, filterCleanup);
+    public VeilederGruppeFilterModel(Integer filterId, String filterNavn, PortefoljeFilter filterValg, String aktiveFilterValg, LocalDateTime opprettetDato, Integer filterCleanup, String enhetId) {
+        super(filterId, filterNavn, filterValg, aktiveFilterValg, opprettetDato, filterCleanup);
         this.enhetId = enhetId;
     }
 }

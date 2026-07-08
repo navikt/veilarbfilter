@@ -9,6 +9,7 @@ public class Table {
         public static final String FILTER_ID = "filter_id";
         public static final String FILTER_NAVN = "filter_navn";
         public static final String VALGTE_FILTER = "valgte_filter";
+        public static final String AKTIVE_VALGTE_FILTER = "aktive_valgte_filter";
         public static final String OPPRETTET = "opprettet";
         public static final String FILTER_CLEANUP = "filter_cleanup";
         public static final String FILTER_ID_SEQUENCE = "filter_filter_id_seq";
