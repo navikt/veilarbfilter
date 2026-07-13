@@ -275,12 +275,12 @@ public class MineLagredeFilterRepository implements FilterService {
             String sql;
             if (filterIdOptional.isPresent()) {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ? AND %s =  1 AND f.filter_id != ?",
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ?::jsonb AND %s =  1 AND f.filter_id != ?",
                         MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.AKTIVE_VALGTE_FILTER, MineLagredeFilter.AKTIV);
                 count = db.queryForObject(sql, Integer.class, veilederId, aktiveFilterValg, filterIdOptional.get());
             } else {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ? AND %s =  1",
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ?::jsonb AND %s =  1",
                         MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.AKTIVE_VALGTE_FILTER, MineLagredeFilter.AKTIV);
                 count = db.queryForObject(sql, Integer.class, veilederId, aktiveFilterValg);
             }
