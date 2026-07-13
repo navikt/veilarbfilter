@@ -3,12 +3,17 @@ package no.nav.pto.veilarbfilter.service;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.common.json.JsonUtils;
 import no.nav.common.types.identer.EnhetId;
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
 import no.nav.pto.veilarbfilter.domene.*;
 import no.nav.pto.veilarbfilter.repository.VeilederGruppeFilterRepository;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -68,14 +73,22 @@ public class VeilederGrupperService implements FilterService {
 
     public void slettVeiledereSomIkkeErAktivePaEnheten(String enhetId) {
         List<String> veilederePaEnheten = veilarbveilederClient.hentVeilederePaaEnhet(EnhetId.of(enhetId));
-
         List<FilterModel> filterForBruker = finnFilterForFilterBruker(enhetId);
 
         filterForBruker.forEach(filter -> {
-            List<String> alleVeiledere = filter.getFilterValg().getVeiledere();
+            // aktive valgte filtere
+            String aktiveFilterValgJson = filter.getAktiveFilterValg();
+            if (aktiveFilterValgJson == null || aktiveFilterValgJson.isEmpty()) {
+                return;
+            }
+
+            JsonNode aktiveFilterValgNode = JsonUtils.getMapper().valueToTree(
+                    JsonUtils.fromJson(aktiveFilterValgJson, Object.class));
+            List<String> alleVeiledere = hentVeiledereFraJson(aktiveFilterValgNode);
             List<String> aktiveVeileder = alleVeiledere.stream().filter(veilederePaEnheten::contains).collect(Collectors.toList());
 
             String removedVeileder = getRemovedVeiledere(alleVeiledere, aktiveVeileder);
+
             if (aktiveVeileder.isEmpty()) {
                 log.warn("Removed veiledere: " + removedVeileder);
                 slettFilter(filter.getFilterId(), enhetId);
@@ -83,13 +96,41 @@ public class VeilederGrupperService implements FilterService {
             } else if (aktiveVeileder.size() < alleVeiledere.size()) {
                 log.warn("Removed veiledere: " + removedVeileder);
 
+                // opprinnelige valgte filtre - slettes senere:
                 PortefoljeFilter filterValg = filter.getFilterValg();
                 filterValg.setVeiledere(aktiveVeileder);
-                VeilederGruppeFilterModel updatedVeilederGruppeFilterModel = new VeilederGruppeFilterModel(filter.getFilterId(), filter.getFilterNavn(), filterValg, filter.getAktiveFilterValg(), filter.getOpprettetDato(), 1, enhetId);
+
+                //aktive filtre
+                String oppdatertAktiveFilterValg = medOppdaterteVeiledere(aktiveFilterValgNode, aktiveVeileder);
+                VeilederGruppeFilterModel updatedVeilederGruppeFilterModel = new VeilederGruppeFilterModel(
+                        filter.getFilterId(),
+                        filter.getFilterNavn(),
+                        filterValg,
+                        oppdatertAktiveFilterValg,
+                        filter.getOpprettetDato(),
+                        1,
+                        enhetId);
                 oppdaterFilter(enhetId, updatedVeilederGruppeFilterModel);
                 log.warn("Updated veiledergruppe: " + filter.getFilterNavn() + " from enhet: " + enhetId);
             }
         });
+    }
+
+    private List<String> hentVeiledereFraJson(JsonNode aktiveFilterValgNode) {
+        List<String> veiledere = new ArrayList<>();
+        JsonNode veiledereNode = aktiveFilterValgNode.get("veiledere");
+        if (veiledereNode != null && veiledereNode.isArray()) {
+            veiledereNode.forEach(node -> veiledere.add(node.stringValue()));
+        }
+        return veiledere;
+    }
+
+    private String medOppdaterteVeiledere(JsonNode aktiveFilterValgNode, List<String> aktiveVeileder) {
+        ObjectNode objectNode = (ObjectNode) aktiveFilterValgNode;
+        ArrayNode veiledereArray = JsonUtils.getMapper().createArrayNode();
+        aktiveVeileder.forEach(veiledereArray::add);
+        objectNode.set("veiledere", veiledereArray);
+        return JsonUtils.toJson(objectNode);
     }
 
     private String getRemovedVeiledere(List<String> alleVeiledere, List<String> aktiveVeileder) {
@@ -97,4 +138,5 @@ public class VeilederGrupperService implements FilterService {
                 .filter(veilederIdent -> !aktiveVeileder.contains(veilederIdent))
                 .collect(Collectors.joining(", "));
     }
+
 }

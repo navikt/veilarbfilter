@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @WebMvcTest
 @ActiveProfiles({"test"})
@@ -107,6 +105,7 @@ class VeilederGrupperServiceTest extends AbstractTest {
             PortefoljeFilter filterValg = veiledederGruppe1.getFilterValg();
             filterValg.setVeiledere(List.of("1", "2"));
             veiledederGruppe1.setFilterValg(filterValg);
+            veiledederGruppe1.setAktiveFilterValg(buildAktiveFilterValgJson(List.of("1", "2")));
             veilederGrupperService.oppdaterFilter("1", veiledederGruppe1);
             val filterList = veilederGrupperService.finnFilterForFilterBruker("1");
             Assertions.assertTrue(finnVeilederDB(veiledederGruppe1.getFilterId(), filterList, List.of("1", "2")));
@@ -118,6 +117,7 @@ class VeilederGrupperServiceTest extends AbstractTest {
             PortefoljeFilter filterValg = veilederGruppe2.getFilterValg();
             filterValg.setVeiledere(List.of("1"));
             veilederGruppe2.setFilterValg(filterValg);
+            veilederGruppe2.setAktiveFilterValg(buildAktiveFilterValgJson(List.of("1")));
             veilederGrupperService.oppdaterFilter("1", veilederGruppe2);
             val filterList = veilederGrupperService.finnFilterForFilterBruker("1");
             Assertions.assertTrue(finnVeilederDB(veilederGruppe2.getFilterId(), filterList, List.of("1")));
@@ -134,10 +134,11 @@ class VeilederGrupperServiceTest extends AbstractTest {
         Assertions.assertTrue(filterList.isEmpty());
     }
 
-    private Boolean finnVeilederDB(Integer gruppeID, List<FilterModel> filterList, List veileders) {
-        return filterList.stream().
-                filter(gruppe -> gruppe.getFilterId().equals(gruppeID)).
-                anyMatch(x -> x.getFilterValg().getVeiledere().containsAll(veileders));
+    private Boolean finnVeilederDB(Integer gruppeID, List<FilterModel> filterList, List<String> veileders) {
+        return filterList.stream()
+                .filter(gruppe -> gruppe.getFilterId().equals(gruppeID))
+                .anyMatch(x -> x.getFilterValg().getVeiledere().containsAll(veileders)
+                        && hentVeiledereFraAktiveFilterValg(x.getAktiveFilterValg()).containsAll(veileders));
     }
 
     private NyttFilterModel getRandomFilter(List<String> veiledereList) {
@@ -148,7 +149,27 @@ class VeilederGrupperServiceTest extends AbstractTest {
         return new NyttFilterModel(
                 "Filter " + filterId,
                 portefoljeFilter,
-                "{\"key\":[\"ENUM\"]}"
+                buildAktiveFilterValgJson(veiledereList)
         );
+    }
+
+    private String buildAktiveFilterValgJson(List<String> veiledereList) {
+        Map<String, Object> aktiveFilterValg = new LinkedHashMap<>();
+        aktiveFilterValg.put("veiledere", veiledereList);
+        aktiveFilterValg.put("unik", new Random().nextInt(Integer.MAX_VALUE));
+        return JsonUtils.toJson(aktiveFilterValg);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> hentVeiledereFraAktiveFilterValg(String aktiveFilterValgJson) {
+        if (aktiveFilterValgJson == null || aktiveFilterValgJson.isEmpty()) {
+            return List.of();
+        }
+        Map<String, Object> parsed = JsonUtils.fromJson(aktiveFilterValgJson, Map.class);
+        Object veiledere = parsed.get("veiledere");
+        if (veiledere instanceof List) {
+            return (List<String>) veiledere;
+        }
+        return List.of();
     }
 }
