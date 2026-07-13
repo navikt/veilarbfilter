@@ -153,7 +153,7 @@ public class MineLagredeFilterTest extends AbstractTest {
                 new NyttFilterModel(
                         "NyFilter",
                         randomNyttFilter.getFilterValg(),
-                        "{\"key\":[\"ENUM\"]}"
+                        randomNyttFilter.getAktiveFilterValg()
                 );
 
         val lagreNyttFilterMedEksisterendeFilterKombinasjon =
@@ -194,7 +194,7 @@ public class MineLagredeFilterTest extends AbstractTest {
                 new NyttFilterModel(
                         "Nytt filter",
                         new PortefoljeFilter(),
-                        "{\"key\":[\"ENUM\"]}"
+                        ""
                 );
 
         val lagreNyttFilterMedTomFilterKombinasjon = lagreNyttFilterRespons(nyttFilterModel);
@@ -344,7 +344,7 @@ public class MineLagredeFilterTest extends AbstractTest {
             fail();
         }
 
-        nyttFilter.setFilterValg(new PortefoljeFilter());
+        nyttFilter.setAktiveFilterValg("");
 
         val endepunktRespons = oppdaterMineLagredeFilter(nyttFilter);
 
@@ -493,7 +493,7 @@ public class MineLagredeFilterTest extends AbstractTest {
     private NyttFilterModel getRandomNyttFilter() {
         Random random = new Random();
 
-        return new NyttFilterModel("Filter navn " + random.nextInt(100000), getRandomPortefoljeFilter(), "{\"key\":[\"ENUM\"]}");
+        return new NyttFilterModel("Filter navn " + random.nextInt(100000), getRandomPortefoljeFilter(), "{\"key\":[\"ENUM_" + random.nextInt(100000) + "\"]}");
     }
 
     public PortefoljeFilter getRandomPortefoljeFilter() {

@@ -76,7 +76,6 @@ public class VeilederGrupperService implements FilterService {
             List<String> aktiveVeileder = alleVeiledere.stream().filter(veilederePaEnheten::contains).collect(Collectors.toList());
 
             String removedVeileder = getRemovedVeiledere(alleVeiledere, aktiveVeileder);
-
             if (aktiveVeileder.isEmpty()) {
                 log.warn("Removed veiledere: " + removedVeileder);
                 slettFilter(filter.getFilterId(), enhetId);

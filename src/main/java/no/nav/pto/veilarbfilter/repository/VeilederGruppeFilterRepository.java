@@ -15,6 +15,7 @@ import org.springframework.util.Assert;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static no.nav.pto.veilarbfilter.database.Table.Filter;
@@ -31,17 +32,19 @@ public class VeilederGruppeFilterRepository implements FilterService {
         try {
             validerFilterNavn(nyttFilterModel.getFilterNavn());
             validerFilterValg(nyttFilterModel.getFilterValg());
+            validerAktiveFilterValg(nyttFilterModel.getAktiveFilterValg());
 
             var key = 0;
 
-            String insertSql = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?, to_json(?::JSON), ?)",
-                    Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.OPPRETTET);
+            String insertSql = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?, to_json(?::JSON), ?::jsonb, ?)",
+                    Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.AKTIVE_VALGTE_FILTER, Filter.OPPRETTET);
 
             Integer updateCount = db.execute(insertSql, (PreparedStatementCallback<Integer>) ps -> {
                 try {
                     ps.setString(1, nyttFilterModel.getFilterNavn());
                     ps.setString(2, JsonUtils.toJson(nyttFilterModel.getFilterValg()));
-                    ps.setTimestamp(3, fromLocalDateTimeToTimestamp(LocalDateTime.now()));
+                    ps.setString(3, nyttFilterModel.getAktiveFilterValg());
+                    ps.setTimestamp(4, fromLocalDateTimeToTimestamp(LocalDateTime.now()));
                     return ps.executeUpdate();
                 } catch (Exception e) {
                     log.error("Cant save filter " + e, e);
@@ -74,6 +77,7 @@ public class VeilederGruppeFilterRepository implements FilterService {
         try {
             validerFilterNavn(filter.getFilterNavn());
             validerFilterValg(filter.getFilterValg());
+            validerAktiveFilterValg(filter.getAktiveFilterValg());
 
             String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ? AND %s = ?", VeilederGrupperFilter.TABLE_NAME, VeilederGrupperFilter.ENHET_ID, VeilederGrupperFilter.FILTER_ID);
             Integer numOfRows = db.queryForObject(sql, Integer.class, enhetId, filter.getFilterId());
@@ -187,6 +191,10 @@ public class VeilederGruppeFilterRepository implements FilterService {
 
     private void validerFilterValg(PortefoljeFilter valg) {
         Assert.isTrue(valg.isNotEmpty(), LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message);
+    }
+
+    private void validerAktiveFilterValg(String aktiveFilterValg) {
+        Assert.isTrue(!Objects.equals(aktiveFilterValg, ""), LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message);
     }
 }
 

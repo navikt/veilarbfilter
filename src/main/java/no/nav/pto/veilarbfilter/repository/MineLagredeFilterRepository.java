@@ -32,10 +32,9 @@ public class MineLagredeFilterRepository implements FilterService {
             var key = 0;
 
             validerFilterNavn(nyttFilterModel.getFilterNavn());
-            validerFilterValg(nyttFilterModel.getFilterValg());
             validerAktiveFilterValg(nyttFilterModel.getAktiveFilterValg());
             validerUnikhet(erUgyldigNavn(veilederId, nyttFilterModel.getFilterNavn(), Optional.empty()),
-                    erUgyldigFiltervalg(veilederId, nyttFilterModel.getFilterValg(), Optional.empty()));
+                    erUgyldigAktivtFiltervalg(veilederId, nyttFilterModel.getAktiveFilterValg(), Optional.empty()));
 
             String insertSql = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?, to_json(?::JSON), ?::jsonb, ?)",
                     Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.AKTIVE_VALGTE_FILTER, Filter.OPPRETTET);
@@ -70,11 +69,9 @@ public class MineLagredeFilterRepository implements FilterService {
     public Optional<FilterModel> oppdaterFilter(String veilederId, FilterModel filter) throws IllegalArgumentException {
         try {
             validerFilterNavn(filter.getFilterNavn());
-            validerFilterValg(filter.getFilterValg());
-
+            validerAktiveFilterValg(filter.getAktiveFilterValg());
             validerUnikhet(erUgyldigNavn(veilederId, filter.getFilterNavn(), Optional.of(filter.getFilterId())),
-                    erUgyldigFiltervalg(veilederId, filter.getFilterValg(), Optional.of(filter.getFilterId())));
-
+                    erUgyldigAktivtFiltervalg(veilederId, filter.getAktiveFilterValg(), Optional.of(filter.getFilterId())));
 
             String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ? AND %s = ?", MineLagredeFilter.TABLE_NAME, MineLagredeFilter.VEILEDER_ID, MineLagredeFilter.FILTER_ID);
             Integer numOfRows = db.queryForObject(sql, Integer.class, veilederId, filter.getFilterId());
@@ -272,26 +269,25 @@ public class MineLagredeFilterRepository implements FilterService {
         return count > 0;
     }
 
-    private boolean erUgyldigFiltervalg(String veilederId, PortefoljeFilter
-            filterValg, Optional<Integer> filterIdOptional) {
+    private boolean erUgyldigAktivtFiltervalg(String veilederId, String aktiveFilterValg, Optional<Integer> filterIdOptional) {
         try {
             Integer count;
             String sql;
             if (filterIdOptional.isPresent()) {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1 AND f.filter_id != ?",
-                        MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
-                count = db.queryForObject(sql, Integer.class, veilederId, JsonUtils.toJson(filterValg), filterIdOptional.get());
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ?::jsonb AND %s =  1 AND f.filter_id != ?",
+                        MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.AKTIVE_VALGTE_FILTER, MineLagredeFilter.AKTIV);
+                count = db.queryForObject(sql, Integer.class, veilederId, aktiveFilterValg, filterIdOptional.get());
             } else {
                 sql = String.format("SELECT COUNT(*) FROM %s ml, %s f " +
-                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s::jsonb = to_json(?::JSON)::jsonb AND %s =  1",
-                        MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.VALGTE_FILTER, MineLagredeFilter.AKTIV);
-                count = db.queryForObject(sql, Integer.class, veilederId, JsonUtils.toJson(filterValg));
+                                "WHERE ml.%s = f.%s AND ml.%s = ? AND f.%s = ?::jsonb AND %s =  1",
+                        MineLagredeFilter.TABLE_NAME, Filter.TABLE_NAME, MineLagredeFilter.FILTER_ID, Filter.FILTER_ID, MineLagredeFilter.VEILEDER_ID, Filter.AKTIVE_VALGTE_FILTER, MineLagredeFilter.AKTIV);
+                count = db.queryForObject(sql, Integer.class, veilederId, aktiveFilterValg);
             }
 
             return count > 0;
         } catch (Exception e) {
-            log.warn("Error while checking if filter is valid " + e, e);
+            log.warn("Error while checking if active filter is valid " + e, e);
             return false;
         }
     }
@@ -299,10 +295,6 @@ public class MineLagredeFilterRepository implements FilterService {
     private void validerFilterNavn(String navn) {
         Assert.hasLength(navn, LagredeFilterFeilmeldinger.NAVN_TOMT.message);
         Assert.isTrue(navn.length() < 255, LagredeFilterFeilmeldinger.NAVN_FOR_LANGT.message);
-    }
-
-    private void validerFilterValg(PortefoljeFilter valg) {
-        Assert.isTrue(valg.isNotEmpty(), LagredeFilterFeilmeldinger.FILTERVALG_TOMT.message);
     }
 
     private void validerAktiveFilterValg(String aktiveFilterValg) {
