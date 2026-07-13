@@ -38,7 +38,7 @@ public class MineLagredeFilterRepository implements FilterService {
                     erUgyldigFiltervalg(veilederId, nyttFilterModel.getFilterValg(), Optional.empty()));
 
             String insertSql = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?, to_json(?::JSON), ?::jsonb, ?)",
-                    Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER,Filter.AKTIVE_VALGTE_FILTER, Filter.OPPRETTET);
+                    Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.AKTIVE_VALGTE_FILTER, Filter.OPPRETTET);
             int affectedRows = db.update(insertSql,
                     nyttFilterModel.getFilterNavn(),
                     JsonUtils.toJson(nyttFilterModel.getFilterValg()),
@@ -80,8 +80,8 @@ public class MineLagredeFilterRepository implements FilterService {
             Integer numOfRows = db.queryForObject(sql, Integer.class, veilederId, filter.getFilterId());
 
             if (numOfRows > 0) {
-                sql = String.format("UPDATE %s SET %s = ?, %s = to_json(?::JSON) WHERE %s = ?", Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.FILTER_ID);
-                db.update(sql, filter.getFilterNavn(), JsonUtils.toJson(filter.getFilterValg()), filter.getFilterId());
+                sql = String.format("UPDATE %s SET %s = ?, %s = to_json(?::JSON), %s = ?::jsonb WHERE %s = ?", Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.AKTIVE_VALGTE_FILTER, Filter.FILTER_ID);
+                db.update(sql, filter.getFilterNavn(), JsonUtils.toJson(filter.getFilterValg()), filter.getAktiveFilterValg(), filter.getFilterId());
             }
 
             return hentFilter(filter.getFilterId());
@@ -167,7 +167,7 @@ public class MineLagredeFilterRepository implements FilterService {
                     // håndteringen slik at vi slipper exception som følger av dette.
                     Optional<String> maybeValgteFilterJson = Optional.ofNullable(rs.getString(Filter.VALGTE_FILTER));
 
-                    if(maybeValgteFilterJson.isEmpty()) {
+                    if (maybeValgteFilterJson.isEmpty()) {
                         return null;
                     }
 

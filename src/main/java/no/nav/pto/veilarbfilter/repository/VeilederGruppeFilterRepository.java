@@ -79,8 +79,9 @@ public class VeilederGruppeFilterRepository implements FilterService {
             Integer numOfRows = db.queryForObject(sql, Integer.class, enhetId, filter.getFilterId());
 
             if (numOfRows > 0) {
-                sql = String.format("UPDATE %s SET %s = ?, %s = to_json(?::JSON), %s = ? WHERE %s = ?", Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.FILTER_CLEANUP, Filter.FILTER_ID);
-                db.update(sql, filter.getFilterNavn(), JsonUtils.toJson(filter.getFilterValg()), filter.getFilterCleanup(), filter.getFilterId());
+                sql = String.format("UPDATE %s SET %s = ?, %s = to_json(?::JSON), %s = ?::jsonb, %s = ? WHERE %s = ?", Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.AKTIVE_VALGTE_FILTER, Filter.FILTER_CLEANUP, Filter.FILTER_ID);
+
+                db.update(sql, filter.getFilterNavn(), JsonUtils.toJson(filter.getFilterValg()), filter.getAktiveFilterValg(), filter.getFilterCleanup(), filter.getFilterId());
             }
 
             return hentFilter(filter.getFilterId());
