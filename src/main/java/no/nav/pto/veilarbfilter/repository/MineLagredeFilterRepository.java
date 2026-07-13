@@ -81,7 +81,7 @@ public class MineLagredeFilterRepository implements FilterService {
 
             if (numOfRows > 0) {
                 sql = String.format("UPDATE %s SET %s = ?, %s = to_json(?::JSON), %s = ?::jsonb WHERE %s = ?", Filter.TABLE_NAME, Filter.FILTER_NAVN, Filter.VALGTE_FILTER, Filter.AKTIVE_VALGTE_FILTER, Filter.FILTER_ID);
-                db.update(sql, filter.getFilterNavn(), JsonUtils.toJson(filter.getFilterValg()), filter.getFilterId());
+                db.update(sql, filter.getFilterNavn(), JsonUtils.toJson(filter.getFilterValg()), filter.getAktiveFilterValg(), filter.getFilterId());
             }
 
             return hentFilter(filter.getFilterId());
