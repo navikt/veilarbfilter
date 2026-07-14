@@ -138,7 +138,11 @@ public class VeilederGrupperService implements FilterService {
             return Optional.empty();
         }
         List<String> veiledere = new ArrayList<>();
-        veiledereNode.forEach(node -> veiledere.add(node.stringValue()));
+        veiledereNode.forEach(node -> {
+            if (node != null && node.isString()) {
+                veiledere.add(node.stringValue());
+            }
+        });
         return Optional.of(veiledere);
     }
 
