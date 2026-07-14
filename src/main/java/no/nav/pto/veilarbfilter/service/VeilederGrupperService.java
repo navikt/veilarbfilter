@@ -82,9 +82,22 @@ public class VeilederGrupperService implements FilterService {
                 return;
             }
 
-            JsonNode aktiveFilterValgNode = JsonUtils.getMapper().valueToTree(
-                    JsonUtils.fromJson(aktiveFilterValgJson, Object.class));
-            List<String> alleVeiledere = hentVeiledereFraJson(aktiveFilterValgNode);
+            JsonNode aktiveFilterValgNode;
+            try {
+                aktiveFilterValgNode = JsonUtils.getMapper().readTree(aktiveFilterValgJson);
+            } catch (Exception e) {
+                log.warn("Invalid aktiveFilterValg for filterId={} enhetId={}", filter.getFilterId(), enhetId, e);
+                return;
+            }
+
+            List<String> alleVeiledere = hentVeiledereFraJson(aktiveFilterValgNode)
+                    .orElse(null);
+            if (alleVeiledere == null) {
+                log.warn("aktiveFilterValg mangler gyldig 'veiledere'-felt for filterId={} enhetId={}, hopper over.",
+                        filter.getFilterId(), enhetId);
+                return;
+            }
+
             List<String> aktiveVeileder = alleVeiledere.stream().filter(veilederePaEnheten::contains).collect(Collectors.toList());
 
             String removedVeileder = getRemovedVeiledere(alleVeiledere, aktiveVeileder);
@@ -116,13 +129,17 @@ public class VeilederGrupperService implements FilterService {
         });
     }
 
-    private List<String> hentVeiledereFraJson(JsonNode aktiveFilterValgNode) {
-        List<String> veiledere = new ArrayList<>();
-        JsonNode veiledereNode = aktiveFilterValgNode.get("veiledere");
-        if (veiledereNode != null && veiledereNode.isArray()) {
-            veiledereNode.forEach(node -> veiledere.add(node.stringValue()));
+    private Optional<List<String>> hentVeiledereFraJson(JsonNode aktiveFilterValgNode) {
+        if (aktiveFilterValgNode == null || !aktiveFilterValgNode.isObject()) {
+            return Optional.empty();
         }
-        return veiledere;
+        JsonNode veiledereNode = aktiveFilterValgNode.get("veiledere");
+        if (veiledereNode == null || !veiledereNode.isArray()) {
+            return Optional.empty();
+        }
+        List<String> veiledere = new ArrayList<>();
+        veiledereNode.forEach(node -> veiledere.add(node.stringValue()));
+        return Optional.of(veiledere);
     }
 
     private String medOppdaterteVeiledere(JsonNode aktiveFilterValgNode, List<String> aktiveVeileder) {
