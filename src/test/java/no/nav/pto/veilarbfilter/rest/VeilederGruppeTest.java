@@ -20,9 +20,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -84,8 +82,10 @@ public class VeilederGruppeTest extends AbstractTest {
                 if (filterePaEnhet == null || filterePaEnhet.isEmpty()) {
                     fail();
                 } else {
-                    assertTrue(filterePaEnhet.stream().filter(x -> Objects.equals(x.getFilterId(), responsLagring.getFilterId()))
-                            .allMatch(x -> x.getFilterValg().getVeiledere().equals(List.of("1", "2"))));
+                    assertTrue(filterePaEnhet.stream()
+                            .filter(x -> Objects.equals(x.getFilterId(), responsLagring.getFilterId()))
+                            .allMatch(x -> x.getFilterValg().getVeiledere().equals(List.of("1", "2"))
+                                    && hentVeiledereFraAktiveFilterValg(x.getAktiveFilterValg()).equals(List.of("1", "2"))));
                 }
             }
         }
@@ -101,6 +101,7 @@ public class VeilederGruppeTest extends AbstractTest {
             fail();
         } else {
             responsLagring.setFilterValg(getRandomPortefoljeFilter(veildederGruppeEtter));
+            responsLagring.setAktiveFilterValg(buildAktiveFilterValgJson(veildederGruppeEtter));
             val responsOppdater = oppdaterVeilederFilter("1", responsLagring).getContent();
 
             val alleFilterePaEnhet = getFilterGrupper("1");
@@ -109,7 +110,10 @@ public class VeilederGruppeTest extends AbstractTest {
                 fail();
             } else {
                 val filterePaEnhet = alleFilterePaEnhet.getContent();
-                assertTrue(filterePaEnhet.stream().filter(x -> x.getFilterId().equals(responsLagring.getFilterId())).allMatch(x -> x.getFilterValg().getVeiledere().equals(veildederGruppeEtter)));
+                assertTrue(filterePaEnhet.stream()
+                        .filter(x -> x.getFilterId().equals(responsLagring.getFilterId()))
+                        .allMatch(x -> x.getFilterValg().getVeiledere().equals(veildederGruppeEtter)
+                                && hentVeiledereFraAktiveFilterValg(x.getAktiveFilterValg()).equals(veildederGruppeEtter)));
             }
         }
     }
@@ -126,8 +130,10 @@ public class VeilederGruppeTest extends AbstractTest {
             if (allefilterePaEnhetForSlett == null) {
                 fail();
             } else {
-
-                assertTrue(allefilterePaEnhetForSlett.stream().filter(x -> x.getFilterId().equals(responsLagring.getFilterId())).allMatch(x -> x.getFilterValg().getVeiledere().equals(veildederGruppe)));
+                assertTrue(allefilterePaEnhetForSlett.stream()
+                        .filter(x -> x.getFilterId().equals(responsLagring.getFilterId()))
+                        .allMatch(x -> x.getFilterValg().getVeiledere().equals(veildederGruppe)
+                                && hentVeiledereFraAktiveFilterValg(x.getAktiveFilterValg()).equals(veildederGruppe)));
                 slettFilter("1", responsLagring.getFilterId());
 
                 val allefilterePaEnhetEtterSlett = getFilterGrupper("1").getContent();
@@ -204,10 +210,11 @@ public class VeilederGruppeTest extends AbstractTest {
 
     private NyttFilterModel getRandomNyttFilter(List<String> veiledersList) {
         Random random = new Random();
-
-        return new NyttFilterModel("Filter navn " + random.nextInt(100000), getRandomPortefoljeFilter(veiledersList), "{\"key\":[\"ENUM\"]}");
+        return new NyttFilterModel(
+                "Filter navn " + random.nextInt(100000),
+                getRandomPortefoljeFilter(veiledersList),
+                buildAktiveFilterValgJson(veiledersList));
     }
-
     public PortefoljeFilter getRandomPortefoljeFilter(List<String> veiledersList) {
         return new PortefoljeFilter(
                 null,
@@ -233,5 +240,25 @@ public class VeilederGruppeTest extends AbstractTest {
                 emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(),
                 emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(),
                 emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList());
+    }
+
+    private String buildAktiveFilterValgJson(List<String> veiledersList) {
+        Map<String, Object> aktiveFilterValg = new LinkedHashMap<>();
+        aktiveFilterValg.put("veiledere", veiledersList);
+        aktiveFilterValg.put("unik", new Random().nextInt(Integer.MAX_VALUE));
+        return JsonUtils.toJson(aktiveFilterValg);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> hentVeiledereFraAktiveFilterValg(String aktiveFilterValgJson) {
+        if (aktiveFilterValgJson == null || aktiveFilterValgJson.isEmpty()) {
+            return List.of();
+        }
+        Map<String, Object> parsed = JsonUtils.fromJson(aktiveFilterValgJson, Map.class);
+        Object veiledere = parsed.get("veiledere");
+        if (veiledere instanceof List) {
+            return (List<String>) veiledere;
+        }
+        return List.of();
     }
 }
