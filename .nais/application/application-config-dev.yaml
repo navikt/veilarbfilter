@@ -51,8 +51,6 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: veilarbportefoljeflatefs
-          namespace: obo
         - application: veilarbpersonflate
           namespace: poao
         - application: azure-token-generator
@@ -61,8 +59,6 @@ spec:
       rules:
         - application: poao-tilgang
           namespace: poao
-        - application: veilarbveileder
-          namespace: obo
         - application: logging
           namespace: nais-system
       external:
@@ -80,7 +76,5 @@ spec:
       value: http://poao-tilgang.poao
     - name: POAO_TILGANG_SCOPE
       value: api://dev-gcp.poao.poao-tilgang/.default
-    - name: VEILARBVEILEDER_URL
-      value: http://veilarbveileder.obo
   envFrom:
     - secret: veilarbfilter-unleash-api-token
