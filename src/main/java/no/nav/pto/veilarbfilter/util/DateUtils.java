@@ -14,7 +14,4 @@ public class DateUtils {
         return Timestamp.valueOf(dateTime.format(format));
     }
 
-    public static LocalDateTime fromTimestampToLocalDateTime(Timestamp timestamp) {
-        return timestamp.toLocalDateTime();
-    }
 }
