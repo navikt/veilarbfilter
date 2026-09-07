@@ -13,7 +13,6 @@ import no.nav.common.job.leader_election.LeaderElectionHttpClient;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
-import no.nav.common.utils.EnvironmentUtils;
 import no.nav.poao_tilgang.api.dto.response.TilgangsattributterResponse;
 import no.nav.poao_tilgang.client.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -87,13 +86,11 @@ public class ApplicationConfig {
 
     @Bean
     public DefaultUnleash defaultUnleash(EnvironmentProperties properties) {
-        String environment = EnvironmentUtils.isProduction().orElse(false) ? "production" : "development";
         UnleashConfig config = UnleashConfig.builder()
                 .appName(APPLICATION_NAME)
                 .instanceId(APPLICATION_NAME)
                 .unleashAPI(properties.getUnleashUrl())
                 .apiKey(properties.getUnleashApiToken())
-                .environment(environment)
                 .build();
 
         return new DefaultUnleash(config);
