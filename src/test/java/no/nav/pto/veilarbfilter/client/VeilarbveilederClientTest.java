@@ -3,7 +3,6 @@ package no.nav.pto.veilarbfilter.client;
 import com.sun.net.httpserver.HttpServer;
 import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient;
-import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningRequest;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningResponse;
 import org.junit.jupiter.api.AfterEach;
@@ -75,7 +74,7 @@ class VeilarbveilederClientTest {
     }
 
     @Test
-    void forwardsAllOperationsWithAnOnBehalfOfToken() {
+    void skal_sende_alle_kall_med_token_pa_vegne_av_brukeren() {
         var getResponse = client.hent();
         var postResponse = client.lagre(new OverblikkVisningRequest(List.of("CV")));
         var deleteResponse = client.slett();
