@@ -1,6 +1,7 @@
 package no.nav.pto.veilarbfilter.rest
 
 import io.getunleash.DefaultUnleash
+import io.getunleash.UnleashContext
 import no.nav.pto.veilarbfilter.auth.AuthUtils
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.FeatureToggle
@@ -12,13 +13,17 @@ import no.nav.pto.veilarbfilter.service.OverblikkVisningService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.doAnswer
+import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockStatic
+import org.mockito.Mockito.times
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
-import org.mockito.Mockito.doReturn
-import org.mockito.Mockito.`when`
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import java.util.*
@@ -31,7 +36,12 @@ class OverblikkVisningRoutingTest {
 
     @BeforeEach
     fun settOpp() {
-        `when`(funksjonsbryter.isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER))
+        `when`(
+            funksjonsbryter.isEnabled(
+                eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
+                any(UnleashContext::class.java)
+            )
+        )
             .thenReturn(true)
     }
 
@@ -43,25 +53,41 @@ class OverblikkVisningRoutingTest {
             .thenReturn(ResponseEntity.noContent().build())
         `when`(veilarbveilederKlient.slett()).thenReturn(ResponseEntity.noContent().build())
 
-        assertThat(kontroller.hentOverblikkvisningForInnloggetVeileder().body).isEqualTo(forventetSvar)
-        assertThat(
-            kontroller.lagreOverblikkvisningForInnloggetVeileder(
-                OverblikkVisningRequest(listOf("CV"))
-            ).statusCode
-        ).isEqualTo(HttpStatus.NO_CONTENT)
-        assertThat(kontroller.slettOverblikkvisningForInnloggetVeileder().statusCode)
-            .isEqualTo(HttpStatus.NO_CONTENT)
+        mockStatic(AuthUtils::class.java).use { autentisering ->
+            autentisering.`when`<VeilederId> { AuthUtils.getInnloggetVeilederIdent() }
+                .thenReturn(VeilederId.of("Z999999"))
 
-        verify(veilarbveilederKlient).hent()
-        verify(veilarbveilederKlient).lagre(OverblikkVisningRequest(listOf("CV")))
-        verify(veilarbveilederKlient).slett()
-        verifyNoInteractions(tjeneste)
+            assertThat(kontroller.hentOverblikkvisningForInnloggetVeileder().body)
+                .isEqualTo(forventetSvar)
+            assertThat(
+                kontroller.lagreOverblikkvisningForInnloggetVeileder(
+                    OverblikkVisningRequest(listOf("CV"))
+                ).statusCode
+            ).isEqualTo(HttpStatus.NO_CONTENT)
+            assertThat(kontroller.slettOverblikkvisningForInnloggetVeileder().statusCode)
+                .isEqualTo(HttpStatus.NO_CONTENT)
+
+            verify(veilarbveilederKlient).hent()
+            verify(veilarbveilederKlient).lagre(OverblikkVisningRequest(listOf("CV")))
+            verify(veilarbveilederKlient).slett()
+            val kontekster = ArgumentCaptor.forClass(UnleashContext::class.java)
+            verify(funksjonsbryter, times(3)).isEnabled(
+                eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
+                kontekster.capture()
+            )
+            assertThat(kontekster.allValues).allSatisfy {
+                assertThat(it.userId).hasValue("Z999999")
+            }
+            verifyNoInteractions(tjeneste)
+        }
     }
 
     @Test
     fun `skal gi like svar og opprett oppdater slett flyt med og uten funksjonsbryter`() {
-        doReturn(false).`when`(funksjonsbryter)
-            .isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER)
+        doReturn(false).`when`(funksjonsbryter).isEnabled(
+            eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
+            any(UnleashContext::class.java)
+        )
 
         var lokalVisning: List<String>? = null
         var visningIVeilarbveileder: List<String>? = null
@@ -109,8 +135,10 @@ class OverblikkVisningRoutingTest {
                 .thenReturn(VeilederId.of("Z999999"))
 
             val lokaleSvar = kjorOpprettOppdaterSlettFlyt()
-            doReturn(true).`when`(funksjonsbryter)
-                .isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER)
+            doReturn(true).`when`(funksjonsbryter).isEnabled(
+                eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
+                any(UnleashContext::class.java)
+            )
             val svarFraVeilarbveileder = kjorOpprettOppdaterSlettFlyt()
 
             assertThat(svarFraVeilarbveileder).isEqualTo(lokaleSvar)
@@ -121,6 +149,14 @@ class OverblikkVisningRoutingTest {
                 listOf("CV"),
                 emptyList<String>()
             )
+            val kontekster = ArgumentCaptor.forClass(UnleashContext::class.java)
+            verify(funksjonsbryter, times(14)).isEnabled(
+                eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
+                kontekster.capture()
+            )
+            assertThat(kontekster.allValues).allSatisfy {
+                assertThat(it.userId).hasValue("Z999999")
+            }
         }
     }
 

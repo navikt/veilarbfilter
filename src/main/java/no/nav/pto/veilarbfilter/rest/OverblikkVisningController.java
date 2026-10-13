@@ -3,6 +3,7 @@ package no.nav.pto.veilarbfilter.rest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.getunleash.DefaultUnleash;
+import io.getunleash.UnleashContext;
 import no.nav.pto.veilarbfilter.auth.AuthUtils;
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
 import no.nav.pto.veilarbfilter.config.FeatureToggle;
@@ -34,11 +35,10 @@ public class OverblikkVisningController {
 
     @PostMapping
     public ResponseEntity<Object> lagreOverblikkvisningForInnloggetVeileder(@RequestBody OverblikkVisningRequest overblikkVisningRequest) {
-        if (unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER)) {
+        VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
+        if (erFunksjonAktivertFor(veilederId)) {
             return veilarbveilederClient.lagre(overblikkVisningRequest);
         }
-
-        VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
 
         try {
             validerRequest(overblikkVisningRequest);
@@ -55,11 +55,10 @@ public class OverblikkVisningController {
 
     @GetMapping
     public ResponseEntity<OverblikkVisningResponse> hentOverblikkvisningForInnloggetVeileder() {
-        if (unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER)) {
+        VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
+        if (erFunksjonAktivertFor(veilederId)) {
             return veilarbveilederClient.hent();
         }
-
-        VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
 
         try {
             Optional<OverblikkVisning> visningsListe = overblikkVisningService.hentOverblikkVisning(veilederId);
@@ -74,11 +73,10 @@ public class OverblikkVisningController {
 
     @DeleteMapping
     public ResponseEntity<Object> slettOverblikkvisningForInnloggetVeileder() {
-        if (unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER)) {
+        VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
+        if (erFunksjonAktivertFor(veilederId)) {
             return veilarbveilederClient.slett();
         }
-
-        VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
 
         try {
             overblikkVisningService.slettOverblikkVisning(veilederId);
@@ -102,5 +100,12 @@ public class OverblikkVisningController {
         if (!alleValgteAlternativerErLovlige) {
             throw new IllegalArgumentException();
         }
+    }
+
+    private boolean erFunksjonAktivertFor(VeilederId veilederId) {
+        UnleashContext kontekst = UnleashContext.builder()
+                .userId(veilederId.getValue())
+                .build();
+        return unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER, kontekst);
     }
 }

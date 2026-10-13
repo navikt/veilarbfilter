@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import io.getunleash.DefaultUnleash;
+import io.getunleash.UnleashContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpStatus;
@@ -54,7 +55,7 @@ public class OverblikkVisningTest extends AbstractTest {
     public void resetDB() {
         db.update("TRUNCATE " + Table.OverblikkVisning.TABLE_NAME);
         reset(unleash, veilarbveilederClient);
-        when(unleash.isEnabled(any(String.class))).thenReturn(false);
+        when(unleash.isEnabled(any(String.class), any(UnleashContext.class))).thenReturn(false);
     }
 
     @Test
@@ -144,7 +145,7 @@ public class OverblikkVisningTest extends AbstractTest {
 
     @Test
     public void skal_rute_til_veilarbveileder_nar_feature_toggle_er_pa() {
-        when(unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER)).thenReturn(true);
+        when(unleash.isEnabled(any(String.class), any(UnleashContext.class))).thenReturn(true);
         when(veilarbveilederClient.hent())
                 .thenReturn(ResponseEntity.ok(new OverblikkVisningResponse(List.of("CV"))));
         when(veilarbveilederClient.lagre(any(OverblikkVisningRequest.class)))
