@@ -2,7 +2,10 @@ package no.nav.pto.veilarbfilter.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import io.getunleash.DefaultUnleash;
 import no.nav.pto.veilarbfilter.auth.AuthUtils;
+import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
+import no.nav.pto.veilarbfilter.config.FeatureToggle;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisning;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningAlternativer;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningRequest;
@@ -26,9 +29,15 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class OverblikkVisningController {
 
     private final OverblikkVisningService overblikkVisningService;
+    private final VeilarbveilederClient veilarbveilederClient;
+    private final DefaultUnleash unleash;
 
     @PostMapping
     public ResponseEntity<Object> lagreOverblikkvisningForInnloggetVeileder(@RequestBody OverblikkVisningRequest overblikkVisningRequest) {
+        if (unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER)) {
+            return veilarbveilederClient.lagre(overblikkVisningRequest);
+        }
+
         VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
 
         try {
@@ -46,6 +55,10 @@ public class OverblikkVisningController {
 
     @GetMapping
     public ResponseEntity<OverblikkVisningResponse> hentOverblikkvisningForInnloggetVeileder() {
+        if (unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER)) {
+            return veilarbveilederClient.hent();
+        }
+
         VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
 
         try {
@@ -61,6 +74,10 @@ public class OverblikkVisningController {
 
     @DeleteMapping
     public ResponseEntity<Object> slettOverblikkvisningForInnloggetVeileder() {
+        if (unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER)) {
+            return veilarbveilederClient.slett();
+        }
+
         VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
 
         try {

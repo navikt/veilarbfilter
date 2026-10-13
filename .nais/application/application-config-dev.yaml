@@ -61,6 +61,8 @@ spec:
           namespace: poao
         - application: logging
           namespace: nais-system
+        - application: veilarbveileder
+          namespace: obo
       external:
         - host: obo-unleash-api.nav.cloud.nais.io
   resources:
@@ -76,5 +78,7 @@ spec:
       value: http://poao-tilgang.poao
     - name: POAO_TILGANG_SCOPE
       value: api://dev-gcp.poao.poao-tilgang/.default
+    - name: VEILARBVEILEDER_SCOPE
+      value: api://dev-gcp.obo.veilarbveileder/.default
   envFrom:
     - secret: veilarbfilter-unleash-api-token

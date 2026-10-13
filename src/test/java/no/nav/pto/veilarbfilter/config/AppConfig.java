@@ -8,6 +8,7 @@ import no.nav.common.json.DateModule;
 import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.PoaoTilgangClient;
 import no.nav.poao_tilgang.client.api.ApiResult;
+import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
 import no.nav.pto.veilarbfilter.repository.OverblikkVisningRepository;
 import no.nav.pto.veilarbfilter.rest.OverblikkVisningController;
 import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
@@ -56,9 +57,14 @@ public class AppConfig {
     @Bean
     public DefaultUnleash defaultUnleash() {
         final DefaultUnleash mock = mock(DefaultUnleash.class);
-        when(mock.isEnabled(anyString())).thenReturn(true);
+        when(mock.isEnabled(anyString())).thenReturn(false);
 
         return mock;
+    }
+
+    @Bean
+    public VeilarbveilederClient veilarbveilederClient() {
+        return mock(VeilarbveilederClient.class);
     }
 
     @Bean

@@ -13,8 +13,10 @@ import no.nav.common.job.leader_election.LeaderElectionHttpClient;
 import no.nav.common.rest.client.RestClient;
 import no.nav.common.token_client.builder.AzureAdTokenClientBuilder;
 import no.nav.common.token_client.client.AzureAdMachineToMachineTokenClient;
+import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient;
 import no.nav.poao_tilgang.api.dto.response.TilgangsattributterResponse;
 import no.nav.poao_tilgang.client.*;
+import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,6 +64,28 @@ public class ApplicationConfig {
         return AzureAdTokenClientBuilder.builder()
                 .withNaisDefaults()
                 .buildMachineToMachineTokenClient();
+    }
+
+    @Bean
+    public AzureAdOnBehalfOfTokenClient azureAdOnBehalfOfTokenClient() {
+        return AzureAdTokenClientBuilder.builder()
+                .withNaisDefaults()
+                .buildOnBehalfOfTokenClient();
+    }
+
+    @Bean
+    public VeilarbveilederClient veilarbveilederClient(
+            EnvironmentProperties properties,
+            AzureAdOnBehalfOfTokenClient tokenClient,
+            AuthContextHolder authContextHolder,
+            org.springframework.web.client.RestClient.Builder restClientBuilder
+    ) {
+        return new VeilarbveilederClient(
+                restClientBuilder.baseUrl(properties.getVeilarbveilederUrl()).build(),
+                properties.getVeilarbveilederScope(),
+                tokenClient,
+                authContextHolder
+        );
     }
 
     @Bean
