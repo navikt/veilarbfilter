@@ -2,13 +2,19 @@ package no.nav.pto.veilarbfilter.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import io.getunleash.DefaultUnleash;
+import io.getunleash.UnleashContext;
 import no.nav.pto.veilarbfilter.auth.AuthUtils;
+import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
+import no.nav.pto.veilarbfilter.config.FeatureToggle;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisning;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningAlternativer;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningRequest;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningResponse;
 import no.nav.pto.veilarbfilter.domene.value.VeilederId;
 import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +32,18 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class OverblikkVisningController {
 
     private final OverblikkVisningService overblikkVisningService;
+    private final VeilarbveilederClient veilarbveilederClient;
+    private final DefaultUnleash unleash;
 
     @PostMapping
     public ResponseEntity<Object> lagreOverblikkvisningForInnloggetVeileder(@RequestBody OverblikkVisningRequest overblikkVisningRequest) {
         VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
+        if (unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_SKRIVESPERRE)) {
+            return skrivesperretRespons();
+        }
+        if (erFunksjonAktivertFor(veilederId)) {
+            return veilarbveilederClient.lagre(overblikkVisningRequest);
+        }
 
         try {
             validerRequest(overblikkVisningRequest);
@@ -47,6 +61,9 @@ public class OverblikkVisningController {
     @GetMapping
     public ResponseEntity<OverblikkVisningResponse> hentOverblikkvisningForInnloggetVeileder() {
         VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
+        if (erFunksjonAktivertFor(veilederId)) {
+            return veilarbveilederClient.hent();
+        }
 
         try {
             Optional<OverblikkVisning> visningsListe = overblikkVisningService.hentOverblikkVisning(veilederId);
@@ -62,6 +79,12 @@ public class OverblikkVisningController {
     @DeleteMapping
     public ResponseEntity<Object> slettOverblikkvisningForInnloggetVeileder() {
         VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
+        if (unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_SKRIVESPERRE)) {
+            return skrivesperretRespons();
+        }
+        if (erFunksjonAktivertFor(veilederId)) {
+            return veilarbveilederClient.slett();
+        }
 
         try {
             overblikkVisningService.slettOverblikkVisning(veilederId);
@@ -70,6 +93,17 @@ public class OverblikkVisningController {
             secureLog.error(String.format("Klarte ikke å slette overblikk visning for veilederId: %s", veilederId), e);
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    private ResponseEntity<Object> skrivesperretRespons() {
+        log.warn("Skrivekall for overblikkvisning avvist fordi skrivesperren er aktiv.");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Lagring, oppdatering og sletting av overblikkvisning er midlertidig sperret under datamigrering."
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .body(problem);
     }
 
     private void validerRequest(OverblikkVisningRequest overblikkVisningRequest) {
@@ -85,5 +119,12 @@ public class OverblikkVisningController {
         if (!alleValgteAlternativerErLovlige) {
             throw new IllegalArgumentException();
         }
+    }
+
+    private boolean erFunksjonAktivertFor(VeilederId veilederId) {
+        UnleashContext kontekst = UnleashContext.builder()
+                .userId(veilederId.getValue())
+                .build();
+        return unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER, kontekst);
     }
 }

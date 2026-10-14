@@ -2,27 +2,38 @@ package no.nav.pto.veilarbfilter.rest;
 
 import no.nav.common.json.JsonUtils;
 import no.nav.pto.veilarbfilter.AbstractTest;
+import no.nav.pto.veilarbfilter.client.VeilarbveilederClient;
+import no.nav.pto.veilarbfilter.config.FeatureToggle;
 import no.nav.pto.veilarbfilter.database.Table;
+import no.nav.pto.veilarbfilter.domene.OverblikkVisningRequest;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import io.getunleash.DefaultUnleash;
+import io.getunleash.UnleashContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @WebMvcTest(controllers = OverblikkVisningController.class)
 @ActiveProfiles({"test"})
@@ -35,9 +46,17 @@ public class OverblikkVisningTest extends AbstractTest {
     @Autowired
     private JdbcTemplate db;
 
+    @Autowired
+    private DefaultUnleash unleash;
+
+    @MockitoBean
+    private VeilarbveilederClient veilarbveilederClient;
+
     @BeforeEach
     public void resetDB() {
         db.update("TRUNCATE " + Table.OverblikkVisning.TABLE_NAME);
+        reset(unleash, veilarbveilederClient);
+        when(unleash.isEnabled(any(String.class), any(UnleashContext.class))).thenReturn(false);
     }
 
     @Test
@@ -123,6 +142,26 @@ public class OverblikkVisningTest extends AbstractTest {
         var lagreVisningRespons = lagreOverblikkVisning(overblikkVisningJson);
 
         assertThat(lagreVisningRespons.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void skal_rute_til_veilarbveileder_nar_feature_toggle_er_pa() {
+        when(unleash.isEnabled(any(String.class), any(UnleashContext.class))).thenReturn(true);
+        when(veilarbveilederClient.hent())
+                .thenReturn(ResponseEntity.ok(new OverblikkVisningResponse(List.of("CV"))));
+        when(veilarbveilederClient.lagre(any(OverblikkVisningRequest.class)))
+                .thenReturn(ResponseEntity.noContent().build());
+        when(veilarbveilederClient.slett())
+                .thenReturn(ResponseEntity.noContent().build());
+
+        assertThat(hentOverblikkVisning().getContent().overblikkVisning()).containsExactly("CV");
+        assertThat(lagreOverblikkVisning("{\"overblikkVisning\":[\"CV\"]}").getStatus())
+                .isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(slettVisningTest().getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        verify(veilarbveilederClient).hent();
+        verify(veilarbveilederClient).lagre(any(OverblikkVisningRequest.class));
+        verify(veilarbveilederClient).slett();
     }
 
     private ApiResponse<OverblikkVisningResponse> hentOverblikkVisning() {
