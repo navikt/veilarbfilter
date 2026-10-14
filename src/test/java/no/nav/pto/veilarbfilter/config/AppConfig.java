@@ -5,6 +5,7 @@ import no.nav.common.auth.context.AuthContextHolder;
 import no.nav.common.auth.context.AuthContextHolderThreadLocal;
 import no.nav.common.job.leader_election.LeaderElectionClient;
 import no.nav.common.json.DateModule;
+import no.nav.common.token_client.client.AzureAdOnBehalfOfTokenClient;
 import no.nav.poao_tilgang.client.Decision;
 import no.nav.poao_tilgang.client.PoaoTilgangClient;
 import no.nav.poao_tilgang.client.api.ApiResult;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.RestClient;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.cfg.DateTimeFeature;
@@ -63,8 +65,22 @@ public class AppConfig {
     }
 
     @Bean
-    public VeilarbveilederClient veilarbveilederClient() {
-        return mock(VeilarbveilederClient.class);
+    public AzureAdOnBehalfOfTokenClient azureAdOnBehalfOfTokenClient() {
+        return mock(AzureAdOnBehalfOfTokenClient.class);
+    }
+
+    @Bean
+    public VeilarbveilederClient veilarbveilederClient(
+            RestClient.Builder restClientBuilder,
+            AzureAdOnBehalfOfTokenClient tokenClient,
+            AuthContextHolder authContextHolder
+    ) {
+        return new VeilarbveilederClient(
+                restClientBuilder.baseUrl("http://localhost").build(),
+                "test-scope",
+                tokenClient,
+                authContextHolder
+        );
     }
 
     @Bean
