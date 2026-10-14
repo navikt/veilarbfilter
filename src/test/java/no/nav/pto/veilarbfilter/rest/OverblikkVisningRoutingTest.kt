@@ -13,6 +13,8 @@ import no.nav.pto.veilarbfilter.service.OverblikkVisningService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
@@ -24,7 +26,15 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.util.*
 
 class OverblikkVisningRoutingTest : AbstractTest() {
@@ -146,6 +156,66 @@ class OverblikkVisningRoutingTest : AbstractTest() {
         )
         assertThat(kontekster.allValues).allSatisfy {
             assertThat(it.userId).hasValue("Z999999")
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [false, true])
+    fun `skal sperre lagring oppdatering og sletting under migrering`(rutingAktivert: Boolean) {
+        `when`(funksjonsbryter.isEnabled(FeatureToggle.OVERBLIKK_VISNING_SKRIVESPERRE))
+            .thenReturn(true)
+        doReturn(rutingAktivert).`when`(funksjonsbryter).isEnabled(
+            eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
+            any(UnleashContext::class.java)
+        )
+        val mvc = MockMvcBuilders.standaloneSetup(kontroller).build()
+        val foresporsler = listOf(
+            post("/api/overblikkvisning").content("""{"overblikkVisning":["CV","Personalia"]}"""),
+            post("/api/overblikkvisning").content("""{"overblikkVisning":["CV"]}"""),
+            delete("/api/overblikkvisning")
+        )
+
+        foresporsler.forEach {
+            mvc.perform(it.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isServiceUnavailable)
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(503))
+                .andExpect(jsonPath("$.detail").value(
+                    "Lagring, oppdatering og sletting av overblikkvisning er midlertidig sperret under datamigrering."
+                ))
+        }
+
+        verifyNoInteractions(tjeneste, veilarbveilederKlient)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [false, true])
+    fun `skal tillate lesing mens skrivesperren er aktiv`(rutingAktivert: Boolean) {
+        `when`(funksjonsbryter.isEnabled(FeatureToggle.OVERBLIKK_VISNING_SKRIVESPERRE))
+            .thenReturn(true)
+        doReturn(rutingAktivert).`when`(funksjonsbryter).isEnabled(
+            eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
+            any(UnleashContext::class.java)
+        )
+        if (rutingAktivert) {
+            `when`(veilarbveilederKlient.hent())
+                .thenReturn(ResponseEntity.ok(OverblikkVisningResponse(listOf("CV"))))
+        } else {
+            `when`(tjeneste.hentOverblikkVisning(VeilederId.of("Z999999")))
+                .thenReturn(Optional.of(OverblikkVisning(UUID.randomUUID(), listOf("CV"))))
+        }
+
+        MockMvcBuilders.standaloneSetup(kontroller).build()
+            .perform(get("/api/overblikkvisning").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.overblikkVisning[0]").value("CV"))
+
+        if (rutingAktivert) {
+            verify(veilarbveilederKlient).hent()
+            verifyNoInteractions(tjeneste)
+        } else {
+            verify(tjeneste).hentOverblikkVisning(VeilederId.of("Z999999"))
+            verifyNoInteractions(veilarbveilederKlient)
         }
     }
 

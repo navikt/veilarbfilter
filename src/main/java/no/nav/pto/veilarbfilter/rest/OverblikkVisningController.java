@@ -13,6 +13,8 @@ import no.nav.pto.veilarbfilter.domene.OverblikkVisningRequest;
 import no.nav.pto.veilarbfilter.domene.OverblikkVisningResponse;
 import no.nav.pto.veilarbfilter.domene.value.VeilederId;
 import no.nav.pto.veilarbfilter.service.OverblikkVisningService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +38,9 @@ public class OverblikkVisningController {
     @PostMapping
     public ResponseEntity<Object> lagreOverblikkvisningForInnloggetVeileder(@RequestBody OverblikkVisningRequest overblikkVisningRequest) {
         VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
+        if (unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_SKRIVESPERRE)) {
+            return skrivesperretRespons();
+        }
         if (erFunksjonAktivertFor(veilederId)) {
             return veilarbveilederClient.lagre(overblikkVisningRequest);
         }
@@ -74,6 +79,9 @@ public class OverblikkVisningController {
     @DeleteMapping
     public ResponseEntity<Object> slettOverblikkvisningForInnloggetVeileder() {
         VeilederId veilederId = AuthUtils.getInnloggetVeilederIdent();
+        if (unleash.isEnabled(FeatureToggle.OVERBLIKK_VISNING_SKRIVESPERRE)) {
+            return skrivesperretRespons();
+        }
         if (erFunksjonAktivertFor(veilederId)) {
             return veilarbveilederClient.slett();
         }
@@ -85,6 +93,17 @@ public class OverblikkVisningController {
             secureLog.error(String.format("Klarte ikke å slette overblikk visning for veilederId: %s", veilederId), e);
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    private ResponseEntity<Object> skrivesperretRespons() {
+        log.warn("Skrivekall for overblikkvisning avvist fordi skrivesperren er aktiv.");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Lagring, oppdatering og sletting av overblikkvisning er midlertidig sperret under datamigrering."
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .body(problem);
     }
 
     private void validerRequest(OverblikkVisningRequest overblikkVisningRequest) {

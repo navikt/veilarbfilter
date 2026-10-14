@@ -47,3 +47,16 @@ select valgte_filter from filter WHERE (valgte_filter::jsonb ->> 'ytelse') = 'AA
 ```
 
 Om alt ser riktig ut, avslutt transaksjonen med å kjøre `commit`. 
+
+## Skrivesperre ved migrering av overblikkvisning
+
+Aktiver Unleash-bryteren `veilarbfilter.overblikkvisning_skrivesperre` for alle brukere
+før data migreres til veilarbveileder. Bryteren skal bruke en global strategi uten
+brukeravgrensning. Når den er aktiv, returnerer `POST` (lagring og oppdatering) og
+`DELETE` på `/api/overblikkvisning` HTTP 503 med en feilmelding. Dette gjelder også
+kall som ellers ville blitt sendt videre til veilarbveileder. `GET` fungerer som før.
+
+Vent til bryteren er oppdatert i alle podder og pågående skrivekall er ferdige før
+migreringen starter. Sperren stopper nye kall, ikke kall som allerede har passert
+sjekken. Deaktiver bryteren etter migreringen for å åpne for skriving igjen.
+Når bryteren er av eller ikke finnes, er oppførselen uendret.
