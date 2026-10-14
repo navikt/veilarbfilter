@@ -2,7 +2,7 @@ package no.nav.pto.veilarbfilter.rest
 
 import io.getunleash.DefaultUnleash
 import io.getunleash.UnleashContext
-import no.nav.pto.veilarbfilter.auth.AuthUtils
+import no.nav.pto.veilarbfilter.AbstractTest
 import no.nav.pto.veilarbfilter.client.VeilarbveilederClient
 import no.nav.pto.veilarbfilter.config.FeatureToggle
 import no.nav.pto.veilarbfilter.domene.OverblikkVisning
@@ -19,7 +19,6 @@ import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.mockStatic
 import org.mockito.Mockito.times
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
@@ -28,7 +27,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import java.util.*
 
-class OverblikkVisningRoutingTest {
+class OverblikkVisningRoutingTest : AbstractTest() {
     private val tjeneste = mock(OverblikkVisningService::class.java)
     private val veilarbveilederKlient = mock(VeilarbveilederClient::class.java)
     private val funksjonsbryter = mock(DefaultUnleash::class.java)
@@ -53,33 +52,28 @@ class OverblikkVisningRoutingTest {
             .thenReturn(ResponseEntity.noContent().build())
         `when`(veilarbveilederKlient.slett()).thenReturn(ResponseEntity.noContent().build())
 
-        mockStatic(AuthUtils::class.java).use { autentisering ->
-            autentisering.`when`<VeilederId> { AuthUtils.getInnloggetVeilederIdent() }
-                .thenReturn(VeilederId.of("Z999999"))
+        assertThat(kontroller.hentOverblikkvisningForInnloggetVeileder().body)
+            .isEqualTo(forventetSvar)
+        assertThat(
+            kontroller.lagreOverblikkvisningForInnloggetVeileder(
+                OverblikkVisningRequest(listOf("CV"))
+            ).statusCode
+        ).isEqualTo(HttpStatus.NO_CONTENT)
+        assertThat(kontroller.slettOverblikkvisningForInnloggetVeileder().statusCode)
+            .isEqualTo(HttpStatus.NO_CONTENT)
 
-            assertThat(kontroller.hentOverblikkvisningForInnloggetVeileder().body)
-                .isEqualTo(forventetSvar)
-            assertThat(
-                kontroller.lagreOverblikkvisningForInnloggetVeileder(
-                    OverblikkVisningRequest(listOf("CV"))
-                ).statusCode
-            ).isEqualTo(HttpStatus.NO_CONTENT)
-            assertThat(kontroller.slettOverblikkvisningForInnloggetVeileder().statusCode)
-                .isEqualTo(HttpStatus.NO_CONTENT)
-
-            verify(veilarbveilederKlient).hent()
-            verify(veilarbveilederKlient).lagre(OverblikkVisningRequest(listOf("CV")))
-            verify(veilarbveilederKlient).slett()
-            val kontekster = ArgumentCaptor.forClass(UnleashContext::class.java)
-            verify(funksjonsbryter, times(3)).isEnabled(
-                eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
-                kontekster.capture()
-            )
-            assertThat(kontekster.allValues).allSatisfy {
-                assertThat(it.userId).hasValue("Z999999")
-            }
-            verifyNoInteractions(tjeneste)
+        verify(veilarbveilederKlient).hent()
+        verify(veilarbveilederKlient).lagre(OverblikkVisningRequest(listOf("CV")))
+        verify(veilarbveilederKlient).slett()
+        val kontekster = ArgumentCaptor.forClass(UnleashContext::class.java)
+        verify(funksjonsbryter, times(3)).isEnabled(
+            eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
+            kontekster.capture()
+        )
+        assertThat(kontekster.allValues).allSatisfy {
+            assertThat(it.userId).hasValue("Z999999")
         }
+        verifyNoInteractions(tjeneste)
     }
 
     @Test
@@ -130,33 +124,28 @@ class OverblikkVisningRoutingTest {
             ResponseEntity.noContent().build<Any>()
         }
 
-        mockStatic(AuthUtils::class.java).use { autentisering ->
-            autentisering.`when`<VeilederId> { AuthUtils.getInnloggetVeilederIdent() }
-                .thenReturn(VeilederId.of("Z999999"))
+        val lokaleSvar = kjorOpprettOppdaterSlettFlyt()
+        doReturn(true).`when`(funksjonsbryter).isEnabled(
+            eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
+            any(UnleashContext::class.java)
+        )
+        val svarFraVeilarbveileder = kjorOpprettOppdaterSlettFlyt()
 
-            val lokaleSvar = kjorOpprettOppdaterSlettFlyt()
-            doReturn(true).`when`(funksjonsbryter).isEnabled(
-                eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
-                any(UnleashContext::class.java)
-            )
-            val svarFraVeilarbveileder = kjorOpprettOppdaterSlettFlyt()
-
-            assertThat(svarFraVeilarbveileder).isEqualTo(lokaleSvar)
-            assertThat(lokaleSvar.statuskoder).containsExactly(200, 204, 200, 204, 200, 204, 200)
-            assertThat(lokaleSvar.visninger).containsExactly(
-                emptyList<String>(),
-                listOf("CV", "Personalia"),
-                listOf("CV"),
-                emptyList<String>()
-            )
-            val kontekster = ArgumentCaptor.forClass(UnleashContext::class.java)
-            verify(funksjonsbryter, times(14)).isEnabled(
-                eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
-                kontekster.capture()
-            )
-            assertThat(kontekster.allValues).allSatisfy {
-                assertThat(it.userId).hasValue("Z999999")
-            }
+        assertThat(svarFraVeilarbveileder).isEqualTo(lokaleSvar)
+        assertThat(lokaleSvar.statuskoder).containsExactly(200, 204, 200, 204, 200, 204, 200)
+        assertThat(lokaleSvar.visninger).containsExactly(
+            emptyList<String>(),
+            listOf("CV", "Personalia"),
+            listOf("CV"),
+            emptyList<String>()
+        )
+        val kontekster = ArgumentCaptor.forClass(UnleashContext::class.java)
+        verify(funksjonsbryter, times(14)).isEnabled(
+            eq(FeatureToggle.OVERBLIKK_VISNING_I_VEILARBVEILEDER),
+            kontekster.capture()
+        )
+        assertThat(kontekster.allValues).allSatisfy {
+            assertThat(it.userId).hasValue("Z999999")
         }
     }
 
